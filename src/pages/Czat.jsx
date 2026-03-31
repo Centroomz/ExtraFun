@@ -7,13 +7,13 @@ const XENIA_AVATAR = '🤖'
 const XENIA_NAME = 'Xenia – AI Asystentka'
 
 const XENIA_RESPONSES = [
-  "Cześć! Jestem Xenia, Twoja AI asystentka na MoreFun. Mogę pomóc Ci zrozumieć terminy CNM, znaleźć miejsca lub odpowiedzieć na pytania o społeczność. O czym chcesz porozmawiać? 💙",
+  "Cześć! Jestem Xenia, Twoja AI asystentka na ExtraFun. Mogę pomóc Ci zrozumieć terminy CNM, znaleźć miejsca lub odpowiedzieć na pytania o społeczność. O czym chcesz porozmawiać? 💙",
   "To świetne pytanie! W świecie CNM kluczowa jest komunikacja i wzajemna zgoda. Czy chcesz wiedzieć więcej o konkretnym aspekcie?",
   "Rozumiem Twoje wątpliwości. Każda droga jest inna – nie ma jednego 'właściwego' sposobu na relacje. Najważniejsze to autentyczność i szacunek.",
   "Compersion to piękne uczucie, prawda? 💜 To umiejętność, którą można rozwijać. Zacznij od małych kroków i daj sobie czas.",
   "Polecam zajrzeć do sekcji Magazyn – mamy tam artykuły na ten temat! A jeśli masz pytanie do społeczności, Forum jest świetnym miejscem.",
   "Bezpieczeństwo jest zawsze priorytetem. Warto pamiętać o zasadzie SSC: Safe, Sane, Consensual.",
-  "Nie jesteś sam/a! Społeczność MoreFun jest tutaj, żeby się wspierać. Spróbuj zapoznać się na Forum – ludzie są naprawdę życzliwi.",
+  "Nie jesteś sam/a! Społeczność ExtraFun jest tutaj, żeby się wspierać. Spróbuj zapoznać się na Forum – ludzie są naprawdę życzliwi.",
   "To normalne czuć mieszane emocje na początku. NRE – New Relationship Energy – może być przytłaczające. Daj sobie czas.",
   "Świetnie, że pytasz! Edukacja to klucz. Polecam zacząć od sekcji 'CNM 101' w Magazynie.",
 ]

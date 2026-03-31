@@ -25,7 +25,7 @@ export function LoginPage({ onSwitch, onSuccess }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div className="auth-logo">MoreFun</div>
+        <div className="auth-logo">ExtraFun</div>
         <div className="auth-tagline">Witaj z powrotem! 💙</div>
         {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>

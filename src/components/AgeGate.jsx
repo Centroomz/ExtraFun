@@ -5,7 +5,7 @@ export function AgeGate({ onConfirm }) {
         <span className="age-gate-emoji">🔞</span>
         <h2 className="age-gate-title">Poczekaj chwilę.</h2>
         <p className="age-gate-desc">
-          MoreFun to platforma dla dorosłych, poruszająca tematy związane z relacjami i seksualnością.
+          ExtraFun to platforma dla dorosłych, poruszająca tematy związane z relacjami i seksualnością.
           Wchodząc potwierdzasz, że masz ukończone 18 lat i akceptujesz nasz regulamin.
         </p>
         <button

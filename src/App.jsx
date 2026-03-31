@@ -53,13 +53,13 @@ function ProfilePage({ user, profile, onSignOut }) {
 function AppInner() {
   const { user, profile, loading, signOut } = useAuth()
   const [ageConfirmed, setAgeConfirmed] = useState(() => {
-    try { return localStorage.getItem('mf_age') === '1' } catch { return false }
+    try { return localStorage.getItem('ef_age') === '1' } catch { return false }
   })
   const [activePage, setActivePage] = useState('magazyn')
   const [authMode, setAuthMode] = useState(null) // null | 'login' | 'signup'
 
   const handleAgeConfirm = () => {
-    try { localStorage.setItem('mf_age', '1') } catch {}
+    try { localStorage.setItem('ef_age', '1') } catch {}
     setAgeConfirmed(true)
   }
 
@@ -79,7 +79,7 @@ function AppInner() {
   if (loading) {
     return (
       <div className="loading-screen">
-        <div className="loading-logo">MoreFun</div>
+        <div className="loading-logo">ExtraFun</div>
         <div className="spinner" />
       </div>
     )

@@ -46,7 +46,7 @@ export function SignupPage({ onSwitch, onSuccess }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <div className="auth-logo">MoreFun</div>
+        <div className="auth-logo">ExtraFun</div>
         <div className="auth-tagline">Dołącz do społeczności 🌈</div>
         {error && <div className="form-error">{error}</div>}
         <form onSubmit={handleSubmit}>
