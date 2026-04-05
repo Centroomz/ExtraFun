@@ -158,10 +158,13 @@ function VenueDetail({ venue, onBack }) {
 }
 
 export function Przewodnik() {
+  const [view, setView] = useState('venues') // 'venues' | 'events'
   const [venues, setVenues] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeType, setActiveType] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [allEvents, setAllEvents] = useState([])
+  const [eventsLoading, setEventsLoading] = useState(false)
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
 
   useEffect(() => {
@@ -169,14 +172,15 @@ export function Przewodnik() {
     requestLocation()
   }, [])
 
+  useEffect(() => {
+    if (view === 'events' && allEvents.length === 0) loadEvents()
+  }, [view])
+
   async function loadVenues() {
     try {
       const { data, error } = await supabase.from('swingers_venues').select('*').order('name', { ascending: true })
-      if (error || !data || data.length === 0) {
-        setVenues(DEMO_VENUES)
-      } else {
-        setVenues(data)
-      }
+      if (error || !data || data.length === 0) setVenues(DEMO_VENUES)
+      else setVenues(data)
     } catch {
       setVenues(DEMO_VENUES)
     } finally {
@@ -184,18 +188,33 @@ export function Przewodnik() {
     }
   }
 
-  const displayVenues = location
-    ? sortByDistance(venues, location.lat, location.lng)
-    : venues
+  async function loadEvents() {
+    setEventsLoading(true)
+    try {
+      const today = new Date().toISOString().split('T')[0]
+      const { data } = await supabase
+        .from('venue_events')
+        .select('*, swingers_venues(name, city, type)')
+        .gte('event_date', today)
+        .order('event_date', { ascending: true })
+        .limit(60)
+      setAllEvents(data || [])
+    } finally {
+      setEventsLoading(false)
+    }
+  }
 
-  const filtered = activeType === 'all'
-    ? displayVenues
-    : displayVenues.filter(v => v.type === activeType)
+  const displayVenues = location ? sortByDistance(venues, location.lat, location.lng) : venues
+  const filtered = activeType === 'all' ? displayVenues : displayVenues.filter(v => v.type === activeType)
+  const types = [{ id: 'all', label: 'Wszystkie' }, ...Object.entries(TYPE_CONFIG).map(([id, cfg]) => ({ id, label: cfg.label }))]
 
-  const types = [
-    { id: 'all', label: 'Wszystkie' },
-    ...Object.entries(TYPE_CONFIG).map(([id, cfg]) => ({ id, label: cfg.label }))
-  ]
+  // Group events by date
+  const eventsByDate = allEvents.reduce((acc, ev) => {
+    const key = ev.event_date
+    if (!acc[key]) acc[key] = []
+    acc[key].push(ev)
+    return acc
+  }, {})
 
   if (selected) {
     const v = displayVenues.find(v => v.id === selected)
@@ -208,31 +227,85 @@ export function Przewodnik() {
         <PageTitle section="Miejsca" />
       </div>
 
-      {/* Location bar */}
-      <div className="location-bar">
-        <span className="location-bar-icon">📡</span>
-        <span className="location-bar-text">
-          {geoLoading ? 'Szukam lokalizacji...' :
-           location ? <><strong>Lokalizacja aktywna</strong> – odległości od Ciebie</> :
-           geoError ? 'Lokalizacja niedostępna' : 'Włącz lokalizację'}
-        </span>
-        {!location && !geoLoading && (
-          <button className="location-bar-btn" onClick={requestLocation}>Włącz GPS</button>
-        )}
+      {/* View toggle */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+        <button
+          className={`category-chip ${view === 'venues' ? 'active' : ''}`}
+          onClick={() => setView('venues')}
+        >🏠 Lokale</button>
+        <button
+          className={`category-chip ${view === 'events' ? 'active' : ''}`}
+          onClick={() => setView('events')}
+        >📅 Imprezy</button>
       </div>
 
-      {/* Type filter */}
-      <div className="category-filter">
-        {types.map(({ id, label }) => (
-          <button
-            key={id}
-            className={`category-chip ${activeType === id ? 'active' : ''}`}
-            onClick={() => setActiveType(id)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {view === 'events' ? (
+        eventsLoading ? (
+          <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
+        ) : Object.keys(eventsByDate).length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">📅</div>
+            <div className="empty-title">Brak nadchodzących imprez</div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 80 }}>
+            {Object.entries(eventsByDate).map(([date, evs]) => (
+              <div key={date}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-dim)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '.06em' }}>
+                  {new Date(date).toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {evs.map(ev => (
+                    <div
+                      key={ev.id}
+                      className="glass-card"
+                      style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, cursor: ev.swingers_venues ? 'pointer' : 'default' }}
+                      onClick={() => ev.swingers_venues && setSelected(venues.find(v => v.name === ev.swingers_venues.name)?.id)}
+                    >
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: 14 }}>{ev.event_name}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 3 }}>
+                          {ev.swingers_venues?.name} · {ev.start_time}{ev.end_time && `–${ev.end_time}`}
+                        </div>
+                        {ev.description && (
+                          <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>{ev.description}</div>
+                        )}
+                      </div>
+                      {ev.price && <span style={{ fontSize: 13, fontWeight: 700, color: '#00E5FF', whiteSpace: 'nowrap' }}>{ev.price}</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : (
+        <>
+          {/* Location bar */}
+          <div className="location-bar">
+            <span className="location-bar-icon">📡</span>
+            <span className="location-bar-text">
+              {geoLoading ? 'Szukam lokalizacji...' :
+               location ? <><strong>Lokalizacja aktywna</strong> – odległości od Ciebie</> :
+               geoError ? 'Lokalizacja niedostępna' : 'Włącz lokalizację'}
+            </span>
+            {!location && !geoLoading && (
+              <button className="location-bar-btn" onClick={requestLocation}>Włącz GPS</button>
+            )}
+          </div>
+
+          {/* Type filter */}
+          <div className="category-filter">
+            {types.map(({ id, label }) => (
+              <button
+                key={id}
+                className={`category-chip ${activeType === id ? 'active' : ''}`}
+                onClick={() => setActiveType(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
       {loading ? (
         <div className="empty-state">
@@ -271,6 +344,8 @@ export function Przewodnik() {
             )
           })}
         </div>
+      )}
+        </>
       )}
     </div>
   )
