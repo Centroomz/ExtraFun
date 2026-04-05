@@ -71,6 +71,19 @@ const TYPE_CONFIG = {
 
 function VenueDetail({ venue, onBack }) {
   const t = TYPE_CONFIG[venue.type] || TYPE_CONFIG.club
+  const [events, setEvents] = useState([])
+
+  useEffect(() => {
+    supabase
+      .from('venue_events')
+      .select('*')
+      .eq('venue_id', venue.id)
+      .gte('event_date', new Date().toISOString().split('T')[0])
+      .order('event_date', { ascending: true })
+      .limit(10)
+      .then(({ data }) => setEvents(data || []))
+  }, [venue.id])
+
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -113,8 +126,28 @@ function VenueDetail({ venue, onBack }) {
               </div>
             )}
           </div>
+          {events.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10, color: 'var(--text)' }}>📅 Nadchodzące imprezy</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {events.map(ev => (
+                  <div key={ev.id} className="glass-card" style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{ev.event_name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>
+                        {new Date(ev.event_date).toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })}
+                        {ev.start_time && ` · ${ev.start_time}`}{ev.end_time && `–${ev.end_time}`}
+                      </div>
+                    </div>
+                    {ev.price && <span style={{ fontSize: 12, fontWeight: 700, color: '#00E5FF', whiteSpace: 'nowrap' }}>{ev.price}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {venue.website && (
-            <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', marginTop: 16, display: 'block' }}>
               <button className="btn-primary" style={{ width: '100%' }}>🌐 Przejdź do strony</button>
             </a>
           )}
