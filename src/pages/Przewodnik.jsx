@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
+import { PageTitle } from '../components/PageTitle'
 
 // Fallback demo venues if Supabase table is empty
 const DEMO_VENUES = [
@@ -62,11 +63,10 @@ const DEMO_VENUES = [
 ]
 
 const TYPE_CONFIG = {
-  club: { label: 'Klub lifestylowy', color: '#00E5FF', bg: 'rgba(0,229,255,0.12)' },
-  bdsm: { label: 'Studio BDSM', color: '#FF0080', bg: 'rgba(255,0,128,0.12)' },
-  party: { label: 'Imprezy prywatne', color: '#9D4EDD', bg: 'rgba(157,78,221,0.12)' },
-  fetish: { label: 'Klub fetyszowy', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
-  meetup: { label: 'Spotkanie towarzyskie', color: '#00FF96', bg: 'rgba(0,255,150,0.12)' },
+  club: { label: 'Klub', color: '#00E5FF', bg: 'rgba(0,229,255,0.12)' },
+  sauna: { label: 'Sauna', color: '#FF0080', bg: 'rgba(255,0,128,0.12)' },
+  resort: { label: 'Resort / Hotel', color: '#9D4EDD', bg: 'rgba(157,78,221,0.12)' },
+  bar: { label: 'Bar', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
 }
 
 function VenueDetail({ venue, onBack }) {
@@ -97,12 +97,6 @@ function VenueDetail({ venue, onBack }) {
             <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
               {t.label}
             </span>
-            {venue.verified && (
-              <span className="verified-badge">✓ Zweryfikowane</span>
-            )}
-            <span style={{ fontSize: 12, color: 'var(--text-dim)', display: 'flex', alignItems: 'center', gap: 4 }}>
-              ⭐ {venue.rating}
-            </span>
           </div>
           <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>
             {venue.description}
@@ -110,26 +104,20 @@ function VenueDetail({ venue, onBack }) {
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
               <span style={{ fontSize: 16 }}>📍</span>
-              <span style={{ fontSize: 14, color: 'var(--text-dim)' }}>{venue.address}</span>
+              <span style={{ fontSize: 14, color: 'var(--text-dim)' }}>{venue.address}, {venue.city}</span>
             </div>
-            {venue.opening_hours && (
-              <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
-                <span style={{ fontSize: 16 }}>🕐</span>
-                <span style={{ fontSize: 14, color: 'var(--text-dim)' }}>
-                  {venue.opening_hours.days} · {venue.opening_hours.open}–{venue.opening_hours.close}
-                </span>
-              </div>
-            )}
-            {venue.price_range && (
+            {venue.website && (
               <div style={{ display: 'flex', gap: 10 }}>
-                <span style={{ fontSize: 16 }}>💰</span>
-                <span style={{ fontSize: 14, color: 'var(--text-dim)' }}>{venue.price_range}</span>
+                <span style={{ fontSize: 16 }}>🌐</span>
+                <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#00E5FF', wordBreak: 'break-all' }}>{venue.website}</a>
               </div>
             )}
           </div>
-          <button className="btn-primary" style={{ width: '100%' }}>
-            📩 Napisz do miejsca
-          </button>
+          {venue.website && (
+            <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+              <button className="btn-primary" style={{ width: '100%' }}>🌐 Przejdź do strony</button>
+            </a>
+          )}
         </div>
       </div>
     </div>
@@ -150,7 +138,7 @@ export function Przewodnik() {
 
   async function loadVenues() {
     try {
-      const { data, error } = await supabase.from('places').select('*').order('rating', { ascending: false })
+      const { data, error } = await supabase.from('swingers_venues').select('*').order('name', { ascending: true })
       if (error || !data || data.length === 0) {
         setVenues(DEMO_VENUES)
       } else {
@@ -184,7 +172,7 @@ export function Przewodnik() {
   return (
     <div>
       <div className="page-header">
-        <h1>🗺️ Przewodnik</h1>
+        <PageTitle section="Miejsca" />
       </div>
 
       {/* Location bar */}
@@ -244,8 +232,6 @@ export function Przewodnik() {
                       {t.label}
                     </span>
                     <span>📍 {venue.city}</span>
-                    <span>⭐ {venue.rating}</span>
-                    {venue.price_range && <span>{venue.price_range}</span>}
                   </div>
                 </div>
               </div>
