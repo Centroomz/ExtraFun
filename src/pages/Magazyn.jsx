@@ -1,7 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { getWordOfTheDay } from '../lib/dictionary'
-import { ARTICLES, CATEGORIES, getArticlesByCategory } from '../lib/articles'
+import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES, getArticlesByCategory } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult } from '../lib/quiz'
+import { supabase } from '../lib/supabase'
+
+function estimateReadingTime(content) {
+  return Math.max(1, Math.ceil((content || '').split(/\s+/).length / 200))
+}
 
 const CATEGORY_COLORS = {
   'CNM 101': { bg: 'rgba(0,229,255,0.12)', color: '#00E5FF', border: 'rgba(0,229,255,0.3)' },
@@ -147,9 +152,36 @@ export function Magazyn() {
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const [view, setView] = useState('home') // home | quiz | article
   const [selectedArticle, setSelectedArticle] = useState(null)
+  const [dbArticles, setDbArticles] = useState(null) // null = loading, [] = empty/fallback
 
+  useEffect(() => {
+    supabase
+      .from('articles')
+      .select('id, title, excerpt, content, category_slug, reading_time')
+      .eq('site', 'extrafun')
+      .eq('status', 'published')
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (error || !data || data.length === 0) {
+          setDbArticles([]) // fallback to hardcoded
+        } else {
+          setDbArticles(data.map(a => ({
+            id: a.id,
+            title: a.title,
+            description: a.excerpt || '',
+            category: a.category_slug || 'CNM 101',
+            reading_time: a.reading_time || estimateReadingTime(a.content),
+            content: a.content || '',
+          })))
+        }
+      })
+  }, [])
+
+  const allArticles = (dbArticles && dbArticles.length > 0) ? dbArticles : FALLBACK_ARTICLES
   const word = getWordOfTheDay()
-  const articles = getArticlesByCategory(activeCategory)
+  const articles = activeCategory === 'Wszystkie'
+    ? allArticles
+    : allArticles.filter(a => a.category === activeCategory)
 
   if (view === 'quiz') return <QuizView onBack={() => setView('home')} />
   if (view === 'article' && selectedArticle) return (
