@@ -20,8 +20,8 @@ export function sortByDistance(items, userLat, userLng) {
   return items
     .map(item => ({
       ...item,
-      distance: item.latitude && item.longitude
-        ? calculateDistance(userLat, userLng, item.latitude, item.longitude)
+      distance: item.lat && item.lng
+        ? calculateDistance(userLat, userLng, parseFloat(item.lat), parseFloat(item.lng))
         : null
     }))
     .sort((a, b) => {

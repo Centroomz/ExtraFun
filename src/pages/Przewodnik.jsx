@@ -2,87 +2,69 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
-import { PageTitle } from '../components/PageTitle'
 
-// Fallback demo venues if Supabase table is empty
 const DEMO_VENUES = [
   {
-    id: '1', name: 'Club Enigma', type: 'club',
+    id: '1', name: 'Club Enigma', type: 'klub',
     description: 'Elegancki klub lifestylowy dla par i singli. Dyskretna atmosfera, profesjonalna obsługa.',
     city: 'Warszawa', address: 'ul. Narbutta 27, Warszawa',
-    latitude: 52.2297, longitude: 21.0122,
-    rating: 4.8, price_range: '$$', verified: true,
-    opening_hours: { open: '21:00', close: '04:00', days: 'Pt-Nd' },
-    emoji: '🔮'
+    lat: 52.2297, lng: 21.0122,
   },
   {
-    id: '2', name: 'Dungeon Mystique', type: 'bdsm',
-    description: 'Profesjonalne studio BDSM z pełnym wyposażeniem. Bezpieczne, dyskretne środowisko.',
+    id: '2', name: 'Sauna Mystique', type: 'sauna',
+    description: 'Relaksująca sauna z pełnym wyposażeniem. Bezpieczne, dyskretne środowisko.',
     city: 'Kraków', address: 'ul. Kazimierza 15, Kraków',
-    latitude: 50.0647, longitude: 19.9450,
-    rating: 4.6, price_range: '$$$', verified: true,
-    opening_hours: { open: '20:00', close: '03:00', days: 'Cz-Nd' },
-    emoji: '⛓️'
+    lat: 50.0647, lng: 19.9450,
   },
   {
-    id: '3', name: 'Libertine Lounge', type: 'club',
-    description: 'Mieszana przestrzeń lifestylowa – od soft play po pełne imprezy swingerskie.',
+    id: '3', name: 'Libertine Lounge', type: 'bar',
+    description: 'Mieszana przestrzeń lifestylowa – od soft play po pełne imprezy.',
     city: 'Wrocław', address: 'ul. Świdnicka 45, Wrocław',
-    latitude: 51.1079, longitude: 17.0385,
-    rating: 4.5, price_range: '$$', verified: true,
-    opening_hours: { open: '22:00', close: '05:00', days: 'Sb-Nd' },
-    emoji: '🥂'
-  },
-  {
-    id: '4', name: 'Paradise Events', type: 'party',
-    description: 'Organizacja prywatnych imprez lifestylowych w ekskluzywnych lokalach.',
-    city: 'Gdańsk', address: 'Długi Targ 20, Gdańsk',
-    latitude: 54.3520, longitude: 18.6466,
-    rating: 4.7, price_range: '$$$', verified: false,
-    opening_hours: { open: '22:00', close: '06:00', days: 'Sb' },
-    emoji: '🎉'
-  },
-  {
-    id: '5', name: 'Fetish Club Noir', type: 'fetish',
-    description: 'Klub fetyszowy z tematycznymi imprezami i specjalnymi strefami.',
-    city: 'Poznań', address: 'ul. Półwiejska 12, Poznań',
-    latitude: 52.4082, longitude: 16.9335,
-    rating: 4.4, price_range: '$$', verified: true,
-    opening_hours: { open: '21:00', close: '04:00', days: 'Pt-Sb' },
-    emoji: '🖤'
-  },
-  {
-    id: '6', name: 'Poly Café', type: 'meetup',
-    description: 'Cykliczne spotkania społeczności CNM i poliamporycznej. Zero presji, czysto towarzysko.',
-    city: 'Warszawa', address: 'ul. Marszałkowska 84, Warszawa',
-    latitude: 52.2318, longitude: 21.0127,
-    rating: 4.9, price_range: '$', verified: true,
-    opening_hours: { open: '18:00', close: '22:00', days: 'Co środa' },
-    emoji: '☕'
+    lat: 51.1079, lng: 17.0385,
   },
 ]
 
 const TYPE_CONFIG = {
-  club: { label: 'Klub', color: '#00E5FF', bg: 'rgba(0,229,255,0.12)' },
-  sauna: { label: 'Sauna', color: '#FF0080', bg: 'rgba(255,0,128,0.12)' },
-  resort: { label: 'Resort / Hotel', color: '#9D4EDD', bg: 'rgba(157,78,221,0.12)' },
-  bar: { label: 'Bar', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
+  klub:        { label: 'Klub',        color: '#00E5FF', bg: 'rgba(0,229,255,0.12)',   icon: '🎭' },
+  bar:         { label: 'Bar',         color: '#FF0080', bg: 'rgba(255,0,128,0.12)',   icon: '🍸' },
+  sauna:       { label: 'Sauna',       color: '#9D4EDD', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
+  kawiarnia:   { label: 'Kawiarnia',   color: '#FFA500', bg: 'rgba(255,165,0,0.12)',  icon: '☕' },
+  restauracja: { label: 'Restauracja', color: '#00FF96', bg: 'rgba(0,255,150,0.12)',  icon: '🍴' },
+  inne:        { label: 'Inne',        color: '#888',    bg: 'rgba(136,136,136,0.12)',icon: '📍' },
+}
+
+function getTypeConfig(type) {
+  return TYPE_CONFIG[type] || TYPE_CONFIG.inne
 }
 
 function VenueDetail({ venue, onBack }) {
-  const t = TYPE_CONFIG[venue.type] || TYPE_CONFIG.club
-  const [events, setEvents] = useState([])
+  const t = getTypeConfig(venue.type)
+  const [recurringEvents, setRecurringEvents] = useState([])
+  const [upcomingEvents, setUpcomingEvents] = useState([])
 
   useEffect(() => {
-    supabase
-      .from('venue_events')
-      .select('*')
-      .eq('venue_id', venue.id)
-      .gte('event_date', new Date().toISOString().split('T')[0])
-      .order('event_date', { ascending: true })
-      .limit(10)
-      .then(({ data }) => setEvents(data || []))
+    const today = new Date().toISOString().split('T')[0]
+    Promise.all([
+      supabase
+        .from('recurring_events')
+        .select('*')
+        .eq('venue_id', venue.id)
+        .eq('is_active', true)
+        .order('day_of_week', { ascending: true }),
+      supabase
+        .from('one_time_events')
+        .select('*')
+        .eq('venue_id', venue.id)
+        .gte('event_date', today)
+        .order('event_date', { ascending: true })
+        .limit(10),
+    ]).then(([rec, one]) => {
+      setRecurringEvents(rec.data || [])
+      setUpcomingEvents(one.data || [])
+    })
   }, [venue.id])
+
+  const DAY_NAMES = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb']
 
   return (
     <div>
@@ -96,8 +78,8 @@ function VenueDetail({ venue, onBack }) {
         <h1 style={{ fontSize: 16 }}>Szczegóły miejsca</h1>
       </div>
       <div style={{ padding: '0 0 80px' }}>
-        <div className="venue-card-img" style={{ fontSize: 72, height: 180, background: `linear-gradient(135deg, ${t.bg.replace('0.12','0.4')}, rgba(10,10,30,0.8))` }}>
-          {venue.emoji || '📍'}
+        <div className="venue-card-img" style={{ fontSize: 72, height: 180, background: `linear-gradient(135deg, ${t.bg.replace('0.12', '0.4')}, rgba(10,10,30,0.8))` }}>
+          {t.icon}
         </div>
         <div style={{ padding: '20px 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -110,15 +92,26 @@ function VenueDetail({ venue, onBack }) {
             <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
               {t.label}
             </span>
+            {venue.district && (
+              <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>{venue.district}</span>
+            )}
           </div>
-          <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>
-            {venue.description}
-          </p>
+          {venue.description && (
+            <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>
+              {venue.description}
+            </p>
+          )}
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
-            <div style={{ display: 'flex', gap: 10, marginBottom: 10 }}>
+            <div style={{ display: 'flex', gap: 10, marginBottom: venue.website || venue.phone ? 10 : 0 }}>
               <span style={{ fontSize: 16 }}>📍</span>
               <span style={{ fontSize: 14, color: 'var(--text-dim)' }}>{venue.address}, {venue.city}</span>
             </div>
+            {venue.phone && (
+              <div style={{ display: 'flex', gap: 10, marginBottom: venue.website ? 10 : 0 }}>
+                <span style={{ fontSize: 16 }}>📞</span>
+                <a href={`tel:${venue.phone}`} style={{ fontSize: 14, color: '#00E5FF' }}>{venue.phone}</a>
+              </div>
+            )}
             {venue.website && (
               <div style={{ display: 'flex', gap: 10 }}>
                 <span style={{ fontSize: 16 }}>🌐</span>
@@ -126,11 +119,31 @@ function VenueDetail({ venue, onBack }) {
               </div>
             )}
           </div>
-          {events.length > 0 && (
+
+          {recurringEvents.length > 0 && (
+            <div style={{ marginTop: 20 }}>
+              <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10, color: 'var(--text)' }}>🔁 Stały program</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {recurringEvents.map(ev => (
+                  <div key={ev.id} className="glass-card" style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 13 }}>{ev.event_name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>
+                        {DAY_NAMES[ev.day_of_week]} · {ev.start_time}{ev.end_time && `–${ev.end_time}`}
+                      </div>
+                    </div>
+                    {ev.price && <span style={{ fontSize: 12, fontWeight: 700, color: '#00E5FF', whiteSpace: 'nowrap' }}>{ev.price}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {upcomingEvents.length > 0 && (
             <div style={{ marginTop: 20 }}>
               <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10, color: 'var(--text)' }}>📅 Nadchodzące imprezy</div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {events.map(ev => (
+                {upcomingEvents.map(ev => (
                   <div key={ev.id} className="glass-card" style={{ padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 13 }}>{ev.event_name}</div>
@@ -158,7 +171,7 @@ function VenueDetail({ venue, onBack }) {
 }
 
 export function Przewodnik() {
-  const [view, setView] = useState('venues') // 'venues' | 'events'
+  const [view, setView] = useState('venues')
   const [venues, setVenues] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeType, setActiveType] = useState('all')
@@ -178,7 +191,11 @@ export function Przewodnik() {
 
   async function loadVenues() {
     try {
-      const { data, error } = await supabase.from('swingers_venues').select('*').order('name', { ascending: true })
+      const { data, error } = await supabase
+        .from('venues')
+        .select('id, name, type, address, city, district, lat, lng, website, phone, description, is_active')
+        .eq('is_active', true)
+        .order('name', { ascending: true })
       if (error || !data || data.length === 0) setVenues(DEMO_VENUES)
       else setVenues(data)
     } catch {
@@ -193,8 +210,8 @@ export function Przewodnik() {
     try {
       const today = new Date().toISOString().split('T')[0]
       const { data } = await supabase
-        .from('venue_events')
-        .select('*, swingers_venues(name, city, type)')
+        .from('one_time_events')
+        .select('*, venues(name, city, type)')
         .gte('event_date', today)
         .order('event_date', { ascending: true })
         .limit(60)
@@ -206,9 +223,11 @@ export function Przewodnik() {
 
   const displayVenues = location ? sortByDistance(venues, location.lat, location.lng) : venues
   const filtered = activeType === 'all' ? displayVenues : displayVenues.filter(v => v.type === activeType)
-  const types = [{ id: 'all', label: 'Wszystkie' }, ...Object.entries(TYPE_CONFIG).map(([id, cfg]) => ({ id, label: cfg.label }))]
+  const types = [
+    { id: 'all', label: 'Wszystkie' },
+    ...Object.entries(TYPE_CONFIG).map(([id, cfg]) => ({ id, label: cfg.label }))
+  ]
 
-  // Group events by date
   const eventsByDate = allEvents.reduce((acc, ev) => {
     const key = ev.event_date
     if (!acc[key]) acc[key] = []
@@ -224,10 +243,9 @@ export function Przewodnik() {
   return (
     <div>
       <div className="page-header">
-        <PageTitle section="Miejsca" />
+        <h1>📍 Miejsca</h1>
       </div>
 
-      {/* View toggle */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         <button
           className={`category-chip ${view === 'venues' ? 'active' : ''}`}
@@ -259,13 +277,18 @@ export function Przewodnik() {
                     <div
                       key={ev.id}
                       className="glass-card"
-                      style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, cursor: ev.swingers_venues ? 'pointer' : 'default' }}
-                      onClick={() => ev.swingers_venues && setSelected(venues.find(v => v.name === ev.swingers_venues.name)?.id)}
+                      style={{ padding: '14px 16px', display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: 12, cursor: ev.venues ? 'pointer' : 'default' }}
+                      onClick={() => {
+                        if (ev.venues) {
+                          const v = venues.find(v => v.name === ev.venues.name)
+                          if (v) setSelected(v.id)
+                        }
+                      }}
                     >
                       <div>
                         <div style={{ fontWeight: 700, fontSize: 14 }}>{ev.event_name}</div>
                         <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 3 }}>
-                          {ev.swingers_venues?.name} · {ev.start_time}{ev.end_time && `–${ev.end_time}`}
+                          {ev.venues?.name} · {ev.start_time}{ev.end_time && `–${ev.end_time}`}
                         </div>
                         {ev.description && (
                           <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 2 }}>{ev.description}</div>
@@ -281,7 +304,6 @@ export function Przewodnik() {
         )
       ) : (
         <>
-          {/* Location bar */}
           <div className="location-bar">
             <span className="location-bar-icon">📡</span>
             <span className="location-bar-text">
@@ -294,7 +316,6 @@ export function Przewodnik() {
             )}
           </div>
 
-          {/* Type filter */}
           <div className="category-filter">
             {types.map(({ id, label }) => (
               <button
@@ -307,44 +328,44 @@ export function Przewodnik() {
             ))}
           </div>
 
-      {loading ? (
-        <div className="empty-state">
-          <div className="spinner" style={{ margin: '0 auto' }} />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">🏙️</div>
-          <div className="empty-title">Brak miejsc</div>
-          <div className="empty-desc">Nie znaleziono miejsc tego typu.</div>
-        </div>
-      ) : (
-        <div className="venue-list">
-          {filtered.map(venue => {
-            const t = TYPE_CONFIG[venue.type] || TYPE_CONFIG.club
-            return (
-              <div key={venue.id} className="venue-card" onClick={() => setSelected(venue.id)}>
-                <div className="venue-card-img">
-                  {venue.emoji || '📍'}
-                </div>
-                <div className="venue-card-body">
-                  <div className="venue-card-top">
-                    <div className="venue-card-name">{venue.name}</div>
-                    {venue.distance != null && (
-                      <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
-                    )}
+          {loading ? (
+            <div className="empty-state">
+              <div className="spinner" style={{ margin: '0 auto' }} />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">🏙️</div>
+              <div className="empty-title">Brak miejsc</div>
+              <div className="empty-desc">Nie znaleziono miejsc tego typu.</div>
+            </div>
+          ) : (
+            <div className="venue-list">
+              {filtered.map(venue => {
+                const t = getTypeConfig(venue.type)
+                return (
+                  <div key={venue.id} className="venue-card" onClick={() => setSelected(venue.id)}>
+                    <div className="venue-card-img" style={{ fontSize: 32 }}>
+                      {t.icon}
+                    </div>
+                    <div className="venue-card-body">
+                      <div className="venue-card-top">
+                        <div className="venue-card-name">{venue.name}</div>
+                        {venue.distance != null && (
+                          <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
+                        )}
+                      </div>
+                      <div className="venue-card-meta">
+                        <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
+                          {t.label}
+                        </span>
+                        <span>📍 {venue.city}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="venue-card-meta">
-                    <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
-                      {t.label}
-                    </span>
-                    <span>📍 {venue.city}</span>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+                )
+              })}
+            </div>
+          )}
         </>
       )}
     </div>
