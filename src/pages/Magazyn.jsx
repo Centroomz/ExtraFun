@@ -157,7 +157,7 @@ export function Magazyn() {
   useEffect(() => {
     supabase
       .from('articles')
-      .select('id, title, excerpt, content, category_slug, reading_time')
+      .select('id, title, excerpt, content, category_slug')
       .eq('site', 'extrafun')
       .eq('status', 'published')
       .order('created_at', { ascending: false })

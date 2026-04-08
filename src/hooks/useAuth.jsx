@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
       const { data } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .single()
       setProfile(data)
     } catch {
@@ -56,7 +56,7 @@ export function AuthProvider({ children }) {
     if (error) throw error
     if (data.user) {
       await supabase.from('profiles').upsert({
-        id: data.user.id,
+        user_id: data.user.id,
         username,
         display_name: username,
       })
