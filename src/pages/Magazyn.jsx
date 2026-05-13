@@ -9,32 +9,34 @@ function estimateReadingTime(content) {
 }
 
 const CATEGORY_COLORS = {
-  'CNM 101': { bg: 'rgba(0,229,255,0.12)', color: '#00E5FF', border: 'rgba(0,229,255,0.3)' },
-  'Pierwszy Raz': { bg: 'rgba(255,0,128,0.12)', color: '#FF0080', border: 'rgba(255,0,128,0.3)' },
-  'Bez Osądu': { bg: 'rgba(157,78,221,0.12)', color: '#9D4EDD', border: 'rgba(157,78,221,0.3)' },
-  'Tam i Tam': { bg: 'rgba(255,165,0,0.12)', color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
-  'Słownik': { bg: 'rgba(0,255,150,0.12)', color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
-  'Temat Miesiąca': { bg: 'rgba(255,200,0,0.12)', color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
+  'CNM 101':       { bg: 'rgba(0,229,255,0.12)',   color: '#00E5FF', border: 'rgba(0,229,255,0.3)' },
+  'Pierwszy Raz':  { bg: 'rgba(255,0,128,0.12)',   color: '#FF0080', border: 'rgba(255,0,128,0.3)' },
+  'Bez Osądu':     { bg: 'rgba(157,78,221,0.12)',  color: '#9D4EDD', border: 'rgba(157,78,221,0.3)' },
+  'Tam i Tam':     { bg: 'rgba(255,165,0,0.12)',   color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
+  'Słownik':       { bg: 'rgba(0,255,150,0.12)',   color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
+  'Temat Miesiąca':{ bg: 'rgba(255,200,0,0.12)',   color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
 }
 
-// Map DB slugs → display names for CATEGORY_COLORS
 const SLUG_TO_DISPLAY = {
-  'cnm-101': 'CNM 101',
-  'pierwszy-raz': 'Pierwszy Raz',
-  'bez-osadu': 'Bez Osądu',
-  'tam-i-tam': 'Tam i Tam',
-  'slownik': 'Słownik',
+  'cnm-101':        'CNM 101',
+  'pierwszy-raz':   'Pierwszy Raz',
+  'bez-osadu':      'Bez Osądu',
+  'tam-i-tam':      'Tam i Tam',
+  'slownik':        'Słownik',
   'temat-miesiaca': 'Temat Miesiąca',
 }
 
+/* ─── Article Detail ──────────────────────────────────────────── */
 function ArticleDetail({ article, onBack }) {
+  const c = CATEGORY_COLORS[article.category] || CATEGORY_COLORS['CNM 101']
+
   const lines = article.content.trim().split('\n')
   const rendered = lines.map((line, i) => {
-    if (line.startsWith('# ')) return <h1 key={i}>{line.slice(2)}</h1>
-    if (line.startsWith('## ')) return <h2 key={i}>{line.slice(3)}</h2>
-    if (line.startsWith('### ')) return <h3 key={i}>{line.slice(4)}</h3>
-    if (line.startsWith('- ')) return <li key={i}>{parseBold(line.slice(2))}</li>
-    if (line.trim() === '') return null
+    if (line.startsWith('# '))   return <h1 key={i}>{parseBold(line.slice(2))}</h1>
+    if (line.startsWith('## '))  return <h2 key={i}>{parseBold(line.slice(3))}</h2>
+    if (line.startsWith('### ')) return <h3 key={i}>{parseBold(line.slice(4))}</h3>
+    if (line.startsWith('- '))   return <li key={i}>{parseBold(line.slice(2))}</li>
+    if (line.trim() === '')      return null
     return <p key={i}>{parseBold(line)}</p>
   })
 
@@ -45,34 +47,38 @@ function ArticleDetail({ article, onBack }) {
     )
   }
 
-  const c = CATEGORY_COLORS[article.category] || CATEGORY_COLORS['CNM 101']
   return (
-    <div>
-      <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button
-          onClick={onBack}
-          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 22, padding: 0, lineHeight: 1 }}
-        >
-          ←
+    <div className="mag-root">
+      {/* Back bar */}
+      <div className="mag-article-bar">
+        <button className="mag-back-btn" onClick={onBack}>
+          ← Powrót
         </button>
-        <h1 style={{ fontSize: 16 }}>Artykuł</h1>
+        <span className="article-card-tag" style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
+          {article.category}
+        </span>
+        <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>{article.reading_time} min czytania</span>
       </div>
-      <div className="article-detail">
-        <div style={{ marginBottom: 12, display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' }}>
-          <span
-            className="article-card-tag"
-            style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}
-          >
-            {article.category}
-          </span>
-          <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>{article.reading_time} min czytania</span>
+
+      {/* Hero image */}
+      {article.cover_image && (
+        <div className="mag-article-hero">
+          <img src={article.cover_image} alt={article.title} />
+          <div className="mag-article-hero-overlay" />
         </div>
-        {rendered}
+      )}
+
+      {/* Content */}
+      <div className="mag-article-body">
+        <div className="article-detail">
+          {rendered}
+        </div>
       </div>
     </div>
   )
 }
 
+/* ─── Quiz View ───────────────────────────────────────────────── */
 function QuizView({ onBack }) {
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState([])
@@ -83,61 +89,38 @@ function QuizView({ onBack }) {
   const q = QUIZ_QUESTIONS[current]
   const total = QUIZ_QUESTIONS.length
 
-  const handleAnswer = (points) => {
-    setSelected(points)
-  }
-
   const handleNext = () => {
     const newAnswers = [...answers, selected]
     if (current + 1 < total) {
-      setAnswers(newAnswers)
-      setCurrent(current + 1)
-      setSelected(null)
+      setAnswers(newAnswers); setCurrent(current + 1); setSelected(null)
     } else {
-      const totalPoints = newAnswers.reduce((sum, p) => sum + p, 0)
-      setResult(interpretQuizResult(totalPoints))
-      setDone(true)
+      const totalPoints = newAnswers.reduce((s, p) => s + p, 0)
+      setResult(interpretQuizResult(totalPoints)); setDone(true)
     }
   }
 
   return (
-    <div>
-      <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button
-          onClick={onBack}
-          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 22, padding: 0 }}
-        >
-          ←
-        </button>
-        <h1 style={{ fontSize: 16 }}>Quiz</h1>
+    <div className="mag-root">
+      <div className="mag-article-bar">
+        <button className="mag-back-btn" onClick={onBack}>← Powrót</button>
       </div>
-
-      <div className="quiz-container">
+      <div className="quiz-container" style={{ maxWidth: 640, margin: '0 auto', padding: '24px 24px 80px' }}>
         {!done ? (
           <>
             <div className="quiz-progress">
-              <div className="quiz-progress-fill" style={{ width: `${((current) / total) * 100}%` }} />
+              <div className="quiz-progress-fill" style={{ width: `${(current / total) * 100}%` }} />
             </div>
             <div className="quiz-question-num">Pytanie {current + 1} z {total}</div>
             <div className="quiz-question">{q.question}</div>
             <div className="quiz-answers">
               {q.answers.map((a, i) => (
-                <button
-                  key={i}
-                  className={`quiz-answer ${selected === a.points ? 'selected' : ''}`}
-                  onClick={() => handleAnswer(a.points)}
-                >
-                  {a.text}
-                </button>
+                <button key={i} className={`quiz-answer ${selected === a.points ? 'selected' : ''}`}
+                  onClick={() => setSelected(a.points)}>{a.text}</button>
               ))}
             </div>
             {selected !== null && (
-              <button
-                className="btn-primary"
-                style={{ width: '100%', marginTop: 20 }}
-                onClick={handleNext}
-              >
-                {current + 1 < total ? 'Następne pytanie →' : 'Zobacz wynik →'}
+              <button className="btn-primary" style={{ width: '100%', marginTop: 20 }} onClick={handleNext}>
+                {current + 1 < total ? 'Następne →' : 'Zobacz wynik →'}
               </button>
             )}
           </>
@@ -146,12 +129,8 @@ function QuizView({ onBack }) {
             <span className="quiz-result-emoji">{result.emoji}</span>
             <h2 className="quiz-result-title" style={{ color: result.color }}>{result.title}</h2>
             <p className="quiz-result-desc">{result.description}</p>
-            <p className="quiz-result-score">
-              Twój wynik: {answers.reduce((s, p) => s + p, 0)}/{total * 3} pkt
-            </p>
-            <button className="btn-primary" style={{ width: '100%' }} onClick={onBack}>
-              Wróć do Magazynu
-            </button>
+            <p className="quiz-result-score">Wynik: {answers.reduce((s,p)=>s+p,0)}/{total*3} pkt</p>
+            <button className="btn-primary" style={{ width: '100%' }} onClick={onBack}>Wróć do Magazynu</button>
           </div>
         )}
       </div>
@@ -159,11 +138,22 @@ function QuizView({ onBack }) {
   )
 }
 
+/* ─── Category Tag ────────────────────────────────────────────── */
+function CatTag({ category }) {
+  const c = CATEGORY_COLORS[category] || CATEGORY_COLORS['CNM 101']
+  return (
+    <span className="article-card-tag" style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
+      {category}
+    </span>
+  )
+}
+
+/* ─── Magazyn Main ────────────────────────────────────────────── */
 export function Magazyn() {
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
-  const [view, setView] = useState('home') // home | quiz | article
+  const [view, setView] = useState('home')
   const [selectedArticle, setSelectedArticle] = useState(null)
-  const [dbArticles, setDbArticles] = useState(null) // null = loading, [] = empty/fallback
+  const [dbArticles, setDbArticles] = useState(null)
 
   useEffect(() => {
     supabase
@@ -174,7 +164,7 @@ export function Magazyn() {
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (error || !data || data.length === 0) {
-          setDbArticles([]) // fallback to hardcoded
+          setDbArticles([])
         } else {
           setDbArticles(data.map(a => ({
             id: a.id,
@@ -192,82 +182,152 @@ export function Magazyn() {
 
   const allArticles = (dbArticles && dbArticles.length > 0) ? dbArticles : FALLBACK_ARTICLES
   const word = getWordOfTheDay()
-  const articles = activeCategory === 'Wszystkie'
+
+  const filtered = activeCategory === 'Wszystkie'
     ? allArticles
     : allArticles.filter(a => a.category === activeCategory)
 
-  if (view === 'quiz') return <QuizView onBack={() => setView('home')} />
-  if (view === 'article' && selectedArticle) return (
-    <ArticleDetail article={selectedArticle} onBack={() => { setView('home'); setSelectedArticle(null) }} />
-  )
+  const openArticle = (art) => { setSelectedArticle(art); setView('article') }
+
+  // Hero = first featured, or first article
+  const hero = filtered.find(a => a.featured) || filtered[0]
+  const rest  = filtered.filter(a => a !== hero)
+
+  if (view === 'quiz')    return <QuizView onBack={() => setView('home')} />
+  if (view === 'article' && selectedArticle)
+    return <ArticleDetail article={selectedArticle} onBack={() => { setView('home'); setSelectedArticle(null) }} />
 
   return (
-    <div>
-      <div className="page-header">
-        <h1>📰 Magazyn</h1>
+    <div className="mag-root">
+
+      {/* ── Masthead ────────────────────────────────── */}
+      <header className="mag-masthead">
+        <div className="mag-masthead-inner">
+          <div className="mag-brand">
+            <span className="mag-brand-name">ExtraFun</span>
+            <span className="mag-brand-divider" />
+            <span className="mag-brand-issue">Wydanie 1 · Maj 2025</span>
+          </div>
+          <nav className="mag-cats">
+            {CATEGORIES.map(cat => (
+              <button key={cat}
+                className={`mag-cat-btn ${activeCategory === cat ? 'active' : ''}`}
+                onClick={() => setActiveCategory(cat)}>
+                {cat}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      {/* ── Mobile header (hidden on desktop) ──────── */}
+      <div className="mag-mobile-header">
+        <h1 className="mag-mobile-title">Magazyn</h1>
+        <div className="category-filter">
+          {CATEGORIES.map(cat => (
+            <button key={cat} className={`category-chip ${activeCategory === cat ? 'active' : ''}`}
+              onClick={() => setActiveCategory(cat)}>{cat}</button>
+          ))}
+        </div>
       </div>
 
-      {/* Hero Quiz */}
-      <div className="hero-quiz" onClick={() => setView('quiz')} style={{ cursor: 'pointer' }}>
-        <div className="hero-quiz-label">✨ Quiz tygodnia</div>
-        <h2 className="hero-quiz-title">Czy CNM jest dla Ciebie?</h2>
-        <p className="hero-quiz-desc">
-          12 pytań, które pomogą Ci lepiej zrozumieć, czy poliamoria, swinging lub inne formy CNM pasują do Twojego stylu życia.
-        </p>
-        <button className="btn-primary" onClick={() => setView('quiz')}>
-          Zacznij quiz →
-        </button>
-      </div>
+      {/* ── Main layout ─────────────────────────────── */}
+      <div className="mag-layout">
 
-      {/* Word of the Day */}
-      <div className="word-of-day">
-        <div className="word-of-day-label">📖 Słówko dnia</div>
-        <div className="word-of-day-term">{word.term}</div>
-        <div className="word-of-day-def">{word.definition}</div>
-        <span className="word-of-day-badge">{word.category}</span>
-      </div>
+        {/* Content column */}
+        <main className="mag-content">
 
-      {/* Category filter */}
-      <div className="category-filter">
-        {CATEGORIES.map(cat => (
-          <button
-            key={cat}
-            className={`category-chip ${activeCategory === cat ? 'active' : ''}`}
-            onClick={() => setActiveCategory(cat)}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
-      {/* Article grid */}
-      <div className="article-grid">
-        {articles.map(article => {
-          const c = CATEGORY_COLORS[article.category] || CATEGORY_COLORS['CNM 101']
-          return (
-            <div
-              key={article.id}
-              className="article-card"
-              onClick={() => { setSelectedArticle(article); setView('article') }}
-              style={article.featured ? { border: `1px solid ${c.border}` } : {}}
-            >
-              {article.cover_image && (
-                <div style={{ margin: '-0px -0px 12px', borderRadius: '12px 12px 0 0', overflow: 'hidden', height: 140 }}>
-                  <img src={article.cover_image} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          {/* Hero article */}
+          {hero && (
+            <article className="mag-hero" onClick={() => openArticle(hero)}>
+              {hero.cover_image
+                ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
+                : <div className="mag-hero-img mag-hero-img--placeholder" />
+              }
+              <div className="mag-hero-body">
+                <CatTag category={hero.category} />
+                <h2 className="mag-hero-title">{hero.title}</h2>
+                <p className="mag-hero-desc">{hero.description}</p>
+                <div className="mag-hero-meta">
+                  <span>{hero.reading_time} min czytania</span>
+                  <span className="mag-hero-cta">Czytaj →</span>
                 </div>
-              )}
-              <span
-                className="article-card-tag"
-                style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}
-              >
-                {article.category}
-              </span>
-              <div className="article-card-title">{article.title}</div>
-              <div className="article-card-desc">{article.description}</div>
-              <div className="article-card-meta">{article.reading_time} min czytania</div>
+              </div>
+            </article>
+          )}
+
+          {/* Article grid */}
+          {rest.length > 0 && (
+            <div className="mag-grid">
+              {rest.map(article => {
+                const c = CATEGORY_COLORS[article.category] || CATEGORY_COLORS['CNM 101']
+                return (
+                  <article key={article.id} className="mag-card" onClick={() => openArticle(article)}>
+                    {article.cover_image && (
+                      <div className="mag-card-img-wrap">
+                        <img src={article.cover_image} className="mag-card-img" alt={article.title} />
+                      </div>
+                    )}
+                    <div className="mag-card-body">
+                      <CatTag category={article.category} />
+                      <h3 className="mag-card-title">{article.title}</h3>
+                      <p className="mag-card-desc">{article.description}</p>
+                      <span className="mag-card-meta">{article.reading_time} min czytania</span>
+                    </div>
+                  </article>
+                )
+              })}
             </div>
-          )
-        })}
+          )}
+
+          {filtered.length === 0 && (
+            <div className="empty-state" style={{ padding: '80px 24px' }}>
+              <div className="empty-icon">📭</div>
+              <div className="empty-title">Brak artykułów</div>
+              <div className="empty-desc">W tej kategorii nie ma jeszcze żadnych artykułów.</div>
+            </div>
+          )}
+        </main>
+
+        {/* Sidebar */}
+        <aside className="mag-sidebar">
+
+          {/* Quiz CTA */}
+          <div className="mag-sidebar-quiz" onClick={() => setView('quiz')}>
+            <div className="mag-sidebar-quiz-label">✨ Quiz tygodnia</div>
+            <div className="mag-sidebar-quiz-title">Czy CNM jest dla Ciebie?</div>
+            <div className="mag-sidebar-quiz-desc">12 pytań które pomogą zrozumieć siebie</div>
+            <button className="btn-primary" style={{ width: '100%', marginTop: 16, fontSize: 13, padding: '10px 16px' }}>
+              Zacznij →
+            </button>
+          </div>
+
+          {/* Word of Day */}
+          <div className="mag-sidebar-word">
+            <div className="mag-sidebar-word-label">📖 Słówko dnia</div>
+            <div className="mag-sidebar-word-term">{word.term}</div>
+            <div className="mag-sidebar-word-def">{word.definition}</div>
+            <span className="word-of-day-badge">{word.category}</span>
+          </div>
+
+          {/* More articles - compact list */}
+          {rest.length > 2 && (
+            <div className="mag-sidebar-more">
+              <div className="mag-sidebar-more-label">Więcej artykułów</div>
+              {rest.slice(0, 4).map(a => (
+                <div key={a.id} className="mag-sidebar-item" onClick={() => openArticle(a)}>
+                  {a.cover_image && <img src={a.cover_image} className="mag-sidebar-item-img" alt="" />}
+                  <div className="mag-sidebar-item-body">
+                    <CatTag category={a.category} />
+                    <div className="mag-sidebar-item-title">{a.title}</div>
+                    <div className="mag-sidebar-item-meta">{a.reading_time} min</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+        </aside>
       </div>
     </div>
   )
