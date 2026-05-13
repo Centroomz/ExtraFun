@@ -13,38 +13,154 @@ import { Admin } from './pages/Admin'
 
 const ADMIN_EMAIL = 'pinksservice@gmail.com'
 
+const NAV_ITEMS = [
+  {
+    id: 'magazyn', label: 'Magazyn',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+    )
+  },
+  {
+    id: 'przewodnik', label: 'Miejsca',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+        <circle cx="12" cy="10" r="3" />
+      </svg>
+    )
+  },
+  {
+    id: 'czat', label: 'Czat',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    )
+  },
+  {
+    id: 'forum', label: 'Forum',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    )
+  },
+  {
+    id: 'ogloszenia', label: 'Ogłoszenia',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    )
+  },
+]
+
+/* ── Desktop Sidebar Nav ── */
+function DesktopNav({ active, onNavigate, user, profile, onSignOut }) {
+  return (
+    <nav className="desktop-nav">
+      {/* Logo */}
+      <div className="desktop-nav-logo" onClick={() => onNavigate('magazyn')}>
+        ExtraFun
+      </div>
+
+      {/* Nav items */}
+      <div className="desktop-nav-items">
+        {NAV_ITEMS.map(({ id, label, icon }) => (
+          <button
+            key={id}
+            className={`desktop-nav-item ${active === id ? 'active' : ''}`}
+            onClick={() => onNavigate(id)}
+          >
+            <span className="desktop-nav-item-icon">{icon}</span>
+            <span className="desktop-nav-item-label">{label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Footer: admin + profile */}
+      <div className="desktop-nav-footer">
+        {user?.email === ADMIN_EMAIL && (
+          <button
+            className={`desktop-nav-item ${active === 'admin' ? 'active' : ''}`}
+            onClick={() => onNavigate('admin')}
+          >
+            <span className="desktop-nav-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M19.07 4.93A10 10 0 0 0 6.99 3.34L9 9m-4.07 5.07A10 10 0 0 0 17.01 20.66L15 15m9-3a10 10 0 0 1-2.93 7.07L17 15M2 12A10 10 0 0 1 4.93 4.93L9 9" />
+              </svg>
+            </span>
+            <span className="desktop-nav-item-label">Admin</span>
+          </button>
+        )}
+
+        {user ? (
+          <button
+            className={`desktop-nav-item ${active === 'profil' ? 'active' : ''}`}
+            onClick={() => onNavigate('profil')}
+          >
+            <span className="desktop-nav-item-icon desktop-nav-avatar">
+              {profile?.display_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?'}
+            </span>
+            <span className="desktop-nav-item-label" style={{ flex: 1, textAlign: 'left' }}>
+              {profile?.display_name || profile?.username || 'Profil'}
+            </span>
+          </button>
+        ) : (
+          <button
+            className="desktop-nav-item"
+            onClick={() => onNavigate('login')}
+          >
+            <span className="desktop-nav-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <span className="desktop-nav-item-label">Zaloguj się</span>
+          </button>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+/* ── Profile Page ── */
 function ProfilePage({ user, profile, onSignOut }) {
   return (
-    <div>
+    <div className="page-inner">
       <div className="page-header">
-        <h1>👤 Profil</h1>
+        <h1>Profil</h1>
       </div>
-      <div className="profile-header">
-        <div className="profile-avatar">
-          {profile?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
-        </div>
-        <div className="profile-info">
-          <div className="profile-name">
-            {profile?.display_name || profile?.username || 'Użytkownik'}
-            {profile?.verified && <span className="verified-badge">✓ Zweryfikowany</span>}
+      <div style={{ maxWidth: 520, padding: '0 16px 80px' }}>
+        <div className="profile-header">
+          <div className="profile-avatar">
+            {profile?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
           </div>
-          <div className="profile-username">@{profile?.username || '---'}</div>
-          <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>{user?.email}</div>
+          <div className="profile-info">
+            <div className="profile-name">
+              {profile?.display_name || profile?.username || 'Użytkownik'}
+              {profile?.verified && <span className="verified-badge">✓</span>}
+            </div>
+            <div className="profile-username">@{profile?.username || '---'}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>{user?.email}</div>
+          </div>
         </div>
-      </div>
-      {profile?.bio && (
-        <div style={{ padding: '0 16px 16px' }}>
-          <div className="glass-card" style={{ padding: 16 }}>
+        {profile?.bio && (
+          <div className="glass-card" style={{ padding: 16, margin: '0 0 16px' }}>
             <p style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>{profile.bio}</p>
           </div>
-        </div>
-      )}
-      {profile?.city && (
-        <div style={{ padding: '0 16px 16px' }}>
-          <div style={{ fontSize: 14, color: 'var(--text-dim)' }}>📍 {profile.city}</div>
-        </div>
-      )}
-      <div style={{ padding: '0 16px 16px' }}>
+        )}
+        {profile?.city && (
+          <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 16 }}>📍 {profile.city}</div>
+        )}
         <button className="btn-ghost" style={{ width: '100%' }} onClick={onSignOut}>
           Wyloguj się
         </button>
@@ -53,13 +169,14 @@ function ProfilePage({ user, profile, onSignOut }) {
   )
 }
 
+/* ── App Inner ── */
 function AppInner() {
   const { user, profile, loading, signOut } = useAuth()
   const [ageConfirmed, setAgeConfirmed] = useState(() => {
     try { return localStorage.getItem('ef_age') === '1' } catch { return false }
   })
   const [activePage, setActivePage] = useState('magazyn')
-  const [authMode, setAuthMode] = useState(null) // null | 'login' | 'signup'
+  const [authMode, setAuthMode] = useState(null)
 
   const handleAgeConfirm = () => {
     try { localStorage.setItem('ef_age', '1') } catch {}
@@ -67,17 +184,12 @@ function AppInner() {
   }
 
   const handleNavigate = (page) => {
-    if (page === 'profil') {
-      if (!user) setAuthMode('login')
-      else setActivePage('profil')
-    } else {
-      setActivePage(page)
-    }
+    if (page === 'login') { setAuthMode('login'); return }
+    if (page === 'profil' && !user) { setAuthMode('login'); return }
+    setActivePage(page)
   }
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [activePage])
+  useEffect(() => { window.scrollTo(0, 0) }, [activePage])
 
   if (loading) {
     return (
@@ -88,15 +200,11 @@ function AppInner() {
     )
   }
 
-  // Auth screens – no nav
   if (authMode === 'login') {
     return (
       <>
         <div className="app-bg" />
-        <LoginPage
-          onSwitch={() => setAuthMode('signup')}
-          onSuccess={() => setAuthMode(null)}
-        />
+        <LoginPage onSwitch={() => setAuthMode('signup')} onSuccess={() => setAuthMode(null)} />
       </>
     )
   }
@@ -104,23 +212,20 @@ function AppInner() {
     return (
       <>
         <div className="app-bg" />
-        <SignupPage
-          onSwitch={() => setAuthMode('login')}
-          onSuccess={() => setAuthMode(null)}
-        />
+        <SignupPage onSwitch={() => setAuthMode('login')} onSuccess={() => setAuthMode(null)} />
       </>
     )
   }
 
   const renderPage = () => {
     switch (activePage) {
-      case 'magazyn': return <Magazyn />
+      case 'magazyn':    return <Magazyn />
       case 'przewodnik': return <Przewodnik />
-      case 'czat': return <Czat user={user} />
-      case 'forum': return <Forum user={user} />
+      case 'czat':       return <Czat user={user} />
+      case 'forum':      return <Forum user={user} />
       case 'ogloszenia': return <Ogloszenia user={user} />
-      case 'admin': return user?.email === ADMIN_EMAIL ? <Admin user={user} /> : <Magazyn />
-      case 'profil': return user
+      case 'admin':      return user?.email === ADMIN_EMAIL ? <Admin user={user} /> : <Magazyn />
+      case 'profil':     return user
         ? <ProfilePage user={user} profile={profile} onSignOut={async () => { await signOut(); setActivePage('magazyn') }} />
         : null
       default: return <Magazyn />
@@ -132,51 +237,35 @@ function AppInner() {
       <div className="app-bg" />
       {!ageConfirmed && <AgeGate onConfirm={handleAgeConfirm} />}
       <div className="app-root">
+
+        {/* Desktop left sidebar */}
+        <DesktopNav
+          active={activePage}
+          onNavigate={handleNavigate}
+          user={user}
+          profile={profile}
+          onSignOut={async () => { await signOut(); setActivePage('magazyn') }}
+        />
+
+        {/* Main content */}
         <div className="page-content">
           {renderPage()}
         </div>
-        <BottomNav
-          active={activePage}
-          onNavigate={handleNavigate}
-        />
-        {/* Admin button — only for admin */}
-        {user?.email === ADMIN_EMAIL && (
-          <button
-            onClick={() => setActivePage('admin')}
-            style={{
-              position: 'fixed', top: 16, right: 64, zIndex: 200,
-              height: 36, borderRadius: 8, padding: '0 12px',
-              background: activePage === 'admin'
-                ? 'linear-gradient(135deg, var(--cyan), var(--purple))'
-                : 'var(--glass)',
-              border: '1px solid var(--glass-border)',
-              color: 'white', fontSize: 13, cursor: 'pointer',
-              fontFamily: 'Outfit', fontWeight: 600, letterSpacing: '0.5px',
-            }}
-          >
-            Admin
-          </button>
-        )}
-        {/* Profile button in header area */}
+
+        {/* Mobile bottom nav */}
+        <BottomNav active={activePage} onNavigate={handleNavigate} />
+
+        {/* Mobile profile button */}
         <button
+          className="mobile-profile-btn"
           onClick={() => handleNavigate('profil')}
-          style={{
-            position: 'fixed', top: 16, right: 16, zIndex: 200,
-            width: 36, height: 36, borderRadius: '50%',
-            background: user
-              ? 'linear-gradient(135deg, var(--cyan), var(--purple))'
-              : 'var(--glass)',
-            border: '1px solid var(--glass-border)',
-            color: 'white', fontSize: 16, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Outfit', fontWeight: 700,
-          }}
         >
           {user
             ? (profile?.display_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?')
             : '👤'
           }
         </button>
+
       </div>
     </>
   )
