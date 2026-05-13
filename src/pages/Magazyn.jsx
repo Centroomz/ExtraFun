@@ -14,6 +14,17 @@ const CATEGORY_COLORS = {
   'Bez Osądu': { bg: 'rgba(157,78,221,0.12)', color: '#9D4EDD', border: 'rgba(157,78,221,0.3)' },
   'Tam i Tam': { bg: 'rgba(255,165,0,0.12)', color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
   'Słownik': { bg: 'rgba(0,255,150,0.12)', color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
+  'Temat Miesiąca': { bg: 'rgba(255,200,0,0.12)', color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
+}
+
+// Map DB slugs → display names for CATEGORY_COLORS
+const SLUG_TO_DISPLAY = {
+  'cnm-101': 'CNM 101',
+  'pierwszy-raz': 'Pierwszy Raz',
+  'bez-osadu': 'Bez Osądu',
+  'tam-i-tam': 'Tam i Tam',
+  'slownik': 'Słownik',
+  'temat-miesiaca': 'Temat Miesiąca',
 }
 
 function ArticleDetail({ article, onBack }) {
@@ -157,7 +168,7 @@ export function Magazyn() {
   useEffect(() => {
     supabase
       .from('articles')
-      .select('id, title, excerpt, content, category_slug')
+      .select('id, title, excerpt, content, category_slug, cover_image, featured')
       .eq('site', 'extrafun')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
@@ -169,9 +180,11 @@ export function Magazyn() {
             id: a.id,
             title: a.title,
             description: a.excerpt || '',
-            category: a.category_slug || 'CNM 101',
+            category: SLUG_TO_DISPLAY[a.category_slug] || a.category_slug || 'CNM 101',
             reading_time: a.reading_time || estimateReadingTime(a.content),
             content: a.content || '',
+            cover_image: a.cover_image || null,
+            featured: a.featured || false,
           })))
         }
       })
@@ -236,7 +249,13 @@ export function Magazyn() {
               key={article.id}
               className="article-card"
               onClick={() => { setSelectedArticle(article); setView('article') }}
+              style={article.featured ? { border: `1px solid ${c.border}` } : {}}
             >
+              {article.cover_image && (
+                <div style={{ margin: '-0px -0px 12px', borderRadius: '12px 12px 0 0', overflow: 'hidden', height: 140 }}>
+                  <img src={article.cover_image} alt={article.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                </div>
+              )}
               <span
                 className="article-card-tag"
                 style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}

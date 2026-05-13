@@ -9,6 +9,9 @@ import { Forum } from './pages/Forum'
 import { Ogloszenia } from './pages/Ogloszenia'
 import { LoginPage } from './auth/LoginPage'
 import { SignupPage } from './auth/SignupPage'
+import { Admin } from './pages/Admin'
+
+const ADMIN_EMAIL = 'pinksservice@gmail.com'
 
 function ProfilePage({ user, profile, onSignOut }) {
   return (
@@ -116,6 +119,7 @@ function AppInner() {
       case 'czat': return <Czat user={user} />
       case 'forum': return <Forum user={user} />
       case 'ogloszenia': return <Ogloszenia user={user} />
+      case 'admin': return user?.email === ADMIN_EMAIL ? <Admin user={user} /> : <Magazyn />
       case 'profil': return user
         ? <ProfilePage user={user} profile={profile} onSignOut={async () => { await signOut(); setActivePage('magazyn') }} />
         : null
@@ -135,6 +139,24 @@ function AppInner() {
           active={activePage}
           onNavigate={handleNavigate}
         />
+        {/* Admin button — only for admin */}
+        {user?.email === ADMIN_EMAIL && (
+          <button
+            onClick={() => setActivePage('admin')}
+            style={{
+              position: 'fixed', top: 16, right: 64, zIndex: 200,
+              height: 36, borderRadius: 8, padding: '0 12px',
+              background: activePage === 'admin'
+                ? 'linear-gradient(135deg, var(--cyan), var(--purple))'
+                : 'var(--glass)',
+              border: '1px solid var(--glass-border)',
+              color: 'white', fontSize: 13, cursor: 'pointer',
+              fontFamily: 'Outfit', fontWeight: 600, letterSpacing: '0.5px',
+            }}
+          >
+            Admin
+          </button>
+        )}
         {/* Profile button in header area */}
         <button
           onClick={() => handleNavigate('profil')}
