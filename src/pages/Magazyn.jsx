@@ -1,20 +1,24 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'wouter'
+import { Helmet } from 'react-helmet-async'
 import { getWordOfTheDay } from '../lib/dictionary'
-import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES, getArticlesByCategory } from '../lib/articles'
+import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult } from '../lib/quiz'
 import { supabase } from '../lib/supabase'
+
+const BASE_URL = 'https://extrafun.pl'
 
 function estimateReadingTime(content) {
   return Math.max(1, Math.ceil((content || '').split(/\s+/).length / 200))
 }
 
 const CATEGORY_COLORS = {
-  'CNM 101':       { bg: 'rgba(0,229,255,0.12)',   color: '#00E5FF', border: 'rgba(0,229,255,0.3)' },
-  'Pierwszy Raz':  { bg: 'rgba(255,0,128,0.12)',   color: '#FF0080', border: 'rgba(255,0,128,0.3)' },
-  'Bez Osądu':     { bg: 'rgba(157,78,221,0.12)',  color: '#9D4EDD', border: 'rgba(157,78,221,0.3)' },
-  'Tam i Tam':     { bg: 'rgba(255,165,0,0.12)',   color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
-  'Słownik':       { bg: 'rgba(0,255,150,0.12)',   color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
-  'Temat Miesiąca':{ bg: 'rgba(255,200,0,0.12)',   color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
+  'CNM 101':        { bg: 'rgba(0,229,255,0.12)',   color: '#00E5FF', border: 'rgba(0,229,255,0.3)' },
+  'Pierwszy Raz':   { bg: 'rgba(255,0,128,0.12)',   color: '#FF0080', border: 'rgba(255,0,128,0.3)' },
+  'Bez Osądu':      { bg: 'rgba(157,78,221,0.12)',  color: '#9D4EDD', border: 'rgba(157,78,221,0.3)' },
+  'Tam i Tam':      { bg: 'rgba(255,165,0,0.12)',   color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
+  'Słownik':        { bg: 'rgba(0,255,150,0.12)',   color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
+  'Temat Miesiąca': { bg: 'rgba(255,200,0,0.12)',   color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
 }
 
 const SLUG_TO_DISPLAY = {
@@ -26,59 +30,7 @@ const SLUG_TO_DISPLAY = {
   'temat-miesiaca': 'Temat Miesiąca',
 }
 
-/* ─── Article Detail ──────────────────────────────────────────── */
-function ArticleDetail({ article, onBack }) {
-  const c = CATEGORY_COLORS[article.category] || CATEGORY_COLORS['CNM 101']
-
-  const lines = article.content.trim().split('\n')
-  const rendered = lines.map((line, i) => {
-    if (line.startsWith('# '))   return <h1 key={i}>{parseBold(line.slice(2))}</h1>
-    if (line.startsWith('## '))  return <h2 key={i}>{parseBold(line.slice(3))}</h2>
-    if (line.startsWith('### ')) return <h3 key={i}>{parseBold(line.slice(4))}</h3>
-    if (line.startsWith('- '))   return <li key={i}>{parseBold(line.slice(2))}</li>
-    if (line.trim() === '')      return null
-    return <p key={i}>{parseBold(line)}</p>
-  })
-
-  function parseBold(text) {
-    const parts = text.split(/\*\*(.*?)\*\*/g)
-    return parts.map((part, i) =>
-      i % 2 === 1 ? <strong key={i}>{part}</strong> : part
-    )
-  }
-
-  return (
-    <div className="mag-root">
-      {/* Back bar */}
-      <div className="mag-article-bar">
-        <button className="mag-back-btn" onClick={onBack}>
-          ← Powrót
-        </button>
-        <span className="article-card-tag" style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
-          {article.category}
-        </span>
-        <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>{article.reading_time} min czytania</span>
-      </div>
-
-      {/* Hero image */}
-      {article.cover_image && (
-        <div className="mag-article-hero">
-          <img src={article.cover_image} alt={article.title} />
-          <div className="mag-article-hero-overlay" />
-        </div>
-      )}
-
-      {/* Content */}
-      <div className="mag-article-body">
-        <div className="article-detail">
-          {rendered}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-/* ─── Quiz View ───────────────────────────────────────────────── */
+/* ─── Quiz View (inline, no URL needed) ──────────────────────── */
 function QuizView({ onBack }) {
   const [current, setCurrent] = useState(0)
   const [answers, setAnswers] = useState([])
@@ -129,7 +81,7 @@ function QuizView({ onBack }) {
             <span className="quiz-result-emoji">{result.emoji}</span>
             <h2 className="quiz-result-title" style={{ color: result.color }}>{result.title}</h2>
             <p className="quiz-result-desc">{result.description}</p>
-            <p className="quiz-result-score">Wynik: {answers.reduce((s,p)=>s+p,0)}/{total*3} pkt</p>
+            <p className="quiz-result-score">Wynik: {answers.reduce((s, p) => s + p, 0)}/{total * 3} pkt</p>
             <button className="btn-primary" style={{ width: '100%' }} onClick={onBack}>Wróć do Magazynu</button>
           </div>
         )}
@@ -151,14 +103,13 @@ function CatTag({ category }) {
 /* ─── Magazyn Main ────────────────────────────────────────────── */
 export function Magazyn() {
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
-  const [view, setView] = useState('home')
-  const [selectedArticle, setSelectedArticle] = useState(null)
+  const [showQuiz, setShowQuiz] = useState(false)
   const [dbArticles, setDbArticles] = useState(null)
 
   useEffect(() => {
     supabase
       .from('articles')
-      .select('id, title, excerpt, content, category_slug, cover_image, featured')
+      .select('id, title, slug, excerpt, content, category_slug, cover_image, featured')
       .eq('site', 'extrafun')
       .eq('status', 'published')
       .order('created_at', { ascending: false })
@@ -168,11 +119,11 @@ export function Magazyn() {
         } else {
           setDbArticles(data.map(a => ({
             id: a.id,
+            slug: a.slug || `artykul-${a.id}`,
             title: a.title,
             description: a.excerpt || '',
             category: SLUG_TO_DISPLAY[a.category_slug] || a.category_slug || 'CNM 101',
-            reading_time: a.reading_time || estimateReadingTime(a.content),
-            content: a.content || '',
+            reading_time: estimateReadingTime(a.content),
             cover_image: a.cover_image || null,
             featured: a.featured || false,
           })))
@@ -187,20 +138,26 @@ export function Magazyn() {
     ? allArticles
     : allArticles.filter(a => a.category === activeCategory)
 
-  const openArticle = (art) => { setSelectedArticle(art); setView('article') }
-
-  // Hero = first featured, or first article
   const hero = filtered.find(a => a.featured) || filtered[0]
-  const rest  = filtered.filter(a => a !== hero)
+  const rest = filtered.filter(a => a !== hero)
 
-  if (view === 'quiz')    return <QuizView onBack={() => setView('home')} />
-  if (view === 'article' && selectedArticle)
-    return <ArticleDetail article={selectedArticle} onBack={() => { setView('home'); setSelectedArticle(null) }} />
+  if (showQuiz) return <QuizView onBack={() => setShowQuiz(false)} />
 
   return (
     <div className="mag-root">
+      <Helmet>
+        <title>Magazyn – CNM, Poliamoria, Swing, Fetysz | ExtraFun</title>
+        <meta name="description" content="ExtraFun – magazyn o konsensulanej niemonogamii, poliamorii, swingu, fetyszu i BDSM. Artykuły, przewodniki i społeczność dla dorosłych w Polsce." />
+        <link rel="canonical" href={`${BASE_URL}/magazyn`} />
+        <meta property="og:title" content="ExtraFun – Magazyn CNM & Lifestyle" />
+        <meta property="og:description" content="Artykuły o poliamorii, CNM, swingu, fetyszu i związkach otwartych. Polska społeczność dla dorosłych." />
+        <meta property="og:url" content={`${BASE_URL}/magazyn`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content={`${BASE_URL}/og-default.jpg`} />
+        <meta property="og:site_name" content="ExtraFun" />
+      </Helmet>
 
-      {/* ── Masthead ────────────────────────────────── */}
+      {/* ── Masthead ── */}
       <header className="mag-masthead">
         <div className="mag-masthead-inner">
           <div className="mag-brand">
@@ -220,7 +177,7 @@ export function Magazyn() {
         </div>
       </header>
 
-      {/* ── Mobile header (hidden on desktop) ──────── */}
+      {/* ── Mobile header ── */}
       <div className="mag-mobile-header">
         <h1 className="mag-mobile-title">Magazyn</h1>
         <div className="category-filter">
@@ -231,38 +188,37 @@ export function Magazyn() {
         </div>
       </div>
 
-      {/* ── Main layout ─────────────────────────────── */}
+      {/* ── Main layout ── */}
       <div className="mag-layout">
-
-        {/* Content column */}
         <main className="mag-content">
 
-          {/* Hero article */}
+          {/* Hero */}
           {hero && (
-            <article className="mag-hero" onClick={() => openArticle(hero)}>
-              {hero.cover_image
-                ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
-                : <div className="mag-hero-img mag-hero-img--placeholder" />
-              }
-              <div className="mag-hero-body">
-                <CatTag category={hero.category} />
-                <h2 className="mag-hero-title">{hero.title}</h2>
-                <p className="mag-hero-desc">{hero.description}</p>
-                <div className="mag-hero-meta">
-                  <span>{hero.reading_time} min czytania</span>
-                  <span className="mag-hero-cta">Czytaj →</span>
+            <Link href={`/magazyn/${hero.slug}`}>
+              <article className="mag-hero" style={{ cursor: 'pointer' }}>
+                {hero.cover_image
+                  ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
+                  : <div className="mag-hero-img mag-hero-img--placeholder" />
+                }
+                <div className="mag-hero-body">
+                  <CatTag category={hero.category} />
+                  <h2 className="mag-hero-title">{hero.title}</h2>
+                  <p className="mag-hero-desc">{hero.description}</p>
+                  <div className="mag-hero-meta">
+                    <span>{hero.reading_time} min czytania</span>
+                    <span className="mag-hero-cta">Czytaj →</span>
+                  </div>
                 </div>
-              </div>
-            </article>
+              </article>
+            </Link>
           )}
 
-          {/* Article grid */}
+          {/* Grid */}
           {rest.length > 0 && (
             <div className="mag-grid">
-              {rest.map(article => {
-                const c = CATEGORY_COLORS[article.category] || CATEGORY_COLORS['CNM 101']
-                return (
-                  <article key={article.id} className="mag-card" onClick={() => openArticle(article)}>
+              {rest.map(article => (
+                <Link key={article.id} href={`/magazyn/${article.slug}`}>
+                  <article className="mag-card" style={{ cursor: 'pointer' }}>
                     {article.cover_image && (
                       <div className="mag-card-img-wrap">
                         <img src={article.cover_image} className="mag-card-img" alt={article.title} />
@@ -275,8 +231,8 @@ export function Magazyn() {
                       <span className="mag-card-meta">{article.reading_time} min czytania</span>
                     </div>
                   </article>
-                )
-              })}
+                </Link>
+              ))}
             </div>
           )}
 
@@ -291,9 +247,7 @@ export function Magazyn() {
 
         {/* Sidebar */}
         <aside className="mag-sidebar">
-
-          {/* Quiz CTA */}
-          <div className="mag-sidebar-quiz" onClick={() => setView('quiz')}>
+          <div className="mag-sidebar-quiz" onClick={() => setShowQuiz(true)} style={{ cursor: 'pointer' }}>
             <div className="mag-sidebar-quiz-label">✨ Quiz tygodnia</div>
             <div className="mag-sidebar-quiz-title">Czy CNM jest dla Ciebie?</div>
             <div className="mag-sidebar-quiz-desc">12 pytań które pomogą zrozumieć siebie</div>
@@ -302,7 +256,6 @@ export function Magazyn() {
             </button>
           </div>
 
-          {/* Word of Day */}
           <div className="mag-sidebar-word">
             <div className="mag-sidebar-word-label">📖 Słówko dnia</div>
             <div className="mag-sidebar-word-term">{word.term}</div>
@@ -310,23 +263,23 @@ export function Magazyn() {
             <span className="word-of-day-badge">{word.category}</span>
           </div>
 
-          {/* More articles - compact list */}
           {rest.length > 2 && (
             <div className="mag-sidebar-more">
               <div className="mag-sidebar-more-label">Więcej artykułów</div>
               {rest.slice(0, 4).map(a => (
-                <div key={a.id} className="mag-sidebar-item" onClick={() => openArticle(a)}>
-                  {a.cover_image && <img src={a.cover_image} className="mag-sidebar-item-img" alt="" />}
-                  <div className="mag-sidebar-item-body">
-                    <CatTag category={a.category} />
-                    <div className="mag-sidebar-item-title">{a.title}</div>
-                    <div className="mag-sidebar-item-meta">{a.reading_time} min</div>
+                <Link key={a.id} href={`/magazyn/${a.slug}`}>
+                  <div className="mag-sidebar-item" style={{ cursor: 'pointer' }}>
+                    {a.cover_image && <img src={a.cover_image} className="mag-sidebar-item-img" alt="" />}
+                    <div className="mag-sidebar-item-body">
+                      <CatTag category={a.category} />
+                      <div className="mag-sidebar-item-title">{a.title}</div>
+                      <div className="mag-sidebar-item-meta">{a.reading_time} min</div>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}
-
         </aside>
       </div>
     </div>
