@@ -12,6 +12,7 @@ import { LoginPage } from './auth/LoginPage'
 import { SignupPage } from './auth/SignupPage'
 import { Admin } from './pages/Admin'
 import { ArticleDetailPage } from './pages/ArticleDetailPage'
+import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 const ADMIN_EMAIL = 'pinksservice@gmail.com'
 
@@ -263,6 +264,7 @@ function AppInner() {
         </button>
 
       </div>
+      <PWAInstallBanner />
     </>
   )
 }
