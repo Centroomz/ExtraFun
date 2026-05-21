@@ -3,6 +3,7 @@ import { Switch, Route, useLocation, Link } from 'wouter'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { AgeGate } from './components/AgeGate'
 import { BottomNav } from './components/BottomNav'
+import extrafunLogo from '/extrafun-logo.png'
 import { Magazyn } from './pages/Magazyn'
 import { Przewodnik } from './pages/Przewodnik'
 import { Czat } from './pages/Czat'
@@ -215,6 +216,25 @@ function AppInner() {
       <div className="app-bg" />
       {!ageConfirmed && <AgeGate onConfirm={handleAgeConfirm} />}
       <div className="app-root">
+
+        {/* Mobile top bar — hidden on desktop */}
+        <header className="mobile-topbar">
+          <Link href="/magazyn" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+            <img src={extrafunLogo} alt="ExtraFun" style={{ width: 32, height: 32, borderRadius: 8 }} />
+            <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5, background: 'linear-gradient(90deg, var(--cyan), var(--purple))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              ExtraFun
+            </span>
+          </Link>
+          <button
+            className="mobile-profile-btn-inline"
+            onClick={() => navigate(user ? '/profil' : '/login')}
+          >
+            {user
+              ? (profile?.display_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || '?')
+              : '👤'
+            }
+          </button>
+        </header>
 
         <DesktopNav user={user} profile={profile} onSignOut={handleSignOut} />
 

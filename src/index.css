@@ -220,7 +220,7 @@ body {
 /* ── Page header (sticky) ── */
 .page-header {
   position: sticky;
-  top: 0;
+  top: 56px;
   z-index: 100;
   padding: 16px;
   background: rgba(10,10,30,0.85);
@@ -1064,14 +1064,30 @@ select.form-input option { background: #151538; }
 
 /* ── Desktop sidebar nav ── */
 .desktop-nav { display: none; }
-.mobile-profile-btn {
-  position: fixed; top: 16px; right: 16px; z-index: 200;
+
+/* ── Mobile top bar ── */
+.mobile-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  height: 56px;
+  padding: 0 16px;
+  background: rgba(10,10,30,0.92);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+}
+.mobile-profile-btn-inline {
   width: 36px; height: 36px; border-radius: 50%;
   background: var(--glass); border: 1px solid var(--glass-border);
   color: white; font-size: 16px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   font-family: 'Outfit'; font-weight: 700;
 }
+/* old fixed profile btn — keep hidden now handled inline */
+.mobile-profile-btn { display: none; }
 
 @media (min-width: 900px) {
   /* Root: row layout */
@@ -1079,7 +1095,7 @@ select.form-input option { background: #151538; }
 
   /* Hide mobile-only elements */
   .bottom-nav { display: none !important; }
-  .mobile-profile-btn { display: none; }
+  .mobile-topbar { display: none; }
 
   /* Page content: fill remaining width, scrollable */
   .page-content {
