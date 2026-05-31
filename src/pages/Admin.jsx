@@ -185,7 +185,7 @@ function ArticlesTab() {
   const load = async () => {
     setLoading(true)
     const { data } = await supabase.from('articles')
-      .select('id, title, slug, excerpt, category_slug, status, featured, cover_image, content, author, tags, created_at')
+      .select('id, title, slug, excerpt, category_slug, status, featured, cover_image, content, author, tags, views, created_at')
       .eq('site', 'extrafun')
       .order('created_at', { ascending: false })
     setArticles(data || [])
@@ -275,6 +275,7 @@ function ArticlesTab() {
                 <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#9D4EDD', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
                 <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(0,229,255,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#00E5FF' : 'rgba(255,255,255,0.5)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
+                <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
               <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{a.excerpt?.slice(0, 80)}{a.excerpt?.length > 80 ? '…' : ''}</div>
             </div>

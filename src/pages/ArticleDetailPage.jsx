@@ -61,6 +61,8 @@ export function ArticleDetailPage() {
         .single()
 
       if (data) {
+        // count this open (fire-and-forget; views shown only in admin)
+        supabase.rpc('increment_article_views', { article_id: data.id })
         setArticle({
           id: data.id,
           slug: data.slug,
