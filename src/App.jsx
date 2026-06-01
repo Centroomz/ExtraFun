@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Switch, Route, useLocation, Link } from 'wouter'
+import { supabase } from './lib/supabase'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { AgeGate } from './components/AgeGate'
 import { BottomNav } from './components/BottomNav'
@@ -201,6 +202,22 @@ function AppInner() {
 
   // Scroll to top on route change
   useEffect(() => { window.scrollTo(0, 0) }, [location])
+
+  // First-party analytics: one page-view per route change (fire-and-forget).
+  useEffect(() => {
+    if (isBot) return
+    try {
+      let sid = sessionStorage.getItem('ef_sid')
+      if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem('ef_sid', sid) }
+      let ref = 'direct'
+      try { if (document.referrer) ref = new URL(document.referrer).hostname.replace(/^www\./, '') } catch {}
+      const device = window.matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop'
+      supabase.from('page_views').insert({
+        site: 'extrafun', path: location.slice(0, 200),
+        referrer: ref.slice(0, 100), device, session_id: sid.slice(0, 40),
+      }).then(() => {}, () => {})
+    } catch {}
+  }, [location])
 
   if (loading) {
     return (

@@ -293,6 +293,99 @@ function ArticlesTab() {
   )
 }
 
+// ── StatsTab (ruch) ───────────────────────────────────────────────────────────
+function StatsTab() {
+  const [rows, setRows] = useState(null)
+  const [days, setDays] = useState(30)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => { load() }, [days])
+
+  async function load() {
+    setLoading(true)
+    const since = new Date(Date.now() - days * 86400000).toISOString()
+    const { data } = await supabase.from('page_views')
+      .select('path, referrer, device, session_id, created_at')
+      .eq('site', 'extrafun').gte('created_at', since)
+      .order('created_at', { ascending: false }).limit(5000)
+    setRows(data || [])
+    setLoading(false)
+  }
+
+  if (loading) return <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.5)' }}>Ładowanie…</div>
+  if (!rows) return null
+
+  const totalViews = rows.length
+  const totalSessions = new Set(rows.map(r => r.session_id)).size
+  const byDay = {}, byPath = {}, byRef = {}, byDev = {}
+  for (const r of rows) {
+    const d = (r.created_at || '').slice(0, 10)
+    byDay[d] = (byDay[d] || 0) + 1
+    byPath[r.path] = (byPath[r.path] || 0) + 1
+    byRef[r.referrer || 'direct'] = (byRef[r.referrer || 'direct'] || 0) + 1
+    byDev[r.device || '?'] = (byDev[r.device || '?'] || 0) + 1
+  }
+  const dailyAsc = Object.entries(byDay).sort((a, b) => a[0].localeCompare(b[0]))
+  const maxV = Math.max(1, ...dailyAsc.map(([, v]) => v))
+  const top = (o, n = 15) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n)
+
+  const card = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 16 }
+  const head = { fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: 10 }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', gap: 8 }}>
+        {[7, 30, 90].map(d => (
+          <button key={d} onClick={() => setDays(d)}
+            style={{ fontSize: 12, padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700,
+              background: days === d ? '#00E5FF' : 'rgba(255,255,255,0.08)', color: days === d ? '#0a0a1e' : 'rgba(255,255,255,0.6)' }}>
+            {d} dni
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 10 }}>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#00E5FF' }}>{totalViews}</div></div>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>SESJE</div><div style={{ fontSize: 28, fontWeight: 900, color: '#00E5FF' }}>{totalSessions}</div></div>
+      </div>
+
+      <div style={card}>
+        <div style={head}>Wizyty dziennie</div>
+        {dailyAsc.length === 0 ? <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Brak danych — zbieranie dopiero ruszyło.</div> : (
+          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 120 }}>
+            {dailyAsc.map(([day, v]) => (
+              <div key={day} title={`${day}: ${v}`} style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
+                <div style={{ width: '100%', background: '#00E5FF', borderRadius: '4px 4px 0 0', height: `${(v / maxV) * 100}%`, minHeight: 2 }} />
+                <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)' }}>{day.slice(5)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={card}>
+        <div style={head}>Najpopularniejsze strony</div>
+        {top(byPath).map(([p, v]) => (
+          <div key={p} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
+            <span>{p}</span><span style={{ color: 'rgba(255,255,255,0.5)' }}>{v}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+        <div style={{ ...card, flex: 1, minWidth: 220 }}>
+          <div style={head}>Źródła ruchu</div>
+          {top(byRef).map(([r, v]) => (<div key={r} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}><span>{r}</span><span style={{ color: 'rgba(255,255,255,0.5)' }}>{v}</span></div>))}
+        </div>
+        <div style={{ ...card, flex: 1, minWidth: 220 }}>
+          <div style={head}>Urządzenia</div>
+          {top(byDev).map(([d, v]) => (<div key={d} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}><span>{d === 'mobile' ? '📱 Telefon' : '💻 Desktop'}</span><span style={{ color: 'rgba(255,255,255,0.5)' }}>{v}</span></div>))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── AdsTab ────────────────────────────────────────────────────────────────────
 function AdsTab() {
   const [ads, setAds] = useState([])
@@ -379,6 +472,7 @@ export function Admin() {
   }
 
   const tabs = [
+    { id: 'ruch', label: '📊 Ruch' },
     { id: 'artykuly', label: '📰 Artykuły' },
     { id: 'ogloszenia', label: '📋 Ogłoszenia' },
   ]
@@ -407,6 +501,7 @@ export function Admin() {
       </div>
 
       <div style={{ padding: 16 }}>
+        {tab === 'ruch' && <StatsTab />}
         {tab === 'artykuly' && <ArticlesTab />}
         {tab === 'ogloszenia' && <AdsTab />}
       </div>
