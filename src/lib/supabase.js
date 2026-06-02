@@ -1,3 +1,5 @@
+// Client Supabase: AUTH ONLY (signin/signup/session). All data goes through
+// the backend /api/* (see lib/api.js) — never query tables from the browser.
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://lvxaycjuhchoqhnttyjj.supabase.co'
