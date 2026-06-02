@@ -1,5 +1,5 @@
 import { supabaseAdmin } from './supabase.js'
-import { verifyJWT } from './auth.js'
+import { verifyJWT, isAdmin } from './auth.js'
 
 export function registerRoutes(app) {
   app.get('/api/health', (_req, res) => res.json({ ok: true }))
@@ -101,5 +101,64 @@ export function registerRoutes(app) {
     }).select('id').single()
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json(data)
+  })
+
+  // === ADMIN ===
+  app.get('/api/admin/articles', verifyJWT, isAdmin, async (_req, res) => {
+    const { data, error } = await supabaseAdmin.from('articles')
+      .select('id, title, slug, excerpt, category_slug, status, featured, cover_image, content, author, tags, views, created_at')
+      .eq('site', 'extrafun').order('created_at', { ascending: false })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  app.post('/api/admin/articles', verifyJWT, isAdmin, async (req, res) => {
+    const payload = { ...req.body, site: 'extrafun' }
+    const { error } = await supabaseAdmin.from('articles').insert(payload)
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json({ ok: true })
+  })
+
+  app.put('/api/admin/articles/:id', verifyJWT, isAdmin, async (req, res) => {
+    const { error } = await supabaseAdmin.from('articles').update(req.body).eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
+  app.delete('/api/admin/articles/:id', verifyJWT, isAdmin, async (req, res) => {
+    const { error } = await supabaseAdmin.from('articles').delete().eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(204).end()
+  })
+
+  app.get('/api/admin/page-views', verifyJWT, isAdmin, async (req, res) => {
+    const days = Math.min(parseInt(req.query.days) || 30, 365)
+    const since = new Date(Date.now() - days * 86400000).toISOString()
+    const { data, error } = await supabaseAdmin.from('page_views')
+      .select('path, referrer, device, session_id, created_at')
+      .eq('site', 'extrafun').gte('created_at', since)
+      .order('created_at', { ascending: false }).limit(5000)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  app.get('/api/admin/ads', verifyJWT, isAdmin, async (_req, res) => {
+    const { data, error } = await supabaseAdmin.from('ads')
+      .select('id, title, description, category, status, created_at, location')
+      .eq('source', 'extrafun').order('created_at', { ascending: false }).limit(50)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  app.delete('/api/admin/ads/:id', verifyJWT, isAdmin, async (req, res) => {
+    const { error } = await supabaseAdmin.from('ads').delete().eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(204).end()
+  })
+
+  app.put('/api/admin/ads/:id', verifyJWT, isAdmin, async (req, res) => {
+    const { error } = await supabaseAdmin.from('ads').update(req.body).eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
   })
 }

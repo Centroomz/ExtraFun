@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
 
 const ADMIN_EMAIL = 'pinksservice@gmail.com'
@@ -184,11 +184,7 @@ function ArticlesTab() {
 
   const load = async () => {
     setLoading(true)
-    const { data } = await supabase.from('articles')
-      .select('id, title, slug, excerpt, category_slug, status, featured, cover_image, content, author, tags, views, created_at')
-      .eq('site', 'extrafun')
-      .order('created_at', { ascending: false })
-    setArticles(data || [])
+    try { setArticles(await apiFetch('/api/admin/articles')) } catch { setArticles([]) }
     setLoading(false)
   }
 
@@ -212,28 +208,28 @@ function ArticlesTab() {
       publish_date: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
-    let error
-    if (mode?.id) {
-      ;({ error } = await supabase.from('articles').update(payload).eq('id', mode.id))
-    } else {
-      ;({ error } = await supabase.from('articles').insert(payload))
+    try {
+      if (mode?.id) await apiFetch(`/api/admin/articles/${mode.id}`, { method: 'PUT', body: payload })
+      else await apiFetch('/api/admin/articles', { method: 'POST', body: payload })
+      setSaving(false)
+      setMsg(mode?.id ? 'Zaktualizowano!' : 'Dodano artykuł!')
+      setMode(null)
+      load()
+    } catch (e) {
+      setSaving(false)
+      setMsg('Błąd: ' + e.message)
     }
-    setSaving(false)
-    if (error) { setMsg('Błąd: ' + error.message); return }
-    setMsg(mode?.id ? 'Zaktualizowano!' : 'Dodano artykuł!')
-    setMode(null)
-    load()
   }
 
   const handleDelete = async (id, title) => {
     if (!confirm(`Usunąć artykuł: "${title}"?`)) return
-    await supabase.from('articles').delete().eq('id', id)
+    await apiFetch(`/api/admin/articles/${id}`, { method: 'DELETE' })
     load()
   }
 
   const toggleStatus = async (article) => {
     const newStatus = article.status === 'published' ? 'draft' : 'published'
-    await supabase.from('articles').update({ status: newStatus }).eq('id', article.id)
+    await apiFetch(`/api/admin/articles/${article.id}`, { method: 'PUT', body: { status: newStatus } })
     load()
   }
 
@@ -303,12 +299,7 @@ function StatsTab() {
 
   async function load() {
     setLoading(true)
-    const since = new Date(Date.now() - days * 86400000).toISOString()
-    const { data } = await supabase.from('page_views')
-      .select('path, referrer, device, session_id, created_at')
-      .eq('site', 'extrafun').gte('created_at', since)
-      .order('created_at', { ascending: false }).limit(5000)
-    setRows(data || [])
+    try { setRows(await apiFetch(`/api/admin/page-views?days=${days}`)) } catch { setRows([]) }
     setLoading(false)
   }
 
@@ -393,12 +384,7 @@ function AdsTab() {
 
   const load = async () => {
     setLoading(true)
-    const { data } = await supabase.from('ads')
-      .select('id, title, description, category, status, created_at, location')
-      .eq('portal', 'extrafun')
-      .order('created_at', { ascending: false })
-      .limit(50)
-    setAds(data || [])
+    try { setAds(await apiFetch('/api/admin/ads')) } catch { setAds([]) }
     setLoading(false)
   }
 
@@ -406,13 +392,13 @@ function AdsTab() {
 
   const handleDelete = async (id, title) => {
     if (!confirm(`Usunąć ogłoszenie: "${title}"?`)) return
-    await supabase.from('ads').delete().eq('id', id)
+    await apiFetch(`/api/admin/ads/${id}`, { method: 'DELETE' })
     load()
   }
 
   const toggleStatus = async (ad) => {
     const newStatus = ad.status === 'active' ? 'removed' : 'active'
-    await supabase.from('ads').update({ status: newStatus }).eq('id', ad.id)
+    await apiFetch(`/api/admin/ads/${ad.id}`, { method: 'PUT', body: { status: newStatus } })
     load()
   }
 
