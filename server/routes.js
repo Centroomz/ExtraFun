@@ -161,4 +161,37 @@ export function registerRoutes(app) {
     if (error) return res.status(500).json({ message: error.message })
     res.json({ ok: true })
   })
+
+  // === SEO ===
+  app.get('/robots.txt', (_req, res) => {
+    res.type('text/plain').send(
+`User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profil
+
+Sitemap: https://extrafun.pl/sitemap.xml`)
+  })
+
+  app.get('/sitemap.xml', async (_req, res) => {
+    const { data } = await supabaseAdmin.from('articles')
+      .select('slug, publish_date').eq('site', 'extrafun').eq('status', 'published')
+    const staticUrls = [
+      { loc: 'https://extrafun.pl/', priority: '1.0' },
+      { loc: 'https://extrafun.pl/magazyn', priority: '0.9' },
+      { loc: 'https://extrafun.pl/miejsca', priority: '0.7' },
+      { loc: 'https://extrafun.pl/czat', priority: '0.5' },
+      { loc: 'https://extrafun.pl/ogloszenia', priority: '0.6' },
+    ]
+    const articleUrls = (data || []).map(a => ({
+      loc: `https://extrafun.pl/magazyn/${a.slug}`, priority: '0.8',
+      lastmod: a.publish_date ? new Date(a.publish_date).toISOString().slice(0, 10) : undefined,
+    }))
+    const urls = [...staticUrls, ...articleUrls]
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')}
+</urlset>`
+    res.type('application/xml').send(xml)
+  })
 }
