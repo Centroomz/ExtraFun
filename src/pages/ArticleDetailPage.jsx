@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
-import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
 
 const BASE_URL = 'https://extrafun.pl'
@@ -50,19 +50,9 @@ export function ArticleDetailPage() {
   useEffect(() => {
     async function load() {
       setLoading(true)
-
-      // 1. Try Supabase
-      const { data } = await supabase
-        .from('articles')
-        .select('id, title, slug, excerpt, content, category_slug, cover_image, featured, seo_title, seo_description')
-        .eq('site', 'extrafun')
-        .eq('status', 'published')
-        .eq('slug', slug)
-        .single()
-
-      if (data) {
-        // count this open (fire-and-forget; views shown only in admin)
-        supabase.rpc('increment_article_views', { article_id: data.id })
+      try {
+        // 1. Try backend API (view increment happens server-side)
+        const data = await apiFetch(`/api/articles/${slug}`)
         setArticle({
           id: data.id,
           slug: data.slug,
@@ -75,13 +65,12 @@ export function ArticleDetailPage() {
           seoDescription: data.seo_description || data.excerpt || '',
           reading_time: Math.max(1, Math.ceil((data.content || '').split(/\s+/).length / 200)),
         })
-      } else {
+      } catch {
         // 2. Fallback to static articles
         const found = ARTICLES.find(a => a.slug === slug)
         if (found) setArticle({ ...found, seoTitle: found.title, seoDescription: found.description })
         else setArticle(null)
       }
-
       setLoading(false)
     }
     load()

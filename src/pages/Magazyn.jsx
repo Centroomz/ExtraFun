@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { getWordOfTheDay } from '../lib/dictionary'
 import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult } from '../lib/quiz'
-import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/api'
 
 const BASE_URL = 'https://extrafun.pl'
 
@@ -107,14 +107,9 @@ export function Magazyn() {
   const [dbArticles, setDbArticles] = useState(null)
 
   useEffect(() => {
-    supabase
-      .from('articles')
-      .select('id, title, slug, excerpt, content, category_slug, cover_image, featured')
-      .eq('site', 'extrafun')
-      .eq('status', 'published')
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (error || !data || data.length === 0) {
+    apiFetch('/api/articles')
+      .then(data => {
+        if (!data || data.length === 0) {
           setDbArticles([])
         } else {
           setDbArticles(data.map(a => ({
@@ -129,6 +124,7 @@ export function Magazyn() {
           })))
         }
       })
+      .catch(() => setDbArticles([]))
   }, [])
 
   const allArticles = (dbArticles && dbArticles.length > 0) ? dbArticles : FALLBACK_ARTICLES
