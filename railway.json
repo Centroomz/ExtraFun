@@ -5,7 +5,7 @@
     "buildCommand": "npm run build"
   },
   "deploy": {
-    "startCommand": "npx serve dist -l $PORT --no-clipboard",
-    "healthcheckPath": "/"
+    "startCommand": "node server/index.js",
+    "healthcheckPath": "/api/health"
   }
 }
