@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 
@@ -80,15 +80,8 @@ export function Ogloszenia({ user }) {
 
   async function loadAds() {
     try {
-      const { data, error } = await supabase
-        .from('classifieds')
-        .select('*')
-        .order('created_at', { ascending: false })
-      if (error || !data || data.length === 0) {
-        setAds(DEMO_ADS)
-      } else {
-        setAds(data)
-      }
+      const data = await apiFetch('/api/ads')
+      setAds(data && data.length > 0 ? data : DEMO_ADS)
     } catch {
       setAds(DEMO_ADS)
     } finally {
@@ -100,13 +93,10 @@ export function Ogloszenia({ user }) {
     if (!newAd.title.trim() || !user || submitting) return
     setSubmitting(true)
     try {
-      await supabase.from('classifieds').insert({
-        ...newAd,
-        author_id: user.id,
-        latitude: location?.lat || null,
-        longitude: location?.lng || null,
-        expires_at: new Date(Date.now() + 30 * 24 * 3600000).toISOString(),
-      })
+      await apiFetch('/api/ads', { method: 'POST', body: {
+        type: newAd.type, title: newAd.title, description: newAd.description, city: newAd.city,
+        latitude: location?.lat || null, longitude: location?.lng || null,
+      }})
       setNewAd({ type: 'looking', title: '', description: '', city: '' })
       setShowNewAd(false)
       loadAds()

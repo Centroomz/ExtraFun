@@ -73,4 +73,33 @@ export function registerRoutes(app) {
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json(data)
   })
+
+  // === OGŁOSZENIA (shared ads pool) ===
+  // Map shared `ads` columns to the fields the ExtraFun UI expects
+  // (type←category, city←location).
+  app.get('/api/ads', async (_req, res) => {
+    const { data, error } = await supabaseAdmin.from('ads')
+      .select('id, title, description, location, category, latitude, longitude, created_at')
+      .eq('status', 'active').order('created_at', { ascending: false }).limit(100)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json((data || []).map(a => ({
+      id: a.id, title: a.title, description: a.description,
+      city: a.location, type: a.category || 'all',
+      latitude: a.latitude, longitude: a.longitude, created_at: a.created_at,
+    })))
+  })
+
+  app.post('/api/ads', verifyJWT, async (req, res) => {
+    const { type, title, description, city, latitude, longitude } = req.body || {}
+    if (!title?.trim()) return res.status(400).json({ message: 'Tytuł wymagany' })
+    const { data, error } = await supabaseAdmin.from('ads').insert({
+      title: title.trim(), description: (description || '').trim(),
+      category: type || 'inne', location: city || null,
+      latitude: latitude || null, longitude: longitude || null,
+      status: 'active', source: 'extrafun', author_uuid: req.user.id,
+      expires_at: new Date(Date.now() + 30 * 24 * 3600000).toISOString(),
+    }).select('id').single()
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json(data)
+  })
 }
