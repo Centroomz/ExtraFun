@@ -51,4 +51,26 @@ export function registerRoutes(app) {
     supabaseAdmin.rpc('increment_article_views', { article_id: data.id }).then(() => {}, () => {})
     res.json(data)
   })
+
+  // === SHARED LIVE CHAT (same stream as bizarriusz.pl/czat) ===
+  app.get('/api/shoutbox', async (req, res) => {
+    const limit = Math.min(parseInt(req.query.limit) || 50, 100)
+    const { data, error } = await supabaseAdmin.from('shoutbox_messages')
+      .select('id, user_id, username, content, created_at').eq('source', 'bizarriusz')
+      .order('created_at', { ascending: false }).limit(limit)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json((data || []).reverse())
+  })
+
+  app.post('/api/shoutbox', verifyJWT, async (req, res) => {
+    const content = (req.body?.content || '').trim()
+    if (!content || content.length > 500) return res.status(400).json({ message: 'Invalid content' })
+    const meta = req.user.meta || {}
+    const username = meta.display_name || meta.full_name || meta.name || meta.username || 'Gość'
+    const { data, error } = await supabaseAdmin.from('shoutbox_messages')
+      .insert({ user_id: req.user.id, username, content, source: 'bizarriusz' })
+      .select('id, user_id, username, content, created_at').single()
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json(data)
+  })
 }
