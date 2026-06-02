@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Switch, Route, useLocation, Link } from 'wouter'
-import { supabase } from './lib/supabase'
+import { apiFetch } from './lib/api'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { AgeGate } from './components/AgeGate'
 import { BottomNav } from './components/BottomNav'
@@ -212,10 +212,9 @@ function AppInner() {
       let ref = 'direct'
       try { if (document.referrer) ref = new URL(document.referrer).hostname.replace(/^www\./, '') } catch {}
       const device = window.matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop'
-      supabase.from('page_views').insert({
-        site: 'extrafun', path: location.slice(0, 200),
-        referrer: ref.slice(0, 100), device, session_id: sid.slice(0, 40),
-      }).then(() => {}, () => {})
+      apiFetch('/api/track', { method: 'POST', body: {
+        path: location, referrer: ref, device, sessionId: sid,
+      }}).catch(() => {})
     } catch {}
   }, [location])
 

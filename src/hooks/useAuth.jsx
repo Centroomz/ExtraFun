@@ -1,5 +1,6 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/api'
 
 const AuthContext = createContext(null)
 
@@ -55,11 +56,9 @@ export function AuthProvider({ children }) {
     })
     if (error) throw error
     if (data.user) {
-      await supabase.from('profiles').upsert({
-        user_id: data.user.id,
-        username,
-        display_name: username,
-      })
+      // Profile row created server-side. Best-effort — if the session is not yet
+      // active (email confirmation flow), it is retried on next login by the app.
+      await apiFetch('/api/profile', { method: 'PUT', body: { username, display_name: username } }).catch(() => {})
     }
     return data
   }
