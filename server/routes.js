@@ -4,6 +4,15 @@ import { verifyJWT, isAdmin } from './auth.js'
 export function registerRoutes(app) {
   app.get('/api/health', (_req, res) => res.json({ ok: true }))
 
+  // === MIEJSCA (swingers venues directory) ===
+  app.get('/api/places', async (_req, res) => {
+    const { data, error } = await supabaseAdmin.from('swingers_venues')
+      .select('id, name, type, address, city, description, website, latitude, longitude')
+      .order('city', { ascending: true })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
   // === ANALYTICS ===
   app.post('/api/track', async (req, res) => {
     const { path, referrer, device, sessionId } = req.body || {}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
 
@@ -278,16 +278,13 @@ export function Przewodnik() {
 
   async function loadVenues() {
     try {
-      const { data, error } = await supabase
-        .from('swingers_venues')
-        .select('id, name, type, address, city, description, website, latitude, longitude')
-        .order('city', { ascending: true })
-      if (!error && data && data.length > 0) {
+      const data = await apiFetch('/api/places')
+      if (data && data.length > 0) {
         // normalize to lat/lng for distance calc
         setVenues(data.map(v => ({ ...v, lat: v.latitude, lng: v.longitude })))
       }
     } catch {
-      // silent fail — no fallback needed, table exists
+      // silent fail
     } finally {
       setLoading(false)
     }
