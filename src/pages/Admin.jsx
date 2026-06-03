@@ -346,6 +346,7 @@ function StatsTab() {
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 120 }}>
             {dailyAsc.map(([day, v]) => (
               <div key={day} title={`${day}: ${v}`} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>{v}</span>
                 <div style={{ width: '100%', background: '#00E5FF', borderRadius: '4px 4px 0 0', height: `${(v / maxV) * 100}%`, minHeight: 2 }} />
                 <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)' }}>{day.slice(5)}</span>
               </div>
