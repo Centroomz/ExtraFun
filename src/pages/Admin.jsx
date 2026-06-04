@@ -311,12 +311,13 @@ function StatsTab() {
   const byDay = {}, byPath = {}, byRef = {}, byDev = {}
   for (const r of rows) {
     const d = (r.created_at || '').slice(0, 10)
-    byDay[d] = (byDay[d] || 0) + 1
+    // visits = distinct sessions per day (not raw page-view rows)
+    ;(byDay[d] = byDay[d] || new Set()).add(r.session_id)
     byPath[r.path] = (byPath[r.path] || 0) + 1
     byRef[r.referrer || 'direct'] = (byRef[r.referrer || 'direct'] || 0) + 1
     byDev[r.device || '?'] = (byDev[r.device || '?'] || 0) + 1
   }
-  const dailyAsc = Object.entries(byDay).sort((a, b) => a[0].localeCompare(b[0]))
+  const dailyAsc = Object.entries(byDay).map(([day, set]) => [day, set.size]).sort((a, b) => a[0].localeCompare(b[0]))
   const maxV = Math.max(1, ...dailyAsc.map(([, v]) => v))
   const top = (o, n = 15) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n)
 
@@ -337,11 +338,11 @@ function StatsTab() {
 
       <div style={{ display: 'flex', gap: 10 }}>
         <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#00E5FF' }}>{totalViews}</div></div>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>SESJE</div><div style={{ fontSize: 28, fontWeight: 900, color: '#00E5FF' }}>{totalSessions}</div></div>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#00E5FF' }}>{totalSessions}</div></div>
       </div>
 
       <div style={card}>
-        <div style={head}>Wizyty dziennie</div>
+        <div style={head}>Odwiedziny dziennie</div>
         {dailyAsc.length === 0 ? <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Brak danych — zbieranie dopiero ruszyło.</div> : (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 120 }}>
             {dailyAsc.map(([day, v]) => (
