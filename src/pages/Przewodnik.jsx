@@ -177,24 +177,36 @@ function VenueDetail({ venue, onBack }) {
           )}
           {venue.events && venue.events.length > 0 && (
             <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
-              <div style={{ fontFamily: 'Outfit', fontSize: 16, fontWeight: 800, marginBottom: 12 }}>📅 Rozkład tygodniowy</div>
-              {[1, 2, 3, 4, 5, 6, 0].map(dow => {
-                const evs = venue.events.filter(e => e.day_of_week === dow)
-                if (!evs.length) return null
-                const DNI = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota']
-                return (
-                  <div key={dow} style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: '#00E5FF', marginBottom: 4 }}>{DNI[dow]}</div>
-                    {evs.map(e => (
-                      <div key={e.id} style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55, marginBottom: 3 }}>
-                        <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
-                        {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
-                        {e.price && <><br /><span style={{ fontSize: 12.5 }}>{e.price}</span></>}
+              <div style={{ fontFamily: 'Outfit', fontSize: 16, fontWeight: 800, marginBottom: 12 }}>📅 Najbliższe dni</div>
+              {(() => {
+                const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota']
+                const MIES = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru']
+                const today = new Date()
+                return [0, 1, 2, 3, 4, 5, 6].map(off => {
+                  const d = new Date(today); d.setDate(d.getDate() + off)
+                  const dow = d.getDay()
+                  const evs = venue.events.filter(e => e.day_of_week === dow)
+                  const label = off === 0 ? 'Dziś' : off === 1 ? 'Jutro'
+                    : `${DNI[dow][0].toUpperCase()}${DNI[dow].slice(1)} ${d.getDate()} ${MIES[d.getMonth()]}`
+                  const isToday = off === 0
+                  return (
+                    <div key={off} style={{ marginBottom: 12, paddingLeft: isToday ? 10 : 0, borderLeft: isToday ? '3px solid #00E5FF' : 'none' }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#00E5FF' : 'var(--text)', marginBottom: 4 }}>
+                        {label}{off > 1 ? '' : ` · ${DNI[dow]} ${d.getDate()} ${MIES[d.getMonth()]}`}
                       </div>
-                    ))}
-                  </div>
-                )
-              })}
+                      {evs.length === 0 ? (
+                        <div style={{ fontSize: 13, color: 'var(--text-dim)', opacity: .6 }}>Zamknięte</div>
+                      ) : evs.map(e => (
+                        <div key={e.id} style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55, marginBottom: 3 }}>
+                          <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
+                          {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
+                          {e.price && <><br /><span style={{ fontSize: 12.5 }}>{e.price}</span></>}
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })
+              })()}
             </div>
           )}
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
