@@ -186,6 +186,67 @@ export function registerRoutes(app) {
     res.json({ ok: true })
   })
 
+  // === ADMIN: VENUES (Przewodnik) ===
+  const VENUE_FIELDS = ['name', 'type', 'scene', 'city', 'address', 'website', 'description', 'logo_url', 'latitude', 'longitude']
+
+  app.get('/api/admin/venues', verifyJWT, isAdmin, async (_req, res) => {
+    const { data, error } = await supabaseAdmin.from('swingers_venues')
+      .select('id, name, type, scene, city, address, website, description, logo_url, latitude, longitude')
+      .order('city', { ascending: true }).order('name', { ascending: true })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  app.post('/api/admin/venues', verifyJWT, isAdmin, async (req, res) => {
+    const b = req.body || {}
+    if (!b.name || !b.city) return res.status(400).json({ message: 'name i city wymagane' })
+    const row = { type: 'club', scene: 'swing' }
+    for (const k of VENUE_FIELDS) if (k in b) row[k] = b[k] || null
+    const { data, error } = await supabaseAdmin.from('swingers_venues').insert(row).select().single()
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data)
+  })
+
+  app.put('/api/admin/venues/:id', verifyJWT, isAdmin, async (req, res) => {
+    const b = req.body || {}
+    const fields = {}
+    for (const k of VENUE_FIELDS) if (k in b) fields[k] = b[k] === '' ? null : b[k]
+    const { error } = await supabaseAdmin.from('swingers_venues').update(fields).eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
+  app.delete('/api/admin/venues/:id', verifyJWT, isAdmin, async (req, res) => {
+    await supabaseAdmin.from('recurring_events').delete().eq('venue_id', req.params.id)
+    await supabaseAdmin.from('one_time_events').delete().eq('venue_id', req.params.id)
+    const { error } = await supabaseAdmin.from('swingers_venues').delete().eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(204).end()
+  })
+
+  // Logo upload: base64 dataURL → Supabase Storage (venue-logos) → set logo_url.
+  app.post('/api/admin/venues/:id/logo', verifyJWT, isAdmin, async (req, res) => {
+    try {
+      const { dataUrl } = req.body || {}
+      const m = String(dataUrl || '').match(/^data:(image\/[a-z+]+);base64,(.+)$/i)
+      if (!m) return res.status(400).json({ message: 'Nieprawidłowy obraz' })
+      const contentType = m[1]
+      const buf = Buffer.from(m[2], 'base64')
+      const ext = (contentType.split('/')[1] || 'png').replace('jpeg', 'jpg').replace('svg+xml', 'svg')
+      const bucket = 'venue-logos'
+      await supabaseAdmin.storage.createBucket(bucket, { public: true }).catch(() => {})
+      const path = `${req.params.id}-${Date.now()}.${ext}`
+      const { error: upErr } = await supabaseAdmin.storage.from(bucket).upload(path, buf, { contentType, upsert: true })
+      if (upErr) return res.status(500).json({ message: upErr.message })
+      const { data: pub } = supabaseAdmin.storage.from(bucket).getPublicUrl(path)
+      const url = pub.publicUrl
+      await supabaseAdmin.from('swingers_venues').update({ logo_url: url }).eq('id', req.params.id)
+      res.json({ logo_url: url })
+    } catch (e) {
+      res.status(500).json({ message: e.message })
+    }
+  })
+
   // === SEO ===
   app.get('/robots.txt', (_req, res) => {
     res.type('text/plain').send(

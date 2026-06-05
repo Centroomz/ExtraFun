@@ -437,6 +437,115 @@ function AdsTab() {
 }
 
 // ── Main Admin ────────────────────────────────────────────────────────────────
+// ── VenuesTab (Przewodnik – lokale) ───────────────────────────────────────────
+const EMPTY_VENUE = { name: '', type: 'club', scene: 'swing', city: '', address: '', website: '', description: '', latitude: '', longitude: '', logo_url: '' }
+const VENUE_TYPES = ['club', 'sauna', 'bar', 'resort', 'kino']
+const VENUE_SCENES = ['swing', 'lgbt', 'mixed']
+
+function VenuesTab() {
+  const [venues, setVenues] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [mode, setMode] = useState(null) // null | 'add' | venue
+  const [form, setForm] = useState(EMPTY_VENUE)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [q, setQ] = useState('')
+
+  useEffect(() => { load() }, [])
+  async function load() { try { setVenues(await apiFetch('/api/admin/venues')) } catch { setVenues([]) } setLoading(false) }
+
+  function openAdd() { setForm(EMPTY_VENUE); setMode('add'); setMsg('') }
+  function openEdit(v) { setForm({ ...EMPTY_VENUE, ...v, latitude: v.latitude ?? '', longitude: v.longitude ?? '', description: v.description ?? '', website: v.website ?? '', address: v.address ?? '', logo_url: v.logo_url ?? '' }); setMode(v); setMsg('') }
+  const set = (k, val) => setForm(f => ({ ...f, [k]: val }))
+
+  async function save() {
+    if (!form.name || !form.city) { setMsg('Nazwa i miasto wymagane'); return }
+    setSaving(true); setMsg('')
+    try {
+      if (mode === 'add') { const created = await apiFetch('/api/admin/venues', { method: 'POST', body: form }); setMode(created); setForm(f => ({ ...f, ...created })) }
+      else await apiFetch(`/api/admin/venues/${mode.id}`, { method: 'PUT', body: form })
+      await load(); setMsg('Zapisano ✓')
+    } catch (e) { setMsg('Błąd: ' + e.message) }
+    setSaving(false)
+  }
+  async function del(v) {
+    if (!confirm(`Usunąć „${v.name}"? (wraz z rozkładem)`)) return
+    try { await apiFetch(`/api/admin/venues/${v.id}`, { method: 'DELETE' }); if (mode && mode.id === v.id) setMode(null); load() } catch (e) { alert(e.message) }
+  }
+  async function uploadLogo(file) {
+    if (!mode || mode === 'add') { setMsg('Najpierw zapisz lokal, potem dodaj logo'); return }
+    const dataUrl = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(file) })
+    setSaving(true); setMsg('')
+    try { const res = await apiFetch(`/api/admin/venues/${mode.id}/logo`, { method: 'POST', body: { dataUrl } }); set('logo_url', res.logo_url); load(); setMsg('Logo wgrane ✓') }
+    catch (e) { setMsg('Błąd logo: ' + e.message) }
+    setSaving(false)
+  }
+
+  const inp = { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 11px', fontSize: 13, color: '#fff', boxSizing: 'border-box', marginBottom: 8 }
+  const lbl = { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 3, display: 'block' }
+
+  if (mode) {
+    return (
+      <div style={{ maxWidth: 560 }}>
+        <button onClick={() => setMode(null)} style={{ background: 'none', border: 'none', color: '#00E5FF', cursor: 'pointer', fontSize: 13, marginBottom: 12 }}>← Lista lokali</button>
+        <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>{mode === 'add' ? 'Nowy lokal' : `Edytuj: ${form.name}`}</h2>
+        <label style={lbl}>Nazwa *</label><input style={inp} value={form.name} onChange={e => set('name', e.target.value)} />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1 }}><label style={lbl}>Miasto *</label><input style={inp} value={form.city} onChange={e => set('city', e.target.value)} /></div>
+          <div style={{ flex: 1 }}><label style={lbl}>Typ</label><select style={inp} value={form.type} onChange={e => set('type', e.target.value)}>{VENUE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
+          <div style={{ flex: 1 }}><label style={lbl}>Scena</label><select style={inp} value={form.scene} onChange={e => set('scene', e.target.value)}>{VENUE_SCENES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
+        </div>
+        <label style={lbl}>Adres</label><input style={inp} value={form.address} onChange={e => set('address', e.target.value)} />
+        <label style={lbl}>Strona WWW</label><input style={inp} value={form.website} onChange={e => set('website', e.target.value)} />
+        <label style={lbl}>Opis</label><textarea style={{ ...inp, minHeight: 90, resize: 'vertical' }} value={form.description} onChange={e => set('description', e.target.value)} />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1 }}><label style={lbl}>Lat</label><input style={inp} value={form.latitude} onChange={e => set('latitude', e.target.value)} /></div>
+          <div style={{ flex: 1 }}><label style={lbl}>Lng</label><input style={inp} value={form.longitude} onChange={e => set('longitude', e.target.value)} /></div>
+        </div>
+        <label style={lbl}>Logo</label>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
+          {form.logo_url ? <img src={form.logo_url} alt="" style={{ width: 56, height: 56, objectFit: 'contain', background: '#000', borderRadius: 8 }} /> : <div style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.06)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🏠</div>}
+          <label style={{ background: 'rgba(0,229,255,0.15)', border: '1px solid rgba(0,229,255,0.3)', color: '#00E5FF', borderRadius: 8, padding: '8px 12px', fontSize: 13, cursor: 'pointer' }}>
+            Wgraj logo
+            <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => e.target.files[0] && uploadLogo(e.target.files[0])} />
+          </label>
+        </div>
+        <input style={inp} placeholder="…lub wklej URL logo" value={form.logo_url} onChange={e => set('logo_url', e.target.value)} />
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+          <button onClick={save} disabled={saving} style={{ background: '#00E5FF', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? '…' : 'Zapisz'}</button>
+          {msg && <span style={{ fontSize: 13, color: msg.startsWith('Błąd') ? '#ff6b6b' : '#00E5FF' }}>{msg}</span>}
+        </div>
+      </div>
+    )
+  }
+
+  const list = venues.filter(v => !q || (v.name + ' ' + v.city).toLowerCase().includes(q.toLowerCase()))
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+        <input style={{ ...inp, marginBottom: 0, flex: 1 }} placeholder="Szukaj (nazwa/miasto)…" value={q} onChange={e => setQ(e.target.value)} />
+        <button onClick={openAdd} style={{ background: '#00E5FF', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Dodaj</button>
+      </div>
+      {loading ? <div style={{ color: 'rgba(255,255,255,0.5)' }}>Ładowanie…</div> : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {list.map(v => (
+            <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 12px' }}>
+              {v.logo_url ? <img src={v.logo_url} alt="" style={{ width: 36, height: 36, objectFit: 'contain', background: '#000', borderRadius: 6, flexShrink: 0 }} /> : <div style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.06)', borderRadius: 6, flexShrink: 0 }} />}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, fontSize: 14 }}>{v.name}</div>
+                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{v.city} · {v.type} · {v.scene}</div>
+              </div>
+              <button onClick={() => openEdit(v)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' }}>Edytuj</button>
+              <button onClick={() => del(v)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.45)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
+            </div>
+          ))}
+          {list.length === 0 && <div style={{ color: 'rgba(255,255,255,0.5)' }}>Brak lokali.</div>}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function Admin() {
   const { user } = useAuth()
   const [tab, setTab] = useState('artykuly')
@@ -463,6 +572,7 @@ export function Admin() {
     { id: 'ruch', label: '📊 Ruch' },
     { id: 'artykuly', label: '📰 Artykuły' },
     { id: 'ogloszenia', label: '📋 Ogłoszenia' },
+    { id: 'lokale', label: '🏠 Lokale' },
   ]
 
   return (
@@ -492,6 +602,7 @@ export function Admin() {
         {tab === 'ruch' && <StatsTab />}
         {tab === 'artykuly' && <ArticlesTab />}
         {tab === 'ogloszenia' && <AdsTab />}
+        {tab === 'lokale' && <VenuesTab />}
       </div>
     </div>
   )
