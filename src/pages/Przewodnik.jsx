@@ -310,6 +310,8 @@ export function Przewodnik() {
   const [loading, setLoading] = useState(true)
   const [activeCity, setActiveCity] = useState('all')
   const [activeType, setActiveType] = useState('all')
+  const [dayOffset, setDayOffset] = useState(0)   // 0=dziś, 1=jutro, 2=pojutrze
+  const [scene, setScene] = useState('all')        // 'all' | 'swing' | 'lgbt'
   const [selectedVenue, setSelectedVenue] = useState(null)
   const [selectedArticle, setSelectedArticle] = useState(null)
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
@@ -360,9 +362,19 @@ export function Przewodnik() {
     return a.localeCompare(b, 'pl')
   })]
 
+  // Client-centric: show what's ON the chosen day, near me.
+  const targetDow = (new Date().getDay() + dayOffset) % 7
+  const sceneOk = v => scene === 'all' || v.scene === scene || v.scene === 'mixed'
   const filtered = venuesWithDist
     .filter(v => activeCity === 'all' || v.city === activeCity)
     .filter(v => activeType === 'all' || v.type === activeType)
+    .filter(sceneOk)
+    .map(v => {
+      const evs = v.events || []
+      return { ...v, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 }
+    })
+    // Open that day: has an event today OR is an event-club (no fixed schedule).
+    .filter(v => v._dayEvents.length > 0 || v._eventClub)
 
   const types = ['all', ...Array.from(new Set(venues.map(v => v.type))).sort()]
 
@@ -419,6 +431,28 @@ export function Przewodnik() {
         {!location && !geoLoading && (
           <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz'}</button>
         )}
+      </div>
+
+      {/* Day switch — what's on today/tomorrow/day-after */}
+      <div className="category-filter" style={{ marginBottom: 8 }}>
+        {[['Dziś', 0], ['Jutro', 1], ['Pojutrze', 2]].map(([label, off]) => (
+          <button
+            key={off}
+            className={`category-chip ${dayOffset === off ? 'active' : ''}`}
+            onClick={() => setDayOffset(off)}
+          >{label}</button>
+        ))}
+      </div>
+
+      {/* Scene toggle */}
+      <div className="category-filter" style={{ marginBottom: 8 }}>
+        {[['Wszystko', 'all'], ['Swing', 'swing'], ['LGBT', 'lgbt']].map(([label, val]) => (
+          <button
+            key={val}
+            className={`category-chip ${scene === val ? 'active' : ''}`}
+            onClick={() => setScene(val)}
+          >{label}</button>
+        ))}
       </div>
 
       {/* City filter */}
@@ -483,10 +517,19 @@ export function Przewodnik() {
                     </span>
                     <span>📍 {venue.city}</span>
                   </div>
-                  {venue.description && (
-                    <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4, lineHeight: 1.4,
-                      overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
-                      {venue.description}
+                  {venue._eventClub ? (
+                    <div style={{ fontSize: 12.5, color: '#00E5FF', marginTop: 6, fontWeight: 600 }}>
+                      🟢 Otwarte — sprawdź imprezę na stronie
+                    </div>
+                  ) : (
+                    <div style={{ marginTop: 6 }}>
+                      {venue._dayEvents.map(e => (
+                        <div key={e.id} style={{ fontSize: 12.5, color: 'var(--text-dim)', lineHeight: 1.45, marginBottom: 2 }}>
+                          <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
+                          {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
+                          {e.price && <> · {e.price}</>}
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

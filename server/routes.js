@@ -7,7 +7,7 @@ export function registerRoutes(app) {
   // === MIEJSCA (swingers venues directory) ===
   app.get('/api/places', async (_req, res) => {
     const { data: venues, error } = await supabaseAdmin.from('swingers_venues')
-      .select('id, name, type, address, city, description, website, latitude, longitude, logo_url')
+      .select('id, name, type, address, city, description, website, latitude, longitude, logo_url, scene')
       .order('city', { ascending: true })
     if (error) return res.status(500).json({ message: error.message })
     // Attach the weekly schedule (recurring_events) to each venue.
