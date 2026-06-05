@@ -152,17 +152,19 @@ function VenueDetail({ venue, onBack }) {
         <h1 style={{ fontSize: 16 }}>Szczegóły</h1>
       </div>
       <div style={{ padding: '0 0 80px' }}>
-        <div className="venue-card-img" style={{ height: 160, background: `linear-gradient(135deg, ${t.bg.replace('0.12', '0.4')}, rgba(10,10,30,0.8))`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-          {venue.logo_url
-            ? <img src={venue.logo_url} alt={venue.name} style={{ maxWidth: '72%', maxHeight: '80%', objectFit: 'contain' }} />
-            : <span style={{ fontSize: 72 }}>{t.icon}</span>}
-        </div>
         <div style={{ padding: '20px 16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-            <h2 style={{ fontFamily: 'Outfit', fontSize: 24, fontWeight: 800, flex: 1 }}>{venue.name}</h2>
-            {venue.distance != null && (
-              <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+            <div style={{ width: 72, height: 72, borderRadius: 14, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              {venue.logo_url
+                ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8, boxSizing: 'border-box' }} />
+                : <span style={{ fontSize: 34 }}>{t.icon}</span>}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 style={{ fontFamily: 'Outfit', fontSize: 24, fontWeight: 800 }}>{venue.name}</h2>
+              {venue.distance != null && (
+                <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
+              )}
+            </div>
           </div>
           <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
             <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
@@ -513,13 +515,13 @@ export function Przewodnik() {
           {filtered.map(venue => {
             const t = getTypeConfig(venue.type)
             return (
-              <div key={venue.id} className="venue-card" onClick={() => setSelectedVenue(venue.id)}>
-                <div className="venue-card-img" style={{ fontSize: 28, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+              <div key={venue.id} className="venue-card" onClick={() => setSelectedVenue(venue.id)} style={{ display: 'flex', gap: 12, padding: 12, alignItems: 'flex-start' }}>
+                <div style={{ width: 64, height: 64, borderRadius: 12, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                   {venue.logo_url
-                    ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                    : t.icon}
+                    ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
+                    : <span style={{ fontSize: 26 }}>{t.icon}</span>}
                 </div>
-                <div className="venue-card-body">
+                <div className="venue-card-body" style={{ flex: 1, minWidth: 0, padding: 0 }}>
                   <div className="venue-card-top">
                     <div className="venue-card-name">{venue.name}</div>
                     {venue.distance != null && (
