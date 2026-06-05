@@ -514,8 +514,10 @@ export function Przewodnik() {
             const t = getTypeConfig(venue.type)
             return (
               <div key={venue.id} className="venue-card" onClick={() => setSelectedVenue(venue.id)}>
-                <div className="venue-card-img" style={{ fontSize: 28, background: t.bg }}>
-                  {t.icon}
+                <div className="venue-card-img" style={{ fontSize: 28, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                  {venue.logo_url
+                    ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                    : t.icon}
                 </div>
                 <div className="venue-card-body">
                   <div className="venue-card-top">
