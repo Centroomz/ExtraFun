@@ -437,6 +437,31 @@ function AdsTab() {
 }
 
 // ── Main Admin ────────────────────────────────────────────────────────────────
+// Downscale + compress an image file in the browser before upload (≤maxSize px,
+// webp) so logos stay tiny and load fast — no manual resizing on the phone.
+function downscaleImage(file, maxSize = 512, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      let { width, height } = img
+      if (width > maxSize || height > maxSize) {
+        if (width >= height) { height = Math.round(height * maxSize / width); width = maxSize }
+        else { width = Math.round(width * maxSize / height); height = maxSize }
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width; canvas.height = height
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height)
+      let out = canvas.toDataURL('image/webp', quality)
+      if (!out.startsWith('data:image/webp')) out = canvas.toDataURL('image/jpeg', quality) // Safari fallback
+      resolve(out)
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Nie udało się wczytać obrazu')) }
+    img.src = url
+  })
+}
+
 // ── VenuesTab (Przewodnik – lokale) ───────────────────────────────────────────
 const EMPTY_VENUE = { name: '', type: 'club', scene: 'swing', city: '', address: '', website: '', description: '', latitude: '', longitude: '', logo_url: '' }
 const VENUE_TYPES = ['club', 'sauna', 'bar', 'resort', 'kino']
@@ -474,8 +499,8 @@ function VenuesTab() {
   }
   async function uploadLogo(file) {
     if (!mode || mode === 'add') { setMsg('Najpierw zapisz lokal, potem dodaj logo'); return }
-    const dataUrl = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(file) })
     setSaving(true); setMsg('')
+    const dataUrl = await downscaleImage(file, 512, 0.85)
     try { const res = await apiFetch(`/api/admin/venues/${mode.id}/logo`, { method: 'POST', body: { dataUrl } }); set('logo_url', res.logo_url); load(); setMsg('Logo wgrane ✓') }
     catch (e) { setMsg('Błąd logo: ' + e.message) }
     setSaving(false)
