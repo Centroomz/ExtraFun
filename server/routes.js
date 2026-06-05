@@ -6,11 +6,18 @@ export function registerRoutes(app) {
 
   // === MIEJSCA (swingers venues directory) ===
   app.get('/api/places', async (_req, res) => {
-    const { data, error } = await supabaseAdmin.from('swingers_venues')
-      .select('id, name, type, address, city, description, website, latitude, longitude')
+    const { data: venues, error } = await supabaseAdmin.from('swingers_venues')
+      .select('id, name, type, address, city, description, website, latitude, longitude, logo_url')
       .order('city', { ascending: true })
     if (error) return res.status(500).json({ message: error.message })
-    res.json(data || [])
+    // Attach the weekly schedule (recurring_events) to each venue.
+    const { data: events } = await supabaseAdmin.from('recurring_events')
+      .select('id, venue_id, day_of_week, event_name, description, start_time, end_time, price, tags')
+      .or('is_active.is.null,is_active.eq.true')
+      .order('day_of_week', { ascending: true })
+    const byVenue = {}
+    for (const e of (events || [])) (byVenue[e.venue_id] ||= []).push(e)
+    res.json((venues || []).map(v => ({ ...v, events: byVenue[v.id] || [] })))
   })
 
   // === ANALYTICS ===

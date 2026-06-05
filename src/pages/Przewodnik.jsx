@@ -152,8 +152,10 @@ function VenueDetail({ venue, onBack }) {
         <h1 style={{ fontSize: 16 }}>Szczegóły</h1>
       </div>
       <div style={{ padding: '0 0 80px' }}>
-        <div className="venue-card-img" style={{ fontSize: 72, height: 160, background: `linear-gradient(135deg, ${t.bg.replace('0.12', '0.4')}, rgba(10,10,30,0.8))` }}>
-          {t.icon}
+        <div className="venue-card-img" style={{ height: 160, background: `linear-gradient(135deg, ${t.bg.replace('0.12', '0.4')}, rgba(10,10,30,0.8))`, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+          {venue.logo_url
+            ? <img src={venue.logo_url} alt={venue.name} style={{ maxWidth: '72%', maxHeight: '80%', objectFit: 'contain' }} />
+            : <span style={{ fontSize: 72 }}>{t.icon}</span>}
         </div>
         <div style={{ padding: '20px 16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
@@ -172,6 +174,28 @@ function VenueDetail({ venue, onBack }) {
             <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>
               {venue.description}
             </p>
+          )}
+          {venue.events && venue.events.length > 0 && (
+            <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
+              <div style={{ fontFamily: 'Outfit', fontSize: 16, fontWeight: 800, marginBottom: 12 }}>📅 Rozkład tygodniowy</div>
+              {[1, 2, 3, 4, 5, 6, 0].map(dow => {
+                const evs = venue.events.filter(e => e.day_of_week === dow)
+                if (!evs.length) return null
+                const DNI = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota']
+                return (
+                  <div key={dow} style={{ marginBottom: 12 }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: '#00E5FF', marginBottom: 4 }}>{DNI[dow]}</div>
+                    {evs.map(e => (
+                      <div key={e.id} style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55, marginBottom: 3 }}>
+                        <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
+                        {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
+                        {e.price && <><br /><span style={{ fontSize: 12.5 }}>{e.price}</span></>}
+                      </div>
+                    ))}
+                  </div>
+                )
+              })}
+            </div>
           )}
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: venue.website ? 10 : 0 }}>
@@ -370,10 +394,11 @@ export function Przewodnik() {
         <span className="location-bar-text">
           {geoLoading ? 'Szukam lokalizacji...' :
            location ? <><strong>GPS aktywny</strong> – sortowanie wg odległości</> :
+           geoError ? 'GPS niedostępny – pozwól na lokalizację w przeglądarce' :
            'Włącz GPS – zobaczysz odległości'}
         </span>
         {!location && !geoLoading && (
-          <button className="location-bar-btn" onClick={requestLocation}>Włącz</button>
+          <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz'}</button>
         )}
       </div>
 
