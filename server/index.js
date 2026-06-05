@@ -10,7 +10,7 @@ const DIST = join(ROOT, 'dist')
 const app = express()
 const PORT = process.env.PORT || 3000
 
-app.use(express.json())
+app.use(express.json({ limit: '12mb' }))  // logo uploads arrive as base64 dataURL
 
 // Domain redirect (.fun/.club → .pl) — preserved from old server.js
 app.use((req, res, next) => {
