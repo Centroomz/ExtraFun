@@ -209,6 +209,13 @@ function VenueDetail({ venue, onBack }) {
               })()}
             </div>
           )}
+          {(!venue.events || venue.events.length === 0) && (
+            <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
+              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+                📅 Klub eventowy — terminy i ceny zmieniają się. Sprawdź aktualne imprezy {venue.website ? 'na stronie poniżej.' : 'u źródła.'}
+              </div>
+            </div>
+          )}
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: venue.website ? 10 : 0 }}>
               <span style={{ fontSize: 16 }}>📍</span>
