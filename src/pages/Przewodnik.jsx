@@ -185,6 +185,8 @@ function VenueDetail({ venue, onBack }) {
                 return [0, 1, 2, 3, 4, 5, 6].map(off => {
                   const d = new Date(today); d.setDate(d.getDate() + off)
                   const dow = d.getDay()
+                  const dymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+                  const special = (venue.oneTime || []).find(e => (e.event_date || '').slice(0, 10) === dymd)
                   const evs = venue.events.filter(e => e.day_of_week === dow)
                   const label = off === 0 ? 'Dziś' : off === 1 ? 'Jutro'
                     : `${DNI[dow][0].toUpperCase()}${DNI[dow].slice(1)} ${d.getDate()} ${MIES[d.getMonth()]}`
@@ -194,7 +196,13 @@ function VenueDetail({ venue, onBack }) {
                       <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#00E5FF' : 'var(--text)', marginBottom: 4 }}>
                         {label}{off > 1 ? '' : ` · ${DNI[dow]} ${d.getDate()} ${MIES[d.getMonth()]}`}
                       </div>
-                      {evs.length === 0 ? (
+                      {special ? (
+                        <div style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55 }}>
+                          <strong style={{ color: '#FFC824' }}>⭐ {special.event_name}</strong>
+                          {(special.start_time || special.end_time) && <> · {special.start_time}{special.end_time ? `–${special.end_time}` : ''}</>}
+                          {special.price && <><br /><span style={{ fontSize: 12.5 }}>{special.price}</span></>}
+                        </div>
+                      ) : evs.length === 0 ? (
                         <div style={{ fontSize: 13, color: 'var(--text-dim)', opacity: .6 }}>Zamknięte</div>
                       ) : evs.map(e => (
                         <div key={e.id} style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55, marginBottom: 3 }}>
@@ -363,7 +371,10 @@ export function Przewodnik() {
   })]
 
   // Client-centric: show what's ON the chosen day, near me.
-  const targetDow = (new Date().getDay() + dayOffset) % 7
+  const _targetDate = new Date(); _targetDate.setDate(_targetDate.getDate() + dayOffset)
+  const targetDow = _targetDate.getDay()
+  const ymd = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  const targetYmd = ymd(_targetDate)
   const sceneOk = v => scene === 'all' || v.scene === scene || v.scene === 'mixed'
   const filtered = venuesWithDist
     .filter(v => activeCity === 'all' || v.city === activeCity)
@@ -371,10 +382,12 @@ export function Przewodnik() {
     .filter(sceneOk)
     .map(v => {
       const evs = v.events || []
-      return { ...v, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 }
+      // A dated special on that exact date overrides the weekly schedule.
+      const special = (v.oneTime || []).find(e => (e.event_date || '').slice(0, 10) === targetYmd)
+      return { ...v, _special: special, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 }
     })
-    // Open that day: has an event today OR is an event-club (no fixed schedule).
-    .filter(v => v._dayEvents.length > 0 || v._eventClub)
+    // Open that day: special OR weekly event OR event-club (no fixed schedule).
+    .filter(v => v._special || v._dayEvents.length > 0 || v._eventClub)
 
   const types = ['all', ...Array.from(new Set(venues.map(v => v.type))).sort()]
 
@@ -517,7 +530,13 @@ export function Przewodnik() {
                     </span>
                     <span>📍 {venue.city}</span>
                   </div>
-                  {venue._eventClub ? (
+                  {venue._special ? (
+                    <div style={{ fontSize: 12.5, color: 'var(--text-dim)', lineHeight: 1.45, marginTop: 6 }}>
+                      <strong style={{ color: '#FFC824' }}>⭐ {venue._special.event_name}</strong>
+                      {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
+                      {venue._special.price && <> · {venue._special.price}</>}
+                    </div>
+                  ) : venue._eventClub ? (
                     <div style={{ fontSize: 12.5, color: '#00E5FF', marginTop: 6, fontWeight: 600 }}>
                       🟢 Otwarte — sprawdź imprezę na stronie
                     </div>

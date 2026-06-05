@@ -17,7 +17,15 @@ export function registerRoutes(app) {
       .order('day_of_week', { ascending: true })
     const byVenue = {}
     for (const e of (events || [])) (byVenue[e.venue_id] ||= []).push(e)
-    res.json((venues || []).map(v => ({ ...v, events: byVenue[v.id] || [] })))
+    // Dated specials (one-off events) that override the weekly schedule on a day.
+    const todayStr = new Date().toISOString().slice(0, 10)
+    const { data: oneTime } = await supabaseAdmin.from('one_time_events')
+      .select('id, venue_id, event_date, event_name, description, start_time, end_time, price, external_link')
+      .gte('event_date', todayStr)
+      .order('event_date', { ascending: true })
+    const otByVenue = {}
+    for (const e of (oneTime || [])) (otByVenue[e.venue_id] ||= []).push(e)
+    res.json((venues || []).map(v => ({ ...v, events: byVenue[v.id] || [], oneTime: otByVenue[v.id] || [] })))
   })
 
   // === ANALYTICS ===
