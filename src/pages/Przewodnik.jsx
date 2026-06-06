@@ -321,7 +321,7 @@ export function Przewodnik() {
   const [activeCity, setActiveCity] = useState('Warszawa') // default: one city, not everything
   const [activeType, setActiveType] = useState('all')
   const [dayOffset, setDayOffset] = useState(0)   // 0=dziś, 1=jutro, 2=pojutrze
-  const [scene, setScene] = useState('all')        // 'all' | 'swing' | 'lgbt'
+  const [scene, setScene] = useState('swing')      // 'all' | 'swing' | 'lgbt' — default swing
   const [radiusKm, setRadiusKm] = useState(25)     // scope when GPS active
   const [selectedVenue, setSelectedVenue] = useState(null)
   const [selectedArticle, setSelectedArticle] = useState(null)
@@ -462,18 +462,6 @@ export function Przewodnik() {
           )}
         </div>
 
-        {/* Promień — tylko z GPS */}
-        {location && (
-          <div className="category-filter" style={{ marginTop: 8, padding: 0 }}>
-            {[10, 25, 50].map(r => (
-              <button
-                key={r}
-                className={`category-chip ${activeCity === 'all' && radiusKm === r ? 'active' : ''}`}
-                onClick={() => { setActiveCity('all'); setRadiusKm(r) }}
-              >{r} km</button>
-            ))}
-          </div>
-        )}
       </div>
 
       {/* Day switch — what's on today/tomorrow/day-after */}
@@ -487,46 +475,37 @@ export function Przewodnik() {
         ))}
       </div>
 
-      {/* Scene toggle */}
-      <div className="category-filter" style={{ marginBottom: 8 }}>
-        {[['Wszystko', 'all'], ['Swing', 'swing'], ['LGBT', 'lgbt']].map(([label, val]) => (
-          <button
-            key={val}
-            className={`category-chip ${scene === val ? 'active' : ''}`}
-            onClick={() => setScene(val)}
-          >{label}</button>
-        ))}
-      </div>
+      {/* Filtry — skonsolidowane dropdowny (scena / miasto / typ / odległość) */}
+      <div style={{ display: 'flex', gap: 8, padding: '0 16px', marginBottom: 16, flexWrap: 'wrap' }}>
+        <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
+          value={scene} onChange={e => setScene(e.target.value)}>
+          <option value="swing">Swing</option>
+          <option value="lgbt">LGBT</option>
+          <option value="all">Każda scena</option>
+        </select>
 
-      {/* City filter */}
-      <div className="category-filter" style={{ marginBottom: 8 }}>
-        {sortedCities.map(city => (
-          <button
-            key={city}
-            className={`category-chip ${activeCity === city ? 'active' : ''}`}
-            onClick={() => setActiveCity(city)}
-          >
-            {city === 'all' ? '🌍 Wszystkie' : city}
-          </button>
-        ))}
-      </div>
+        <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
+          value={activeCity} onChange={e => setActiveCity(e.target.value)}>
+          <option value="all">🌍 Wszystkie miasta</option>
+          {sortedCities.filter(c => c !== 'all').map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
 
-      {/* Type filter */}
-      <div className="category-filter" style={{ marginBottom: 16 }}>
-        <button
-          className={`category-chip ${activeType === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveType('all')}
-        >Wszystkie typy</button>
-        {types.filter(t => t !== 'all').map(type => {
-          const cfg = getTypeConfig(type)
-          return (
-            <button
-              key={type}
-              className={`category-chip ${activeType === type ? 'active' : ''}`}
-              onClick={() => setActiveType(type)}
-            >{cfg.icon} {cfg.label}</button>
-          )
-        })}
+        <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
+          value={activeType} onChange={e => setActiveType(e.target.value)}>
+          <option value="all">Wszystkie typy</option>
+          {types.filter(t => t !== 'all').map(t => <option key={t} value={t}>{getTypeConfig(t).label}</option>)}
+        </select>
+
+        {location && (
+          <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
+            value={activeCity === 'all' ? String(radiusKm) : 'city'}
+            onChange={e => { if (e.target.value !== 'city') { setActiveCity('all'); setRadiusKm(Number(e.target.value)) } }}>
+            {activeCity !== 'all' && <option value="city">Miasto: {activeCity}</option>}
+            <option value="10">≤ 10 km</option>
+            <option value="25">≤ 25 km</option>
+            <option value="50">≤ 50 km</option>
+          </select>
+        )}
       </div>
 
       {/* Venue list */}
