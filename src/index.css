@@ -44,29 +44,16 @@ body {
   background: var(--bg-dark);
   overflow: hidden;
 }
+/* Single, calm cyan glow — one dominant colour, no flashy multi-colour pulse. */
 .app-bg::before {
   content: '';
   position: absolute;
-  top: -30%;
-  left: -20%;
-  width: 70%;
-  height: 70%;
-  background: radial-gradient(ellipse, rgba(0,229,255,0.10) 0%, transparent 65%);
-  animation: pulse 8s ease-in-out infinite alternate;
-}
-.app-bg::after {
-  content: '';
-  position: absolute;
-  bottom: -20%;
-  right: -20%;
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(ellipse, rgba(157,78,221,0.12) 0%, transparent 65%);
-  animation: pulse 10s ease-in-out infinite alternate-reverse;
-}
-@keyframes pulse {
-  from { opacity: 0.5; transform: scale(1); }
-  to { opacity: 1; transform: scale(1.1); }
+  top: -25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  height: 55%;
+  background: radial-gradient(ellipse, rgba(0,229,255,0.07) 0%, transparent 70%);
 }
 
 /* ── Layout ── */
@@ -163,8 +150,8 @@ body {
   gap: 8px;
   padding: 14px 28px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--cyan), var(--purple));
-  color: white;
+  background: linear-gradient(135deg, var(--cyan), #00B8D4);
+  color: #04212a;
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
   font-weight: 700;
@@ -172,7 +159,7 @@ body {
   cursor: pointer;
   transition: opacity 0.2s, transform 0.15s;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(0,229,255,0.25);
+  box-shadow: 0 4px 20px rgba(0,229,255,0.20);
 }
 .btn-primary:hover { opacity: 0.9; }
 .btn-primary:active { transform: scale(0.97); }
@@ -231,10 +218,8 @@ body {
   font-family: 'Outfit', sans-serif;
   font-size: 22px;
   font-weight: 800;
-  background: linear-gradient(90deg, var(--cyan), var(--purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text);
+  letter-spacing: -0.3px;
 }
 
 /* ── Article card ── */
@@ -393,23 +378,24 @@ body {
 .venue-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 0 16px 16px;
+  gap: 14px;
+  padding: 4px 16px 24px;
 }
 .venue-card {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
   border-radius: var(--radius-xl);
   overflow: hidden;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, border-color 0.2s;
 }
-.venue-card:active { opacity: 0.85; }
+.venue-card:hover { border-color: rgba(0,229,255,0.35); background: rgba(255,255,255,0.06); }
+.venue-card:active { opacity: 0.9; }
 .venue-card-img {
   width: 100%;
   height: 140px;
   object-fit: cover;
-  background: linear-gradient(135deg, var(--bg-navy), rgba(157,78,221,0.3));
+  background: var(--bg-navy);
   display: flex;
   align-items: center;
   justify-content: center;
