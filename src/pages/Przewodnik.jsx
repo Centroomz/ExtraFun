@@ -454,7 +454,7 @@ export function Przewodnik() {
           <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
             {geoLoading ? 'Szukam lokalizacji…' :
              location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong>{radiusKm === Infinity ? ' — wg odległości' : ` — w promieniu ${radiusKm} km`}</> :
-             geoError ? 'GPS niedostępny — pozwól na lokalizację' :
+             geoError ? geoError :
              'Włącz GPS — pokażę co jest blisko'}
           </span>
           {!location && !geoLoading && (

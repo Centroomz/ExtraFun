@@ -13,7 +13,14 @@ export function useGeolocation() {
       const loc = await getUserLocation()
       setLocation(loc)
     } catch (err) {
-      setError(err.message || 'Brak dostępu do lokalizacji')
+      const msg = err && err.code === 1
+        ? 'Lokalizacja zablokowana — zezwól w ustawieniach przeglądarki (kłódka przy adresie)'
+        : err && err.code === 2
+        ? 'Nie udało się ustalić pozycji — sprawdź czy lokalizacja w telefonie jest włączona'
+        : err && err.code === 3
+        ? 'Przekroczono czas — spróbuj ponownie'
+        : (err && err.message) || 'Brak dostępu do lokalizacji'
+      setError(msg)
     } finally {
       setLoading(false)
     }

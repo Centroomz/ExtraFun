@@ -37,9 +37,19 @@ export function getUserLocation() {
       reject(new Error('Geolocation not supported'))
       return
     }
+    const ok = (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+    // High accuracy first; on timeout/unavailable fall back to low accuracy
+    // (highAccuracy often fails on desktop / indoors / privacy browsers).
     navigator.geolocation.getCurrentPosition(
-      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      (err) => reject(err),
+      ok,
+      (err) => {
+        if (err && err.code === 1) { reject(err); return } // PERMISSION_DENIED — no retry
+        navigator.geolocation.getCurrentPosition(
+          ok,
+          (err2) => reject(err2),
+          { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 }
+        )
+      },
       { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }
     )
   })
