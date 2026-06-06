@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
@@ -318,18 +318,25 @@ function ArticleCard({ article, hero, onClick }) {
 export function Przewodnik() {
   const [venues, setVenues] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeCity, setActiveCity] = useState('all')
+  const [activeCity, setActiveCity] = useState('Warszawa') // default: one city, not everything
   const [activeType, setActiveType] = useState('all')
   const [dayOffset, setDayOffset] = useState(0)   // 0=dziś, 1=jutro, 2=pojutrze
   const [scene, setScene] = useState('all')        // 'all' | 'swing' | 'lgbt'
+  const [radiusKm, setRadiusKm] = useState(25)     // scope when GPS active
   const [selectedVenue, setSelectedVenue] = useState(null)
   const [selectedArticle, setSelectedArticle] = useState(null)
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
+  const geoApplied = useRef(false)
 
   useEffect(() => {
     loadVenues()
     requestLocation()
   }, [])
+
+  // When GPS first arrives, switch to radius mode (all cities, ≤ radiusKm).
+  useEffect(() => {
+    if (location && !geoApplied.current) { geoApplied.current = true; setActiveCity('all') }
+  }, [location])
 
   async function loadVenues() {
     try {
@@ -379,7 +386,12 @@ export function Przewodnik() {
   const targetYmd = ymd(_targetDate)
   const sceneOk = v => scene === 'all' || v.scene === scene || v.scene === 'mixed'
   const filtered = venuesWithDist
-    .filter(v => activeCity === 'all' || v.city === activeCity)
+    // Scope: a chosen city → that city; otherwise, with GPS → within radiusKm.
+    .filter(v => {
+      if (activeCity !== 'all') return v.city === activeCity
+      if (location) return v.distance != null && v.distance <= radiusKm
+      return true
+    })
     .filter(v => activeType === 'all' || v.type === activeType)
     .filter(sceneOk)
     .map(v => {
@@ -404,56 +416,63 @@ export function Przewodnik() {
 
   return (
     <div>
-      <div style={{ padding: '28px 16px 18px' }}>
-        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--cyan)', marginBottom: 8 }}>
-          ExtraFun · Przewodnik
-        </div>
-        <h1 style={{ fontFamily: 'Outfit', fontSize: 34, fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.05, margin: 0, color: 'var(--text)' }}>
-          Kluby i imprezy<br />blisko Ciebie
-        </h1>
-        <p style={{ fontSize: 15, color: 'var(--text-dim)', marginTop: 10, lineHeight: 1.5, maxWidth: 420 }}>
-          Co jest dziś, jutro i pojutrze — swing i LGBT, w Twoim mieście.
-        </p>
-        <div style={{ height: 3, width: 48, background: 'var(--cyan)', borderRadius: 2, marginTop: 16 }} />
+      {/* ── TOP 10 — na samej górze ── */}
+      <div style={{ padding: '24px 16px 12px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--cyan)' }}>
+        Polecane
+      </div>
+      <div style={{ padding: '0 16px' }}>
+        <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
       </div>
 
-      {/* ── HERO ARTICLE ── */}
-      <ArticleCard
-        article={ARTICLES[0]}
-        hero
-        onClick={() => setSelectedArticle(ARTICLES[0])}
-      />
-
-      {/* ── CITY ARTICLE CARDS ── */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+      {/* ── Polska i Europa ── */}
+      <div style={{ padding: '10px 16px 10px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>
+        Polska i Europa
+      </div>
+      <div style={{ display: 'flex', gap: 10, padding: '0 16px', marginBottom: 28 }}>
         {ARTICLES.slice(1).map(a => (
           <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />
         ))}
       </div>
 
-      {/* ── VENUE BROWSER ── */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14,
-        paddingBottom: 12, borderBottom: '1px solid var(--border)',
-      }}>
-        <span style={{ fontSize: 18 }}>🏠</span>
-        <span style={{ fontFamily: 'Outfit', fontSize: 18, fontWeight: 800 }}>Baza Lokali</span>
-        <span style={{ fontSize: 13, color: 'var(--text-dim)', marginLeft: 4 }}>
-          {loading ? '…' : `(${filtered.length})`}
-        </span>
-      </div>
+      {/* ── Kluby i imprezy blisko Ciebie — GPS + listing ── */}
+      <div style={{ padding: '0 16px', marginBottom: 12 }}>
+        <h2 style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 4px', color: 'var(--text)' }}>
+          📍 Kluby i imprezy blisko Ciebie
+        </h2>
+        <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>
+          {loading ? 'Ładowanie…' : `${filtered.length} ${filtered.length === 1 ? 'miejsce' : 'miejsc'} — ${dayOffset === 0 ? 'dziś' : dayOffset === 1 ? 'jutro' : 'pojutrze'}`}
+        </p>
 
-      {/* Location bar */}
-      <div className="location-bar" style={{ marginBottom: 10 }}>
-        <span className="location-bar-icon">📡</span>
-        <span className="location-bar-text">
-          {geoLoading ? 'Szukam lokalizacji...' :
-           location ? <><strong>GPS aktywny</strong> – sortowanie wg odległości</> :
-           geoError ? 'GPS niedostępny – pozwól na lokalizację w przeglądarce' :
-           'Włącz GPS – zobaczysz odległości'}
-        </span>
-        {!location && !geoLoading && (
-          <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz'}</button>
+        {/* GPS — w boksie sekcji */}
+        <div style={{
+          marginTop: 12, padding: '12px 14px', borderRadius: 14,
+          display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+          background: location ? 'rgba(0,229,255,0.08)' : 'var(--glass)',
+          border: `1px solid ${location ? 'rgba(0,229,255,0.3)' : 'var(--glass-border)'}`,
+        }}>
+          <span style={{ fontSize: 16 }}>📡</span>
+          <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
+            {geoLoading ? 'Szukam lokalizacji…' :
+             location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong> — w promieniu {radiusKm} km</> :
+             geoError ? 'GPS niedostępny — pozwól na lokalizację' :
+             'Włącz GPS — pokażę co jest blisko'}
+          </span>
+          {!location && !geoLoading && (
+            <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</button>
+          )}
+        </div>
+
+        {/* Promień — tylko z GPS */}
+        {location && (
+          <div className="category-filter" style={{ marginTop: 8, padding: 0 }}>
+            {[10, 25, 50].map(r => (
+              <button
+                key={r}
+                className={`category-chip ${activeCity === 'all' && radiusKm === r ? 'active' : ''}`}
+                onClick={() => { setActiveCity('all'); setRadiusKm(r) }}
+              >{r} km</button>
+            ))}
+          </div>
         )}
       </div>
 
