@@ -173,7 +173,7 @@ function VenueDetail({ venue, onBack }) {
             <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>📍 {venue.city}</span>
           </div>
           {venue.description && (
-            <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>
+            <p style={{ fontSize: 15, color: '#fff', lineHeight: 1.7, marginBottom: 20 }}>
               {venue.description}
             </p>
           )}
@@ -199,18 +199,18 @@ function VenueDetail({ venue, onBack }) {
                         {label}{off > 1 ? '' : ` · ${DNI[dow]} ${d.getDate()} ${MIES[d.getMonth()]}`}
                       </div>
                       {special ? (
-                        <div style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55 }}>
+                        <div style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55 }}>
                           <strong style={{ color: '#FFC824' }}>⭐ {special.event_name}</strong>
                           {(special.start_time || special.end_time) && <> · {special.start_time}{special.end_time ? `–${special.end_time}` : ''}</>}
-                          {special.price && <><br /><span style={{ fontSize: 12.5 }}>{special.price}</span></>}
+                          {special.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{special.price}</span></>}
                         </div>
                       ) : evs.length === 0 ? (
                         <div style={{ fontSize: 13, color: 'var(--text-dim)', opacity: .6 }}>Zamknięte</div>
                       ) : evs.map(e => (
-                        <div key={e.id} style={{ fontSize: 13.5, color: 'var(--text-dim)', lineHeight: 1.55, marginBottom: 3 }}>
+                        <div key={e.id} style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55, marginBottom: 3 }}>
                           <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
                           {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
-                          {e.price && <><br /><span style={{ fontSize: 12.5 }}>{e.price}</span></>}
+                          {e.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{e.price}</span></>}
                         </div>
                       ))}
                     </div>
@@ -229,7 +229,7 @@ function VenueDetail({ venue, onBack }) {
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: venue.website ? 10 : 0 }}>
               <span style={{ fontSize: 16 }}>📍</span>
-              <span style={{ fontSize: 14, color: 'var(--text-dim)' }}>{venue.address}</span>
+              <span style={{ fontSize: 14, color: '#fff' }}>{venue.address}</span>
             </div>
             {venue.website && (
               <div style={{ display: 'flex', gap: 10 }}>
@@ -542,7 +542,7 @@ export function Przewodnik() {
                     <span>📍 {venue.city}</span>
                   </div>
                   {venue._special ? (
-                    <div style={{ fontSize: 12.5, color: 'var(--text-dim)', lineHeight: 1.45, marginTop: 6 }}>
+                    <div style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginTop: 6 }}>
                       <strong style={{ color: '#FFC824' }}>⭐ {venue._special.event_name}</strong>
                       {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
                       {venue._special.price && <> · {venue._special.price}</>}
@@ -554,7 +554,7 @@ export function Przewodnik() {
                   ) : (
                     <div style={{ marginTop: 6 }}>
                       {venue._dayEvents.map(e => (
-                        <div key={e.id} style={{ fontSize: 12.5, color: 'var(--text-dim)', lineHeight: 1.45, marginBottom: 2 }}>
+                        <div key={e.id} style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginBottom: 2 }}>
                           <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
                           {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
                           {e.price && <> · {e.price}</>}
