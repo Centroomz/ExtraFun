@@ -322,7 +322,7 @@ export function Przewodnik() {
   const [activeType, setActiveType] = useState('all')
   const [dayOffset, setDayOffset] = useState(0)   // 0=dziś, 1=jutro, 2=pojutrze
   const [scene, setScene] = useState('swing')      // 'all' | 'swing' | 'lgbt' — default swing
-  const [radiusKm, setRadiusKm] = useState(25)     // scope when GPS active
+  const [radiusKm, setRadiusKm] = useState(Infinity) // GPS scope; Infinity = all, sorted by distance
   const [selectedVenue, setSelectedVenue] = useState(null)
   const [selectedArticle, setSelectedArticle] = useState(null)
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
@@ -389,7 +389,7 @@ export function Przewodnik() {
     // Scope: a chosen city → that city; otherwise, with GPS → within radiusKm.
     .filter(v => {
       if (activeCity !== 'all') return v.city === activeCity
-      if (location) return v.distance != null && v.distance <= radiusKm
+      if (location && radiusKm !== Infinity) return v.distance != null && v.distance <= radiusKm
       return true
     })
     .filter(v => activeType === 'all' || v.type === activeType)
@@ -453,7 +453,7 @@ export function Przewodnik() {
           <span style={{ fontSize: 16 }}>📡</span>
           <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
             {geoLoading ? 'Szukam lokalizacji…' :
-             location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong> — w promieniu {radiusKm} km</> :
+             location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong>{radiusKm === Infinity ? ' — wg odległości' : ` — w promieniu ${radiusKm} km`}</> :
              geoError ? 'GPS niedostępny — pozwól na lokalizację' :
              'Włącz GPS — pokażę co jest blisko'}
           </span>
@@ -498,9 +498,15 @@ export function Przewodnik() {
 
         {location && (
           <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
-            value={activeCity === 'all' ? String(radiusKm) : 'city'}
-            onChange={e => { if (e.target.value !== 'city') { setActiveCity('all'); setRadiusKm(Number(e.target.value)) } }}>
+            value={activeCity === 'all' ? (radiusKm === Infinity ? 'all' : String(radiusKm)) : 'city'}
+            onChange={e => {
+              const v = e.target.value
+              if (v === 'city') return
+              setActiveCity('all')
+              setRadiusKm(v === 'all' ? Infinity : Number(v))
+            }}>
             {activeCity !== 'all' && <option value="city">Miasto: {activeCity}</option>}
+            <option value="all">📍 Wg odległości</option>
             <option value="10">≤ 10 km</option>
             <option value="25">≤ 25 km</option>
             <option value="50">≤ 50 km</option>
