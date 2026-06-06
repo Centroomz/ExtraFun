@@ -404,8 +404,17 @@ export function Przewodnik() {
 
   return (
     <div>
-      <div className="page-header">
-        <h1>🗺️ Przewodnik</h1>
+      <div style={{ padding: '28px 16px 18px' }}>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--cyan)', marginBottom: 8 }}>
+          ExtraFun · Przewodnik
+        </div>
+        <h1 style={{ fontFamily: 'Outfit', fontSize: 34, fontWeight: 800, letterSpacing: '-1px', lineHeight: 1.05, margin: 0, color: 'var(--text)' }}>
+          Kluby i imprezy<br />blisko Ciebie
+        </h1>
+        <p style={{ fontSize: 15, color: 'var(--text-dim)', marginTop: 10, lineHeight: 1.5, maxWidth: 420 }}>
+          Co jest dziś, jutro i pojutrze — swing i LGBT, w Twoim mieście.
+        </p>
+        <div style={{ height: 3, width: 48, background: 'var(--cyan)', borderRadius: 2, marginTop: 16 }} />
       </div>
 
       {/* ── HERO ARTICLE ── */}
