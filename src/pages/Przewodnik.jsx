@@ -318,10 +318,10 @@ function ArticleCard({ article, hero, onClick }) {
 export function Przewodnik() {
   const [venues, setVenues] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeCity, setActiveCity] = useState('Warszawa') // default: one city, not everything
+  const [activeCity, setActiveCity] = useState('all') // show all cities by default (GPS narrows to distance)
   const [activeType, setActiveType] = useState('all')
   const [dayOffset, setDayOffset] = useState(0)   // 0=dziś, 1=jutro, 2=pojutrze
-  const [scene, setScene] = useState('swing')      // 'all' | 'swing' | 'lgbt' — default swing
+  const [scene, setScene] = useState('all')        // 'all' | 'swing' | 'lgbt' — show everything by default
   const [radiusKm, setRadiusKm] = useState(Infinity) // GPS scope; Infinity = all, sorted by distance
   const [selectedVenue, setSelectedVenue] = useState(null)
   const [selectedArticle, setSelectedArticle] = useState(null)
@@ -337,6 +337,16 @@ export function Przewodnik() {
   useEffect(() => {
     if (location && !geoApplied.current) { geoApplied.current = true; setActiveCity('all') }
   }, [location])
+
+  // Open a venue/article = a history entry, so the hardware/gesture Back closes
+  // the detail and returns to the list instead of leaving the page.
+  useEffect(() => {
+    if (selectedVenue == null && selectedArticle == null) return
+    window.history.pushState({ efDetail: true }, '')
+    const onPop = () => { setSelectedVenue(null); setSelectedArticle(null) }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [selectedVenue, selectedArticle])
 
   async function loadVenues() {
     try {
@@ -407,11 +417,11 @@ export function Przewodnik() {
 
   // Views
   if (selectedArticle) {
-    return <ArticleReader article={selectedArticle} onBack={() => setSelectedArticle(null)} />
+    return <ArticleReader article={selectedArticle} onBack={() => window.history.back()} />
   }
   if (selectedVenue) {
     const v = venuesWithDist.find(v => v.id === selectedVenue)
-    if (v) return <VenueDetail venue={v} onBack={() => setSelectedVenue(null)} />
+    if (v) return <VenueDetail venue={v} onBack={() => window.history.back()} />
   }
 
   return (
