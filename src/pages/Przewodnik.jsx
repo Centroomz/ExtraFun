@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useLocation } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
@@ -314,8 +315,64 @@ function ArticleCard({ article, hero, onClick }) {
   )
 }
 
+// ─── City helpers ─────────────────────────────────────────────────────────────
+function slugify(s) {
+  return String(s).toLowerCase()
+    .replace(/ł/g, 'l')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+const PL_CITY_SET = ['Warszawa', 'Kraków', 'Wrocław', 'Gdańsk', 'Poznań', 'Łódź', 'Katowice', 'Sopot', 'Szczecin', 'Lublin', 'Czeladź', 'Lubliniec']
+
+// One venue row (used in city listings + "blisko Ciebie"). `venue` carries the
+// attached day status (_special / _dayEvents / _eventClub).
+function VenueRow({ venue, onClick }) {
+  const t = getTypeConfig(venue.type)
+  return (
+    <div className="venue-card" onClick={onClick} style={{ display: 'flex', gap: 12, padding: 12, alignItems: 'flex-start' }}>
+      <div style={{ width: 64, height: 64, borderRadius: 12, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+        {venue.logo_url
+          ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
+          : <span style={{ fontSize: 26 }}>{t.icon}</span>}
+      </div>
+      <div className="venue-card-body" style={{ flex: 1, minWidth: 0, padding: 0 }}>
+        <div className="venue-card-top">
+          <div className="venue-card-name">{venue.name}</div>
+          {venue.distance != null && <span className="venue-card-distance">{formatDistance(venue.distance)}</span>}
+        </div>
+        <div className="venue-card-meta">
+          <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>{t.label}</span>
+          <span>📍 {venue.city}</span>
+        </div>
+        {venue._special ? (
+          <div style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginTop: 6 }}>
+            <strong style={{ color: '#FFC824' }}>⭐ {venue._special.event_name}</strong>
+            {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
+            {venue._special.price && <> · {venue._special.price}</>}
+          </div>
+        ) : venue._eventClub ? (
+          <div style={{ fontSize: 12.5, color: '#00E5FF', marginTop: 6, fontWeight: 600 }}>🟢 Otwarte — sprawdź imprezę na stronie</div>
+        ) : (venue._dayEvents && venue._dayEvents.length > 0) ? (
+          <div style={{ marginTop: 6 }}>
+            {venue._dayEvents.map(e => (
+              <div key={e.id} style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginBottom: 2 }}>
+                <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
+                {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
+                {e.price && <> · {e.price}</>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ fontSize: 12.5, color: 'var(--text-dim)', marginTop: 6 }}>Dziś nieczynne</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export function Przewodnik() {
+export function Przewodnik({ city: cityParam }) {
+  const [, navigate] = useLocation()
   const [venues, setVenues] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeCity, setActiveCity] = useState('all') // show all cities by default (GPS narrows to distance)
@@ -415,6 +472,42 @@ export function Przewodnik() {
 
   const types = ['all', ...Array.from(new Set(venues.map(v => v.type))).sort()]
 
+  // Attach the chosen day's status to a venue (special / weekly / event-club).
+  const statusOf = (v) => {
+    const evs = v.events || []
+    const special = (v.oneTime || []).find(e => (e.event_date || '').slice(0, 10) === targetYmd)
+    return { ...v, _special: special, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 }
+  }
+  const isOpenToday = (v) => v._special || (v._dayEvents && v._dayEvents.length > 0) || v._eventClub
+
+  // City hub data
+  const cityCounts = {}
+  venues.forEach(v => { cityCounts[v.city] = (cityCounts[v.city] || 0) + 1 })
+  const plCount = venues.filter(v => PL_CITY_SET.includes(v.city)).length
+  const foreignCities = Object.keys(cityCounts)
+    .filter(c => !PL_CITY_SET.includes(c))
+    .sort((a, b) => cityCounts[b] - cityCounts[a])
+
+  // "Blisko Ciebie" — open today, within range, nearest first (only with GPS)
+  const nearby = location
+    ? venuesWithDist.map(statusOf).filter(sceneOk).filter(isOpenToday)
+        .filter(v => radiusKm === Infinity || (v.distance != null && v.distance <= radiusKm))
+        .slice(0, 8)
+    : []
+
+  // City page resolution
+  const isPolska = cityParam === 'polska'
+  const cityName = isPolska ? 'Polska' : (Object.keys(cityCounts).find(c => slugify(c) === cityParam) || cityParam)
+  const cityVenues = venuesWithDist
+    .filter(v => isPolska ? PL_CITY_SET.includes(v.city) : v.city === cityName)
+    .map(statusOf)
+    .filter(sceneOk)
+    .filter(v => activeType === 'all' || v.type === activeType)
+    .sort((a, b) => {
+      if (location && a.distance != null && b.distance != null) return a.distance - b.distance
+      return String(a.name).localeCompare(String(b.name), 'pl')
+    })
+
   // Views
   if (selectedArticle) {
     return <ArticleReader article={selectedArticle} onBack={() => window.history.back()} />
@@ -426,163 +519,80 @@ export function Przewodnik() {
 
   return (
     <div>
-      {/* ── TOP 10 — na samej górze ── */}
-      <div style={{ padding: '24px 16px 12px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--cyan)' }}>
-        Polecane
-      </div>
-      <div style={{ padding: '0 16px' }}>
-        <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
-      </div>
+      {cityParam ? (
+        /* ════════ CITY PAGE ════════ */
+        <>
+          <div style={{ padding: '20px 16px 6px', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={() => navigate('/miejsca')} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 24, padding: 0, lineHeight: 1 }}>←</button>
+            <h1 style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, color: 'var(--text)' }}>
+              {isPolska ? '🇵🇱 Polska' : cityName}
+            </h1>
+          </div>
+          <p style={{ padding: '0 16px 6px', fontSize: 13, color: 'var(--text-dim)' }}>
+            {loading ? 'Ładowanie…' : `${cityVenues.length} ${cityVenues.length === 1 ? 'lokal' : 'lokali'} · ${dayOffset === 0 ? 'dziś' : dayOffset === 1 ? 'jutro' : 'pojutrze'}`}
+          </p>
 
-      {/* ── Polska i Europa ── */}
-      <div style={{ padding: '10px 16px 10px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>
-        Polska i Europa
-      </div>
-      <div style={{ display: 'flex', gap: 10, padding: '0 16px', marginBottom: 28 }}>
-        {ARTICLES.slice(1).map(a => (
-          <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />
-        ))}
-      </div>
+          <div className="category-filter" style={{ marginBottom: 8 }}>
+            {[['Dziś', 0], ['Jutro', 1], ['Pojutrze', 2]].map(([label, off]) => (
+              <button key={off} className={`category-chip ${dayOffset === off ? 'active' : ''}`} onClick={() => setDayOffset(off)}>{label}</button>
+            ))}
+          </div>
 
-      {/* ── Kluby i imprezy blisko Ciebie — GPS + listing ── */}
-      <div style={{ padding: '0 16px', marginBottom: 12 }}>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 4px', color: 'var(--text)' }}>
-          📍 Kluby i imprezy blisko Ciebie
-        </h2>
-        <p style={{ fontSize: 13, color: 'var(--text-dim)', margin: 0 }}>
-          {loading ? 'Ładowanie…' : `${filtered.length} ${filtered.length === 1 ? 'miejsce' : 'miejsc'} — ${dayOffset === 0 ? 'dziś' : dayOffset === 1 ? 'jutro' : 'pojutrze'}`}
-        </p>
-
-        {/* GPS — w boksie sekcji */}
-        <div style={{
-          marginTop: 12, padding: '12px 14px', borderRadius: 14,
-          display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
-          background: location ? 'rgba(0,229,255,0.08)' : 'var(--glass)',
-          border: `1px solid ${location ? 'rgba(0,229,255,0.3)' : 'var(--glass-border)'}`,
-        }}>
-          <span style={{ fontSize: 16 }}>📡</span>
-          <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
-            {geoLoading ? 'Szukam lokalizacji…' :
-             location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong>{radiusKm === Infinity ? ' — wg odległości' : ` — w promieniu ${radiusKm} km`}</> :
-             geoError ? geoError :
-             'Włącz GPS — pokażę co jest blisko'}
-          </span>
-          {!location && !geoLoading && (
-            <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</button>
+          {loading ? (
+            <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
+          ) : cityVenues.length === 0 ? (
+            <div className="empty-state"><div className="empty-icon">🏙️</div><div className="empty-title">Brak lokali</div></div>
+          ) : (
+            <div className="venue-list" style={{ paddingBottom: 80 }}>
+              {cityVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => setSelectedVenue(v.id)} />)}
+            </div>
           )}
-        </div>
-
-      </div>
-
-      {/* Day switch — what's on today/tomorrow/day-after */}
-      <div className="category-filter" style={{ marginBottom: 8 }}>
-        {[['Dziś', 0], ['Jutro', 1], ['Pojutrze', 2]].map(([label, off]) => (
-          <button
-            key={off}
-            className={`category-chip ${dayOffset === off ? 'active' : ''}`}
-            onClick={() => setDayOffset(off)}
-          >{label}</button>
-        ))}
-      </div>
-
-      {/* Filtry — skonsolidowane dropdowny (scena / miasto / typ / odległość) */}
-      <div style={{ display: 'flex', gap: 8, padding: '0 16px', marginBottom: 16, flexWrap: 'wrap' }}>
-        <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
-          value={scene} onChange={e => setScene(e.target.value)}>
-          <option value="swing">Swing</option>
-          <option value="lgbt">LGBT</option>
-          <option value="all">Każda scena</option>
-        </select>
-
-        <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
-          value={activeCity} onChange={e => setActiveCity(e.target.value)}>
-          <option value="all">🌍 Wszystkie miasta</option>
-          {sortedCities.filter(c => c !== 'all').map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
-
-        <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
-          value={activeType} onChange={e => setActiveType(e.target.value)}>
-          <option value="all">Wszystkie typy</option>
-          {types.filter(t => t !== 'all').map(t => <option key={t} value={t}>{getTypeConfig(t).label}</option>)}
-        </select>
-
-        {location && (
-          <select className="form-input" style={{ flex: '1 1 130px', width: 'auto', minWidth: 120, padding: '10px 12px', fontSize: 14 }}
-            value={activeCity === 'all' ? (radiusKm === Infinity ? 'all' : String(radiusKm)) : 'city'}
-            onChange={e => {
-              const v = e.target.value
-              if (v === 'city') return
-              setActiveCity('all')
-              setRadiusKm(v === 'all' ? Infinity : Number(v))
-            }}>
-            {activeCity !== 'all' && <option value="city">Miasto: {activeCity}</option>}
-            <option value="all">📍 Wg odległości</option>
-            <option value="10">≤ 10 km</option>
-            <option value="25">≤ 25 km</option>
-            <option value="50">≤ 50 km</option>
-          </select>
-        )}
-      </div>
-
-      {/* Venue list */}
-      {loading ? (
-        <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
-      ) : filtered.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">🏙️</div>
-          <div className="empty-title">Brak miejsc</div>
-          <div className="empty-desc">Spróbuj innego filtra.</div>
-        </div>
+        </>
       ) : (
-        <div className="venue-list" style={{ paddingBottom: 80 }}>
-          {filtered.map(venue => {
-            const t = getTypeConfig(venue.type)
-            return (
-              <div key={venue.id} className="venue-card" onClick={() => setSelectedVenue(venue.id)} style={{ display: 'flex', gap: 12, padding: 12, alignItems: 'flex-start' }}>
-                <div style={{ width: 64, height: 64, borderRadius: 12, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
-                  {venue.logo_url
-                    ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
-                    : <span style={{ fontSize: 26 }}>{t.icon}</span>}
-                </div>
-                <div className="venue-card-body" style={{ flex: 1, minWidth: 0, padding: 0 }}>
-                  <div className="venue-card-top">
-                    <div className="venue-card-name">{venue.name}</div>
-                    {venue.distance != null && (
-                      <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
-                    )}
-                  </div>
-                  <div className="venue-card-meta">
-                    <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
-                      {t.label}
-                    </span>
-                    <span>📍 {venue.city}</span>
-                  </div>
-                  {venue._special ? (
-                    <div style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginTop: 6 }}>
-                      <strong style={{ color: '#FFC824' }}>⭐ {venue._special.event_name}</strong>
-                      {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
-                      {venue._special.price && <> · {venue._special.price}</>}
-                    </div>
-                  ) : venue._eventClub ? (
-                    <div style={{ fontSize: 12.5, color: '#00E5FF', marginTop: 6, fontWeight: 600 }}>
-                      🟢 Otwarte — sprawdź imprezę na stronie
-                    </div>
-                  ) : (
-                    <div style={{ marginTop: 6 }}>
-                      {venue._dayEvents.map(e => (
-                        <div key={e.id} style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginBottom: 2 }}>
-                          <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
-                          {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
-                          {e.price && <> · {e.price}</>}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+        /* ════════ HUB ════════ */
+        <>
+          {/* Top 10 */}
+          <div style={{ padding: '24px 16px 12px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--cyan)' }}>Polecane</div>
+          <div style={{ padding: '0 16px' }}>
+            <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
+          </div>
+          <div style={{ padding: '10px 16px 10px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Polska i Europa</div>
+          <div style={{ display: 'flex', gap: 10, padding: '0 16px', marginBottom: 24 }}>
+            {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
+          </div>
+
+          {/* Blisko Ciebie (GPS) */}
+          <div style={{ padding: '0 16px', marginBottom: 12 }}>
+            <h2 style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 8px', color: 'var(--text)' }}>📍 Blisko Ciebie</h2>
+            <div style={{ padding: '12px 14px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: location ? 'rgba(0,229,255,0.08)' : 'var(--glass)', border: `1px solid ${location ? 'rgba(0,229,255,0.3)' : 'var(--glass-border)'}` }}>
+              <span style={{ fontSize: 16 }}>📡</span>
+              <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
+                {geoLoading ? 'Szukam lokalizacji…' :
+                 location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong> — najbliższe otwarte dziś</> :
+                 geoError ? geoError :
+                 'Włącz GPS — pokażę co jest blisko'}
+              </span>
+              {!location && !geoLoading && <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</button>}
+            </div>
+          </div>
+          {location && nearby.length > 0 && (
+            <div className="venue-list" style={{ marginBottom: 20 }}>
+              {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => setSelectedVenue(v.id)} />)}
+            </div>
+          )}
+
+          {/* City cards */}
+          <div style={{ padding: '0 16px 8px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Przeglądaj wg miasta</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, padding: '0 16px 80px' }}>
+            {[{ label: '🇵🇱 Polska', count: plCount, slug: 'polska' }, ...foreignCities.map(c => ({ label: c, count: cityCounts[c], slug: slugify(c) }))].map(cardItem => (
+              <div key={cardItem.slug} onClick={() => navigate('/miejsca/' + cardItem.slug)}
+                style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '16px 14px', transition: 'border-color .2s' }}>
+                <div style={{ fontFamily: 'Outfit', fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>{cardItem.label}</div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>{cardItem.count} {cardItem.count === 1 ? 'lokal' : 'lokali'}</div>
               </div>
-            )
-          })}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

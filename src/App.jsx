@@ -247,6 +247,7 @@ function AppInner() {
             <Route path="/magazyn" component={Magazyn} />
             <Route path="/magazyn/:slug" component={ArticleDetailPage} />
             <Route path="/miejsca" component={Przewodnik} />
+            <Route path="/miejsca/:city">{(params) => <Przewodnik city={params.city} />}</Route>
             <Route path="/czat">{() => <Czat user={user} />}</Route>
             <Route path="/ogloszenia">{() => <Ogloszenia user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
