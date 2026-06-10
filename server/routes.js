@@ -7,7 +7,7 @@ export function registerRoutes(app) {
   // === MIEJSCA (swingers venues directory) ===
   app.get('/api/places', async (_req, res) => {
     const { data: venues, error } = await supabaseAdmin.from('swingers_venues')
-      .select('id, name, type, address, city, description, website, latitude, longitude, logo_url, scene')
+      .select('id, name, type, address, city, description, website, latitude, longitude, logo_url, scene, gay_days, swing_days')
       .order('city', { ascending: true })
     if (error) return res.status(500).json({ message: error.message })
     // Attach the weekly schedule (recurring_events) to each venue.
@@ -25,7 +25,16 @@ export function registerRoutes(app) {
       .order('event_date', { ascending: true })
     const otByVenue = {}
     for (const e of (oneTime || [])) (otByVenue[e.venue_id] ||= []).push(e)
-    res.json((venues || []).map(v => ({ ...v, events: byVenue[v.id] || [], oneTime: otByVenue[v.id] || [] })))
+    // Audience-by-day: on extrafun (swing) show a venue's events only on its swing
+    // days; label each (a day also in gay_days = mixed crowd). NULL swing_days =
+    // unset → behave as before (show all). getDay 0=Sun..6=Sat.
+    res.json((venues || []).map(v => {
+      const sd = v.swing_days, gd = v.gay_days
+      const allow = (dow) => !sd || sd.includes(dow)
+      const label = (dow) => sd ? (gd && gd.includes(dow) ? 'Panie i Panowie' : 'Pary i single') : null
+      const events = (byVenue[v.id] || []).filter(e => allow(e.day_of_week)).map(e => ({ ...e, audience: label(e.day_of_week) }))
+      return { ...v, events, oneTime: otByVenue[v.id] || [] }
+    }))
   })
 
   // === ANALYTICS ===

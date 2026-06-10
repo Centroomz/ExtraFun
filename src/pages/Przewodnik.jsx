@@ -210,6 +210,7 @@ function VenueDetail({ venue, onBack }) {
                       ) : evs.map(e => (
                         <div key={e.id} style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55, marginBottom: 3 }}>
                           <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
+                          {e.audience && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: '#00E5FF', background: 'rgba(0,229,255,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
                           {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
                           {e.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{e.price}</span></>}
                         </div>
