@@ -144,9 +144,9 @@ export function ArticleDetailPage() {
 
       {/* Content */}
       <div className="mag-article-body">
-        <div className="article-detail">
-          {renderContent(article.content)}
-        </div>
+        <div className="article-detail"
+          dangerouslySetInnerHTML={{ __html: article.content || '' }}
+        />
       </div>
     </div>
   )
