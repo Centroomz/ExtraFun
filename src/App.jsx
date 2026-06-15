@@ -244,6 +244,15 @@ function AppInner() {
               ExtraFun
             </span>
           </Link>
+          {user?.email === ADMIN_EMAIL && (
+            <button
+              className="mobile-profile-btn-inline"
+              onClick={() => navigate('/admin')}
+              style={{ background: 'var(--purple)', color: '#fff', marginRight: 6 }}
+            >
+              A
+            </button>
+          )}
           <button
             className="mobile-profile-btn-inline"
             onClick={() => navigate(user ? '/profil' : '/login')}
