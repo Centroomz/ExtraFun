@@ -30,13 +30,16 @@ export function CalendarWidget() {
 
   const ev = events[idx]
 
+  const now = new Date()
+  const dateStr = now.toLocaleDateString('pl-PL', { day: 'numeric', month: 'long' })
+
   return (
     <div className="mag-sidebar-word" style={{ position: 'relative' }}>
-      <div className="mag-sidebar-word-label">
-        {TYPE_ICON[ev.type]} Kartka z kalendarza
+      <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--cyan)', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 8 }}>
+        📅 {dateStr}
       </div>
-      <div style={{ fontSize: 11, color: 'var(--text-dim)', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-        {TYPE_LABEL[ev.type]}{ev.year ? ` · ${ev.year}` : ''}
+      <div style={{ fontSize: 15, fontWeight: 800, color: '#e5e5e5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>
+        {TYPE_ICON[ev.type]} {TYPE_LABEL[ev.type]}{ev.year ? <span style={{ color: 'var(--cyan)' }}> · {ev.year}</span> : ''}
       </div>
       <div className="mag-sidebar-word-term" style={{ marginBottom: 6 }}>{ev.name}</div>
       <div className="mag-sidebar-word-def">{ev.description}</div>
