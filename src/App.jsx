@@ -18,7 +18,8 @@ import { Slownik } from './pages/Slownik'
 import { SlownikTerm } from './pages/SlownikTerm'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
-const ADMIN_EMAIL = 'pinksservice@gmail.com'
+const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
+const isAdmin = (email) => ADMIN_EMAILS.includes(email)
 
 const NAV_ITEMS = [
   {
@@ -100,7 +101,7 @@ function DesktopNav({ user, profile, onSignOut }) {
       </div>
 
       <div className="desktop-nav-footer">
-        {user?.email === ADMIN_EMAIL && (
+        {isAdmin(user?.email) && (
           <Link href="/admin">
             <button className={`desktop-nav-item ${active === 'admin' ? 'active' : ''}`}>
               <span className="desktop-nav-item-icon">
@@ -244,7 +245,7 @@ function AppInner() {
               ExtraFun
             </span>
           </Link>
-          {user?.email === ADMIN_EMAIL && (
+          {isAdmin(user?.email) && (
             <button
               className="mobile-profile-btn-inline"
               onClick={() => navigate('/admin')}
@@ -284,7 +285,7 @@ function AppInner() {
               ? <ProfilePage user={user} profile={profile} onSignOut={handleSignOut} />
               : (() => { navigate('/login'); return null })()
             }</Route>
-            <Route path="/admin">{() => user?.email === ADMIN_EMAIL
+            <Route path="/admin">{() => isAdmin(user?.email)
               ? <Admin user={user} />
               : <Magazyn />
             }</Route>
