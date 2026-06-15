@@ -147,15 +147,38 @@ export function registerRoutes(app) {
 
   app.post('/api/admin/articles', verifyJWT, isAdmin, async (req, res) => {
     const payload = { ...req.body, site: 'extrafun' }
-    const { error } = await supabaseAdmin.from('articles').insert(payload)
+    const { data, error } = await supabaseAdmin.from('articles').insert(payload).select('id').single()
     if (error) return res.status(500).json({ message: error.message })
-    res.status(201).json({ ok: true })
+    res.status(201).json({ ok: true, id: data.id })
   })
 
   app.put('/api/admin/articles/:id', verifyJWT, isAdmin, async (req, res) => {
     const { error } = await supabaseAdmin.from('articles').update(req.body).eq('id', req.params.id)
     if (error) return res.status(500).json({ message: error.message })
     res.json({ ok: true })
+  })
+
+  // Cover image upload: base64 dataURL → Supabase Storage (article-covers) → return public URL
+  app.post('/api/admin/articles/:id/cover', verifyJWT, isAdmin, async (req, res) => {
+    try {
+      const { dataUrl } = req.body || {}
+      const m = String(dataUrl || '').match(/^data:(image\/[a-z+]+);base64,(.+)$/i)
+      if (!m) return res.status(400).json({ message: 'Nieprawidłowy obraz' })
+      const contentType = m[1]
+      const buf = Buffer.from(m[2], 'base64')
+      const ext = (contentType.split('/')[1] || 'png').replace('jpeg', 'jpg')
+      const bucket = 'article-covers'
+      await supabaseAdmin.storage.createBucket(bucket, { public: true }).catch(() => {})
+      const path = `${req.params.id}-${Date.now()}.${ext}`
+      const { error: upErr } = await supabaseAdmin.storage.from(bucket).upload(path, buf, { contentType, upsert: true })
+      if (upErr) return res.status(500).json({ message: upErr.message })
+      const { data: pub } = supabaseAdmin.storage.from(bucket).getPublicUrl(path)
+      const url = pub.publicUrl
+      await supabaseAdmin.from('articles').update({ cover_image: url }).eq('id', req.params.id)
+      res.json({ cover_image: url })
+    } catch (e) {
+      res.status(500).json({ message: e.message })
+    }
   })
 
   app.delete('/api/admin/articles/:id', verifyJWT, isAdmin, async (req, res) => {

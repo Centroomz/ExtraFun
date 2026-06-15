@@ -142,10 +142,24 @@ function ArticleForm({ initial, onSave, onCancel, saving }) {
       </div>
 
       <div>
-        <label style={labelStyle}>Cover Image URL</label>
-        <input style={inputStyle} value={form.cover_image}
-          onChange={e => set('cover_image', e.target.value)}
-          placeholder="https://images.unsplash.com/photo-...?w=800&q=80" />
+        <label style={labelStyle}>Cover Image</label>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <input style={{ ...inputStyle, flex: 1 }} value={form.cover_image.startsWith('data:') ? '' : form.cover_image}
+            onChange={e => set('cover_image', e.target.value)}
+            placeholder="https://images.unsplash.com/photo-...?w=800&q=80" />
+          <label style={{ ...btnGhost, padding: '8px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
+            Wgraj plik
+            <input type="file" accept="image/*" style={{ display: 'none' }}
+              onChange={e => {
+                const file = e.target.files?.[0]
+                if (!file) return
+                const reader = new FileReader()
+                reader.onload = ev => set('cover_image', ev.target.result)
+                reader.readAsDataURL(file)
+                e.target.value = ''
+              }} />
+          </label>
+        </div>
         {form.cover_image && (
           <img src={form.cover_image} alt="" style={{ marginTop: 8, width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 10 }} />
         )}
@@ -209,8 +223,21 @@ function ArticlesTab() {
       updated_at: new Date().toISOString(),
     }
     try {
-      if (mode?.id) await apiFetch(`/api/admin/articles/${mode.id}`, { method: 'PUT', body: payload })
-      else await apiFetch('/api/admin/articles', { method: 'POST', body: payload })
+      const isDataUrl = payload.cover_image?.startsWith('data:')
+      if (mode?.id) {
+        if (isDataUrl) {
+          const up = await apiFetch(`/api/admin/articles/${mode.id}/cover`, { method: 'POST', body: { dataUrl: payload.cover_image } })
+          payload.cover_image = up.cover_image
+        }
+        await apiFetch(`/api/admin/articles/${mode.id}`, { method: 'PUT', body: payload })
+      } else {
+        if (isDataUrl) payload.cover_image = ''
+        const created = await apiFetch('/api/admin/articles', { method: 'POST', body: payload })
+        if (isDataUrl && form.cover_image?.startsWith('data:') && created?.id) {
+          const up = await apiFetch(`/api/admin/articles/${created.id}/cover`, { method: 'POST', body: { dataUrl: form.cover_image } })
+          await apiFetch(`/api/admin/articles/${created.id}`, { method: 'PUT', body: { cover_image: up.cover_image } })
+        }
+      }
       setSaving(false)
       setMsg(mode?.id ? 'Zaktualizowano!' : 'Dodano artykuł!')
       setMode(null)
