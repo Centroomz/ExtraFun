@@ -436,6 +436,150 @@ function AdsTab() {
   )
 }
 
+// ── EventsTab ─────────────────────────────────────────────────────────────────
+const EMPTY_EVENT = {
+  venue_id: '', event_date: '', event_name: '', start_time: '', end_time: '',
+  price: '', location_name: '', location_address: '', organizer: '',
+  event_url: '', description: '', cover_image: '', is_external: false,
+}
+
+function EventsTab() {
+  const [events, setEvents] = useState([])
+  const [venues, setVenues] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [mode, setMode] = useState(null) // null | 'add' | event
+  const [form, setForm] = useState(EMPTY_EVENT)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState('')
+
+  useEffect(() => { load() }, [])
+  async function load() {
+    try {
+      const [evs, vs] = await Promise.all([
+        apiFetch('/api/admin/events'),
+        apiFetch('/api/admin/venues'),
+      ])
+      setEvents(evs || [])
+      setVenues(vs || [])
+    } catch { setEvents([]) }
+    setLoading(false)
+  }
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  function openAdd() { setForm(EMPTY_EVENT); setMode('add'); setMsg('') }
+  function openEdit(e) { setForm({ ...EMPTY_EVENT, ...e, venue_id: e.venue_id ?? '' }); setMode(e); setMsg('') }
+
+  async function save() {
+    if (!form.event_name || !form.event_date) { setMsg('Nazwa i data wymagane'); return }
+    setSaving(true); setMsg('')
+    const payload = { ...form, venue_id: form.venue_id || null, start_time: form.start_time || null, end_time: form.end_time || null }
+    try {
+      if (mode === 'add') await apiFetch('/api/admin/events', { method: 'POST', body: payload })
+      else await apiFetch(`/api/admin/events/${mode.id}`, { method: 'PUT', body: payload })
+      setMsg('Zapisano ✓'); setMode(null); load()
+    } catch (e) { setMsg('Błąd: ' + e.message) }
+    setSaving(false)
+  }
+
+  async function del(e) {
+    if (!confirm(`Usunąć "${e.event_name}"?`)) return
+    await apiFetch(`/api/admin/events/${e.id}`, { method: 'DELETE' })
+    load()
+  }
+
+  const inp = { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 11px', fontSize: 13, color: '#fff', boxSizing: 'border-box', marginBottom: 8 }
+  const lbl = { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 3, display: 'block' }
+
+  if (mode) {
+    return (
+      <div style={{ maxWidth: 580 }}>
+        <button onClick={() => setMode(null)} style={{ background: 'none', border: 'none', color: '#00E5FF', cursor: 'pointer', fontSize: 13, marginBottom: 12 }}>← Lista imprez</button>
+        <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>{mode === 'add' ? 'Nowa impreza' : `Edytuj: ${form.event_name}`}</h2>
+
+        <label style={lbl}>Nazwa imprezy *</label>
+        <input style={inp} value={form.event_name} onChange={e => set('event_name', e.target.value)} placeholder="np. Gang Bang Fast & Furious" />
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ flex: 1 }}>
+            <label style={lbl}>Data *</label>
+            <input type="date" style={inp} value={form.event_date} onChange={e => set('event_date', e.target.value)} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={lbl}>Start</label>
+            <input type="time" style={inp} value={form.start_time} onChange={e => set('start_time', e.target.value)} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={lbl}>Koniec</label>
+            <input type="time" style={inp} value={form.end_time} onChange={e => set('end_time', e.target.value)} />
+          </div>
+        </div>
+
+        <label style={lbl}>Klub (opcjonalnie)</label>
+        <select style={inp} value={form.venue_id} onChange={e => set('venue_id', e.target.value)}>
+          <option value="">— brak / impreza zewnętrzna —</option>
+          {venues.map(v => <option key={v.id} value={v.id}>{v.name} ({v.city})</option>)}
+        </select>
+
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'rgba(255,255,255,0.8)', marginBottom: 10 }}>
+          <input type="checkbox" checked={form.is_external} onChange={e => set('is_external', e.target.checked)} />
+          Impreza prywatna / hotelowa (nie w stałym klubie)
+        </label>
+
+        <label style={lbl}>Cena</label>
+        <input style={inp} value={form.price} onChange={e => set('price', e.target.value)} placeholder="Para 200 zł · Singielka 1 zł · Singiel 300 zł" />
+
+        <label style={lbl}>Miejsce (jeśli nie klub)</label>
+        <input style={inp} value={form.location_name} onChange={e => set('location_name', e.target.value)} placeholder="np. Hotel Marriott Warszawa" />
+        <input style={inp} value={form.location_address} onChange={e => set('location_address', e.target.value)} placeholder="Adres" />
+
+        <label style={lbl}>Organizator</label>
+        <input style={inp} value={form.organizer} onChange={e => set('organizer', e.target.value)} placeholder="np. SwingersPL" />
+
+        <label style={lbl}>Link do biletów / info</label>
+        <input style={inp} value={form.event_url} onChange={e => set('event_url', e.target.value)} placeholder="https://..." />
+
+        <label style={lbl}>Opis</label>
+        <textarea style={{ ...inp, minHeight: 80, resize: 'vertical' }} value={form.description} onChange={e => set('description', e.target.value)} />
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
+          <button onClick={save} disabled={saving} style={{ background: '#00E5FF', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+            {saving ? '…' : 'Zapisz'}
+          </button>
+          {msg && <span style={{ fontSize: 13, color: msg.startsWith('Błąd') ? '#ff6b6b' : '#00E5FF' }}>{msg}</span>}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{events.length} imprez</div>
+        <button onClick={openAdd} style={{ background: '#00E5FF', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>+ Dodaj imprezę</button>
+      </div>
+      {loading ? (
+        <div style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: 40 }}>Ładowanie…</div>
+      ) : events.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>Brak imprez. Dodaj pierwszą!</div>
+      ) : events.map(e => (
+        <div key={e.id} style={{ ...card, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: 14 }}>{e.event_name}</div>
+            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>
+              {e.event_date} · {e.swingers_venues?.name || e.location_name || e.organizer || (e.is_external ? 'Zewnętrzna' : '—')}
+              {e.start_time && ` · ${e.start_time.slice(0,5)}`}
+            </div>
+            {e.price && <div style={{ fontSize: 12, color: '#00E5FF', marginTop: 2 }}>{e.price}</div>}
+          </div>
+          <button onClick={() => openEdit(e)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' }}>Edytuj</button>
+          <button onClick={() => del(e)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── Main Admin ────────────────────────────────────────────────────────────────
 // Downscale + compress an image file in the browser before upload (≤maxSize px,
 // webp) so logos stay tiny and load fast — no manual resizing on the phone.
@@ -598,6 +742,7 @@ export function Admin() {
     { id: 'artykuly', label: '📰 Artykuły' },
     { id: 'ogloszenia', label: '📋 Ogłoszenia' },
     { id: 'lokale', label: '🏠 Lokale' },
+    { id: 'imprezy', label: '🎉 Imprezy' },
   ]
 
   return (
@@ -628,6 +773,7 @@ export function Admin() {
         {tab === 'artykuly' && <ArticlesTab />}
         {tab === 'ogloszenia' && <AdsTab />}
         {tab === 'lokale' && <VenuesTab />}
+        {tab === 'imprezy' && <EventsTab />}
       </div>
     </div>
   )

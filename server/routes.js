@@ -256,6 +256,59 @@ export function registerRoutes(app) {
     }
   })
 
+  // === VENUE EVENTS (imprezy klubowe + hotelowe) ===
+  app.get('/api/events', async (req, res) => {
+    const { from, to, venue_id } = req.query
+    const today = new Date().toISOString().slice(0, 10)
+    let q = supabaseAdmin.from('venue_events')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external, swingers_venues(id, name, city, logo_url)')
+      .gte('event_date', from || today)
+      .order('event_date', { ascending: true })
+      .order('start_time', { ascending: true })
+      .limit(100)
+    if (to) q = q.lte('event_date', to)
+    if (venue_id) q = q.eq('venue_id', venue_id)
+    const { data, error } = await q
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  // === ADMIN: EVENTS ===
+  app.get('/api/admin/events', verifyJWT, isAdmin, async (req, res) => {
+    const { data, error } = await supabaseAdmin.from('venue_events')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external, swingers_venues(id, name, city)')
+      .order('event_date', { ascending: false }).limit(200)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  app.post('/api/admin/events', verifyJWT, isAdmin, async (req, res) => {
+    const b = req.body || {}
+    if (!b.event_name || !b.event_date) return res.status(400).json({ message: 'event_name i event_date wymagane' })
+    const EVENT_FIELDS = ['venue_id', 'event_date', 'event_name', 'start_time', 'end_time', 'price', 'location_name', 'location_address', 'organizer', 'event_url', 'description', 'cover_image', 'is_external']
+    const row = {}
+    for (const k of EVENT_FIELDS) if (k in b) row[k] = b[k] === '' ? null : b[k]
+    const { data, error } = await supabaseAdmin.from('venue_events').insert(row).select().single()
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json(data)
+  })
+
+  app.put('/api/admin/events/:id', verifyJWT, isAdmin, async (req, res) => {
+    const b = req.body || {}
+    const EVENT_FIELDS = ['venue_id', 'event_date', 'event_name', 'start_time', 'end_time', 'price', 'location_name', 'location_address', 'organizer', 'event_url', 'description', 'cover_image', 'is_external']
+    const fields = {}
+    for (const k of EVENT_FIELDS) if (k in b) fields[k] = b[k] === '' ? null : b[k]
+    const { error } = await supabaseAdmin.from('venue_events').update(fields).eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
+  app.delete('/api/admin/events/:id', verifyJWT, isAdmin, async (req, res) => {
+    const { error } = await supabaseAdmin.from('venue_events').delete().eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(204).end()
+  })
+
   // === SEO ===
   app.get('/robots.txt', (_req, res) => {
     res.type('text/plain').send(

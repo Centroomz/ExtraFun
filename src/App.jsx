@@ -13,6 +13,7 @@ import { LoginPage } from './auth/LoginPage'
 import { SignupPage } from './auth/SignupPage'
 import { Admin } from './pages/Admin'
 import { ArticleDetailPage } from './pages/ArticleDetailPage'
+import { Imprezy } from './pages/Imprezy'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 const ADMIN_EMAIL = 'pinksservice@gmail.com'
@@ -45,6 +46,17 @@ const NAV_ITEMS = [
     )
   },
   {
+    id: 'imprezy', label: 'Imprezy', href: '/imprezy',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
+      </svg>
+    )
+  },
+  {
     id: 'ogloszenia', label: 'Ogłoszenia', href: '/ogloszenia',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -59,6 +71,7 @@ function DesktopNav({ user, profile, onSignOut }) {
   const [location] = useLocation()
   const active = location === '/' ? 'magazyn'
     : location.startsWith('/magazyn') ? 'magazyn'
+    : location.startsWith('/imprezy') ? 'imprezy'
     : location.startsWith('/miejsca') ? 'miejsca'
     : location.startsWith('/czat') ? 'czat'
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
@@ -246,6 +259,7 @@ function AppInner() {
             <Route path="/" component={Magazyn} />
             <Route path="/magazyn" component={Magazyn} />
             <Route path="/magazyn/:slug" component={ArticleDetailPage} />
+            <Route path="/imprezy" component={Imprezy} />
             <Route path="/miejsca" component={Przewodnik} />
             <Route path="/miejsca/:city">{(params) => <Przewodnik city={params.city} />}</Route>
             <Route path="/czat">{() => <Czat user={user} />}</Route>
@@ -266,12 +280,13 @@ function AppInner() {
 
         <BottomNav active={
           location === '/' || location.startsWith('/magazyn') ? 'magazyn'
+          : location.startsWith('/imprezy') ? 'imprezy'
           : location.startsWith('/miejsca') ? 'przewodnik'
           : location.startsWith('/czat') ? 'czat'
-                : location.startsWith('/ogloszenia') ? 'ogloszenia'
+          : location.startsWith('/ogloszenia') ? 'ogloszenia'
           : 'magazyn'
         } onNavigate={(id) => {
-          const map = { magazyn: '/magazyn', przewodnik: '/miejsca', czat: '/czat', ogloszenia: '/ogloszenia' }
+          const map = { magazyn: '/magazyn', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', ogloszenia: '/ogloszenia' }
           navigate(map[id] || '/magazyn')
         }} />
 
