@@ -190,12 +190,22 @@ export function registerRoutes(app) {
   app.get('/api/admin/page-views', verifyJWT, isAdmin, async (req, res) => {
     const days = Math.min(parseInt(req.query.days) || 30, 365)
     const since = new Date(Date.now() - days * 86400000).toISOString()
-    const { data, error } = await supabaseAdmin.from('page_views')
-      .select('path, referrer, device, session_id, created_at')
-      .eq('site', 'extrafun').gte('created_at', since)
-      .order('created_at', { ascending: false }).limit(5000)
-    if (error) return res.status(500).json({ message: error.message })
-    res.json(data || [])
+    // Supabase caps single-query results at 1000 rows — fetch in pages to get real count
+    let allRows = []
+    let from = 0
+    const PAGE = 1000
+    while (true) {
+      const { data, error } = await supabaseAdmin.from('page_views')
+        .select('path, referrer, device, session_id, created_at')
+        .eq('site', 'extrafun').gte('created_at', since)
+        .order('created_at', { ascending: false })
+        .range(from, from + PAGE - 1)
+      if (error) return res.status(500).json({ message: error.message })
+      allRows = allRows.concat(data || [])
+      if (!data || data.length < PAGE) break
+      from += PAGE
+    }
+    res.json(allRows)
   })
 
   app.get('/api/admin/ads', verifyJWT, isAdmin, async (_req, res) => {
