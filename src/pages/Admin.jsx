@@ -144,7 +144,7 @@ function ArticleForm({ initial, onSave, onCancel, saving }) {
       <div>
         <label style={labelStyle}>Cover Image</label>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <input style={{ ...inputStyle, flex: 1 }} value={form.cover_image.startsWith('data:') ? '' : form.cover_image}
+          <input style={{ ...inputStyle, flex: 1 }} value={(form.cover_image || '').startsWith('data:') ? '' : (form.cover_image || '')}
             onChange={e => set('cover_image', e.target.value)}
             placeholder="https://images.unsplash.com/photo-...?w=800&q=80" />
           <label style={{ ...btnGhost, padding: '8px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
