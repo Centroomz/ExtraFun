@@ -160,7 +160,7 @@ export function Magazyn() {
           <div className="mag-brand">
             <span className="mag-brand-name">ExtraFun</span>
             <span className="mag-brand-divider" />
-            <span className="mag-brand-issue">Wydanie 1 · Maj 2025</span>
+            <span className="mag-brand-issue">Wydanie 2 · Czerwiec 2026</span>
           </div>
           <nav className="mag-cats">
             {CATEGORIES.map(cat => (
