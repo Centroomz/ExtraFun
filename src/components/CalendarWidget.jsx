@@ -41,15 +41,15 @@ export function CalendarWidget() {
       <div className="mag-sidebar-word-term" style={{ marginBottom: 6 }}>{ev.name}</div>
       <div className="mag-sidebar-word-def">{ev.description}</div>
       {events.length > 1 && (
-        <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 12 }}>
           <button
             onClick={() => setIdx((idx - 1 + events.length) % events.length)}
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '2px 10px', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 14 }}
+            style={{ background: 'rgba(0,229,255,0.15)', border: '2px solid rgba(0,229,255,0.6)', borderRadius: 8, padding: '6px 18px', color: '#00E5FF', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
           >‹</button>
-          <span style={{ fontSize: 11, color: 'var(--text-dim)', alignSelf: 'center' }}>{idx + 1}/{events.length}</span>
+          <span style={{ fontSize: 12, color: '#00E5FF', fontWeight: 700 }}>{idx + 1} / {events.length}</span>
           <button
             onClick={() => setIdx((idx + 1) % events.length)}
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '2px 10px', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 14 }}
+            style={{ background: 'rgba(0,229,255,0.15)', border: '2px solid rgba(0,229,255,0.6)', borderRadius: 8, padding: '6px 18px', color: '#00E5FF', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
           >›</button>
         </div>
       )}

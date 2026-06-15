@@ -244,6 +244,8 @@ export function Magazyn() {
 
         {/* Sidebar */}
         <aside className="mag-sidebar">
+          <CalendarWidget />
+
           <div className="mag-sidebar-quiz" onClick={() => setShowQuiz(true)} style={{ cursor: 'pointer' }}>
             <div className="mag-sidebar-quiz-label">✨ Quiz tygodnia</div>
             <div className="mag-sidebar-quiz-title">Czy CNM jest dla Ciebie?</div>
@@ -252,8 +254,6 @@ export function Magazyn() {
               Zacznij →
             </button>
           </div>
-
-          <CalendarWidget />
 
           <div className="mag-sidebar-word">
             <div className="mag-sidebar-word-label">📖 Słówko dnia</div>
