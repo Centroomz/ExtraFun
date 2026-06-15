@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { apiFetch } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
 
-const ADMIN_EMAIL = 'pinksservice@gmail.com'
+const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 
 const CATEGORIES = [
   { slug: 'cnm-101',       name: 'CNM 101' },
@@ -728,7 +728,7 @@ export function Admin() {
     )
   }
 
-  if (user.email !== ADMIN_EMAIL) {
+  if (!ADMIN_EMAILS.includes(user.email)) {
     return (
       <div style={{ padding: 32, textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>⛔</div>
