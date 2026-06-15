@@ -144,6 +144,9 @@ export function ArticleDetailPage() {
 
       {/* Content */}
       <div className="mag-article-body">
+        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 20, lineHeight: 1.3 }}>
+          {article.title}
+        </h1>
         <div className="article-detail"
           dangerouslySetInnerHTML={{ __html: article.content || '' }}
         />
