@@ -326,7 +326,9 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
     const staticUrls = [
       { loc: 'https://extrafun.pl/', priority: '1.0' },
       { loc: 'https://extrafun.pl/magazyn', priority: '0.9' },
+      { loc: 'https://extrafun.pl/slownik', priority: '0.9' },
       { loc: 'https://extrafun.pl/miejsca', priority: '0.7' },
+      { loc: 'https://extrafun.pl/imprezy', priority: '0.7' },
       { loc: 'https://extrafun.pl/czat', priority: '0.5' },
       { loc: 'https://extrafun.pl/ogloszenia', priority: '0.6' },
     ]
@@ -334,7 +336,12 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
       loc: `https://extrafun.pl/magazyn/${a.slug}`, priority: '0.8',
       lastmod: a.publish_date ? new Date(a.publish_date).toISOString().slice(0, 10) : undefined,
     }))
-    const urls = [...staticUrls, ...articleUrls]
+    let dictUrls = []
+    try {
+      const { DICTIONARY_TERMS: terms } = await import('../src/lib/dictionary.js')
+      dictUrls = terms.map(t => ({ loc: `https://extrafun.pl/slownik/${t.slug}`, priority: '0.7' }))
+    } catch {}
+    const urls = [...staticUrls, ...articleUrls, ...dictUrls]
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')}

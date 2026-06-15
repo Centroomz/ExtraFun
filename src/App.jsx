@@ -14,6 +14,8 @@ import { SignupPage } from './auth/SignupPage'
 import { Admin } from './pages/Admin'
 import { ArticleDetailPage } from './pages/ArticleDetailPage'
 import { Imprezy } from './pages/Imprezy'
+import { Slownik } from './pages/Slownik'
+import { SlownikTerm } from './pages/SlownikTerm'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 const ADMIN_EMAIL = 'pinksservice@gmail.com'
@@ -260,6 +262,8 @@ function AppInner() {
             <Route path="/magazyn" component={Magazyn} />
             <Route path="/magazyn/:slug" component={ArticleDetailPage} />
             <Route path="/imprezy" component={Imprezy} />
+            <Route path="/slownik/:slug">{(params) => <SlownikTerm slug={params.slug} />}</Route>
+            <Route path="/slownik" component={Slownik} />
             <Route path="/miejsca" component={Przewodnik} />
             <Route path="/miejsca/:city">{(params) => <Przewodnik city={params.city} />}</Route>
             <Route path="/czat">{() => <Czat user={user} />}</Route>
