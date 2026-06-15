@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'wouter'
+import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
@@ -520,6 +521,11 @@ export function Przewodnik({ city: cityParam }) {
 
   return (
     <div>
+      <Helmet>
+        <title>Przewodnik po klubach lifestyle – swing, BDSM, fetysz | ExtraFun</title>
+        <meta name="description" content="Mapa i lista klubów lifestyle, swing i BDSM w Polsce. Znajdź miejsce blisko siebie — filtruj po mieście, typie i dniu tygodnia." />
+        <link rel="canonical" href="https://extrafun.pl/miejsca" />
+      </Helmet>
       {cityParam ? (
         /* ════════ CITY PAGE ════════ */
         <>

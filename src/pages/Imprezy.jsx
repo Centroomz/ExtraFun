@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 
 const DAY_PL = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb']
@@ -107,6 +108,11 @@ export function Imprezy() {
 
   return (
     <div className="page-inner">
+      <Helmet>
+        <title>Imprezy lifestyle – kluby i eventy | ExtraFun</title>
+        <meta name="description" content="Nadchodzące imprezy w klubach lifestyle, swing i BDSM w Polsce. Sprawdź daty, miejsca i szczegóły eventów." />
+        <link rel="canonical" href="https://extrafun.pl/imprezy" />
+      </Helmet>
       <div className="page-header">
         <h1>Imprezy</h1>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, marginTop: 4 }}>Nadchodzące eventi — kluby i imprezy prywatne</p>
