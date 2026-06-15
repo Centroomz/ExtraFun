@@ -147,9 +147,17 @@ export function ArticleDetailPage() {
         <h1 style={{ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 20, lineHeight: 1.3 }}>
           {article.title}
         </h1>
-        <div className="article-detail"
-          dangerouslySetInnerHTML={{ __html: article.content || '' }}
-        />
+        {(() => {
+          const raw = (article.content || '').trim()
+          const isHtml = raw.startsWith('<')
+          if (isHtml) {
+            return <div className="article-detail" dangerouslySetInnerHTML={{ __html: raw }} />
+          }
+          // markdown — strip leading # title line if present, then render
+          const lines = raw.split('\n')
+          const body = lines[0].startsWith('# ') ? lines.slice(1) : lines
+          return <div className="article-detail">{renderContent(body.join('\n'))}</div>
+        })()}
       </div>
     </div>
   )
