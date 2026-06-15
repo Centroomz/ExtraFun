@@ -1,7 +1,10 @@
 import { supabaseAdmin } from './supabase.js'
 
-const ADMIN_EMAILS = (process.env.ADMIN_EMAIL || 'pinksservice@gmail.com')
-  .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+const ADMIN_EMAILS = [
+  'pinksservice@gmail.com',
+  'kingaa.kaczynska@gmail.com',
+  ...(process.env.ADMIN_EMAIL || '').split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
+]
 
 export function isAdminEmail(email) {
   return !!email && ADMIN_EMAILS.includes(email.toLowerCase())
