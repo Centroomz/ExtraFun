@@ -5,6 +5,7 @@ import { getWordOfTheDay } from '../lib/dictionary'
 import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult } from '../lib/quiz'
 import { apiFetch } from '../lib/api'
+import { CalendarWidget } from '../components/CalendarWidget'
 
 const BASE_URL = 'https://extrafun.pl'
 
@@ -251,6 +252,8 @@ export function Magazyn() {
               Zacznij →
             </button>
           </div>
+
+          <CalendarWidget />
 
           <div className="mag-sidebar-word">
             <div className="mag-sidebar-word-label">📖 Słówko dnia</div>

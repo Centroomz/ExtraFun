@@ -273,6 +273,22 @@ export function registerRoutes(app) {
     res.json(data || [])
   })
 
+  // === CALENDAR EVENTS ===
+  app.get('/api/calendar', async (req, res) => {
+    const now = new Date()
+    const month = parseInt(req.query.month) || (now.getMonth() + 1)
+    const day = parseInt(req.query.day) || now.getDate()
+    const { data, error } = await supabaseAdmin.from('calendar_events')
+      .select('id, month, day, year, type, name, description, tags, site, wiki_url')
+      .eq('month', month)
+      .eq('day', day)
+      .in('site', ['extrafun', 'both'])
+      .order('type', { ascending: true })
+      .limit(10)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
   // === ADMIN: EVENTS ===
   app.get('/api/admin/events', verifyJWT, isAdmin, async (req, res) => {
     const { data, error } = await supabaseAdmin.from('venue_events')
