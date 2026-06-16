@@ -13,6 +13,7 @@ const CATEGORY_COLORS = {
 export function Slownik() {
   const [q, setQ] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
+  const [sortAlpha, setSortAlpha] = useState(false)
   const byCategory = getTermsByCategory()
   const categories = Object.keys(byCategory)
 
@@ -22,8 +23,12 @@ export function Slownik() {
     return matchQ && matchCat
   })
 
+  const sortedFiltered = sortAlpha
+    ? [...filtered].sort((a, b) => a.term.localeCompare(b.term, 'pl'))
+    : filtered
+
   const grouped = {}
-  for (const t of filtered) (grouped[t.category] ||= []).push(t)
+  for (const t of sortedFiltered) (grouped[sortAlpha ? t.term[0].toUpperCase() : t.category] ||= []).push(t)
 
   return (
     <>
@@ -56,8 +61,8 @@ export function Slownik() {
           />
         </div>
 
-        {/* Filtry kategorii */}
-        <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', flexWrap: 'wrap' }}>
+        {/* Filtry kategorii + sort */}
+        <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', flexWrap: 'wrap', alignItems: 'center' }}>
           <button onClick={() => setActiveCategory('all')} style={{
             fontSize: 12, padding: '6px 13px', borderRadius: 20, border: 'none', cursor: 'pointer', fontWeight: 600,
             background: activeCategory === 'all' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)',
@@ -74,28 +79,46 @@ export function Slownik() {
               }}>{cat} ({byCategory[cat].length})</button>
             )
           })}
+          {/* Sort toggle */}
+          <button onClick={() => setSortAlpha(v => !v)} style={{
+            fontSize: 12, padding: '6px 13px', borderRadius: 20, border: `1px solid ${sortAlpha ? 'rgba(255,255,255,0.3)' : 'transparent'}`,
+            cursor: 'pointer', fontWeight: 600, marginLeft: 'auto',
+            background: sortAlpha ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
+            color: sortAlpha ? '#fff' : 'rgba(255,255,255,0.4)',
+          }}>A–Z</button>
         </div>
+
+        {/* Cross-link: gay.pl */}
+        <a href="https://gay.pl/slownik" target="_blank" rel="noopener noreferrer" style={{
+          display: 'block', margin: '0 16px 16px',
+          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
+          borderRadius: 14, padding: '14px 16px', textDecoration: 'none',
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>Też cię interesuje?</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Słownik LGBT+ →</div>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>gay.pl/slownik — orientacje, tożsamości, subkultury</div>
+        </a>
 
         {/* Lista terminów */}
         <div style={{ padding: '0 16px 80px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {filtered.length === 0 ? (
+          {sortedFiltered.length === 0 ? (
             <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
               Brak wyników dla "{q}"
             </div>
           ) : q ? (
             // Wyniki wyszukiwania — flat list
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {filtered.map(t => <TermRow key={t.slug} term={t} />)}
+              {sortedFiltered.map(t => <TermRow key={t.slug} term={t} />)}
             </div>
           ) : (
-            // Pogrupowane po kategoriach
-            Object.entries(grouped).map(([cat, terms]) => (
-              <div key={cat}>
+            // Pogrupowane po kategoriach lub literach
+            Object.entries(grouped).map(([group, terms]) => (
+              <div key={group}>
                 <div style={{
                   fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase',
-                  color: CATEGORY_COLORS[cat]?.color || 'rgba(255,255,255,0.4)',
-                  marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${CATEGORY_COLORS[cat]?.border || 'rgba(255,255,255,0.08)'}`,
-                }}>{cat}</div>
+                  color: sortAlpha ? 'rgba(255,255,255,0.4)' : (CATEGORY_COLORS[group]?.color || 'rgba(255,255,255,0.4)'),
+                  marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${sortAlpha ? 'rgba(255,255,255,0.08)' : (CATEGORY_COLORS[group]?.border || 'rgba(255,255,255,0.08)')}`,
+                }}>{group}</div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                   {terms.map(t => <TermRow key={t.slug} term={t} />)}
                 </div>

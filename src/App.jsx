@@ -315,6 +315,12 @@ function AppInner() {
           }
         </button>
 
+        {/* Sister site */}
+        <div style={{ textAlign: 'center', padding: '8px 16px 20px', color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>
+          Portal partnerski:{' '}
+          <a href="https://gay.pl" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>gay.pl</a>
+        </div>
+
       </div>
       <PWAInstallBanner />
     </>
