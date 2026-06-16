@@ -2,7 +2,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
-import { sendArticleHtml } from './meta.js'
+import { sendArticleHtml, sendDictTermHtml } from './meta.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -25,6 +25,7 @@ registerRoutes(app)
 
 // Per-article meta injection for crawlers (before static/SPA fallback)
 app.get('/magazyn/:slug', (req, res) => sendArticleHtml(req, res, DIST))
+app.get('/slownik/:slug', (req, res) => sendDictTermHtml(req, res, DIST))
 
 app.use(express.static(DIST))
 app.use((_req, res) => res.sendFile(join(DIST, 'index.html')))
