@@ -61,6 +61,9 @@ export function ArticleDetailPage() {
           category: SLUG_TO_DISPLAY[data.category_slug] || data.category_slug || 'CNM 101',
           content: data.content || '',
           cover_image: data.cover_image || null,
+          author: data.author || 'Redakcja',
+          date: data.publish_date || data.created_at || null,
+          tags: Array.isArray(data.tags) ? data.tags : [],
           seoTitle: data.seo_title || data.title,
           seoDescription: data.seo_description || data.excerpt || '',
           reading_time: Math.max(1, Math.ceil((data.content || '').split(/\s+/).length / 200)),
@@ -128,37 +131,60 @@ export function ArticleDetailPage() {
         <Link href="/magazyn">
           <button className="mag-back-btn">← Powrót</button>
         </Link>
-        <span className="article-card-tag" style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
-          {article.category}
-        </span>
-        <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>{article.reading_time} min czytania</span>
       </div>
 
       {/* Hero image */}
       {article.cover_image && (
-        <div className="mag-article-hero">
+        <div className="ef-art-hero">
           <img src={article.cover_image} alt={article.title} />
-          <div className="mag-article-hero-overlay" />
         </div>
       )}
 
-      {/* Content */}
-      <div className="mag-article-body">
-        <h1 style={{ fontSize: 26, fontWeight: 800, color: '#fff', marginBottom: 20, lineHeight: 1.3 }}>
-          {article.title}
-        </h1>
+      {/* Article */}
+      <article className={`ef-art-wrap${article.cover_image ? ' ef-art-wrap--overlap' : ''}`}>
+        <div className="ef-art-meta-top">
+          <span className="ef-art-chip">{article.category}</span>
+          <span className="ef-art-dot" />
+          <span>{article.reading_time} MIN CZYTANIA</span>
+        </div>
+
+        <h1 className="ef-art-title">{article.title}</h1>
+
+        <div className="ef-art-author">
+          <div className="ef-art-author-av">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+            </svg>
+          </div>
+          <div>
+            <p className="ef-art-author-name">{article.author}</p>
+            {article.date && (
+              <p className="ef-art-author-date">
+                {new Date(article.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()}
+              </p>
+            )}
+          </div>
+        </div>
+
         {(() => {
           const raw = (article.content || '').trim()
           const isHtml = raw.startsWith('<')
           if (isHtml) {
-            return <div className="article-detail" dangerouslySetInnerHTML={{ __html: raw }} />
+            return <div className="ef-art-text" dangerouslySetInnerHTML={{ __html: raw }} />
           }
-          // markdown — strip leading # title line if present, then render
           const lines = raw.split('\n')
           const body = lines[0].startsWith('# ') ? lines.slice(1) : lines
-          return <div className="article-detail">{renderContent(body.join('\n'))}</div>
+          return <div className="ef-art-text">{renderContent(body.join('\n'))}</div>
         })()}
-      </div>
+
+        {article.tags?.length > 0 && (
+          <div className="ef-art-tags">
+            {article.tags.map((t, i) => (
+              <span key={i} className="ef-art-tag">{t}</span>
+            ))}
+          </div>
+        )}
+      </article>
     </div>
   )
 }
