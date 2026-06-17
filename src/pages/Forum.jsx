@@ -99,7 +99,7 @@ function ThreadView({ thread, onBack, user }) {
         <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: cat.bg, color: cat.color, marginBottom: 10 }}>
           {cat.emoji} {cat.label}
         </span>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 800, lineHeight: 1.3, marginBottom: 12 }}>{thread.title}</h2>
+        <h2 style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 800, lineHeight: 1.3, marginBottom: 12 }}>{thread.title}</h2>
         <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
           <span>{thread.author_emoji} {thread.author_name}</span>
           <span>👍 {thread.upvotes}</span>

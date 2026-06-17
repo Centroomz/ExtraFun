@@ -42,7 +42,7 @@ function AdDetail({ ad, onBack, user }) {
             <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--cyan)' }}>{formatDistance(ad.distance)}</span>
           )}
         </div>
-        <h2 style={{ fontFamily: 'Outfit', fontSize: 24, fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>{ad.title}</h2>
+        <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>{ad.title}</h2>
         <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
           <span>{ad.author_emoji} {ad.author_name}</span>
           <span>📍 {ad.city}</span>

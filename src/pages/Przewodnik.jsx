@@ -119,14 +119,14 @@ function ArticleReader({ article, onBack }) {
             border: `1px solid ${article.tagColor}44`,
             borderRadius: 20, padding: '3px 10px', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '.08em',
           }}>{article.tag} · {article.readTime} czytania</div>
-          <h2 style={{ fontFamily: 'Outfit', fontSize: 24, fontWeight: 900, lineHeight: 1.25, marginBottom: 12 }}>{article.title}</h2>
+          <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 900, lineHeight: 1.25, marginBottom: 12 }}>{article.title}</h2>
           <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.6 }}>{article.lead}</p>
         </div>
         {/* Body */}
         <div style={{ padding: '24px 20px' }}>
           {article.content.map((block, i) =>
             block.h ? (
-              <h3 key={i} style={{ fontFamily: 'Outfit', fontSize: 18, fontWeight: 800, marginTop: i === 0 ? 0 : 28, marginBottom: 10, color: 'var(--text)' }}>
+              <h3 key={i} style={{ fontFamily: 'Playfair Display', fontSize: 18, fontWeight: 800, marginTop: i === 0 ? 0 : 28, marginBottom: 10, color: 'var(--text)' }}>
                 {block.h}
               </h3>
             ) : (
@@ -162,7 +162,7 @@ function VenueDetail({ venue, onBack }) {
                 : <span style={{ fontSize: 34 }}>{t.icon}</span>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ fontFamily: 'Outfit', fontSize: 24, fontWeight: 800 }}>{venue.name}</h2>
+              <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 800 }}>{venue.name}</h2>
               {venue.distance != null && (
                 <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
               )}
@@ -181,7 +181,7 @@ function VenueDetail({ venue, onBack }) {
           )}
           {venue.events && venue.events.length > 0 && (
             <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
-              <div style={{ fontFamily: 'Outfit', fontSize: 16, fontWeight: 800, marginBottom: 12 }}>📅 Najbliższe dni</div>
+              <div style={{ fontFamily: 'Playfair Display', fontSize: 16, fontWeight: 800, marginBottom: 12 }}>📅 Najbliższe dni</div>
               {(() => {
                 const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota']
                 const MIES = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru']
@@ -279,7 +279,7 @@ function ArticleCard({ article, hero, onClick }) {
           }}>{article.tag}</span>
           <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{article.readTime} czytania</span>
         </div>
-        <div style={{ fontFamily: 'Outfit', fontSize: 21, fontWeight: 900, lineHeight: 1.25, marginBottom: 10, color: 'var(--text)' }}>
+        <div style={{ fontFamily: 'Playfair Display', fontSize: 21, fontWeight: 900, lineHeight: 1.25, marginBottom: 10, color: 'var(--text)' }}>
           {article.title}
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.5 }}>{article.lead}</div>
@@ -307,7 +307,7 @@ function ArticleCard({ article, hero, onClick }) {
         fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em',
         color: article.tagColor, marginBottom: 6,
       }}>{article.tag}</div>
-      <div style={{ fontFamily: 'Outfit', fontSize: 15, fontWeight: 800, lineHeight: 1.3, marginBottom: 6, color: 'var(--text)' }}>
+      <div style={{ fontFamily: 'Playfair Display', fontSize: 15, fontWeight: 800, lineHeight: 1.3, marginBottom: 6, color: 'var(--text)' }}>
         {article.title}
       </div>
       <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.4 }}>
@@ -531,7 +531,7 @@ export function Przewodnik({ city: cityParam }) {
         <>
           <div style={{ padding: '20px 16px 6px', display: 'flex', alignItems: 'center', gap: 10 }}>
             <button onClick={() => navigate('/miejsca')} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 24, padding: 0, lineHeight: 1 }}>←</button>
-            <h1 style={{ fontFamily: 'Outfit', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, color: 'var(--text)' }}>
+            <h1 style={{ fontFamily: 'Playfair Display', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, color: 'var(--text)' }}>
               {isPolska ? '🇵🇱 Polska' : cityName}
             </h1>
           </div>
@@ -570,7 +570,7 @@ export function Przewodnik({ city: cityParam }) {
 
           {/* Blisko Ciebie (GPS) */}
           <div style={{ padding: '0 16px', marginBottom: 12 }}>
-            <h2 style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 8px', color: 'var(--text)' }}>📍 Blisko Ciebie</h2>
+            <h2 style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 8px', color: 'var(--text)' }}>📍 Blisko Ciebie</h2>
             <div style={{ padding: '12px 14px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: location ? 'rgba(233,193,118,0.08)' : 'var(--glass)', border: `1px solid ${location ? 'rgba(233,193,118,0.3)' : 'var(--glass-border)'}` }}>
               <span style={{ fontSize: 16 }}>📡</span>
               <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
@@ -594,7 +594,7 @@ export function Przewodnik({ city: cityParam }) {
             {[{ label: '🇵🇱 Polska', count: plCount, slug: 'polska' }, ...foreignCities.map(c => ({ label: c, count: cityCounts[c], slug: slugify(c) }))].map(cardItem => (
               <div key={cardItem.slug} onClick={() => navigate('/miejsca/' + cardItem.slug)}
                 style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '16px 14px', transition: 'border-color .2s' }}>
-                <div style={{ fontFamily: 'Outfit', fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>{cardItem.label}</div>
+                <div style={{ fontFamily: 'Playfair Display', fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>{cardItem.label}</div>
                 <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>{cardItem.count} {cardItem.count === 1 ? 'lokal' : 'lokali'}</div>
               </div>
             ))}

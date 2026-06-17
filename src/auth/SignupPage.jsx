@@ -33,7 +33,7 @@ export function SignupPage({ onSwitch, onSuccess }) {
       <div className="auth-container">
         <div className="auth-card" style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 56, marginBottom: 16 }}>📧</div>
-          <h2 style={{ fontFamily: 'Outfit', fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Prawie gotowe!</h2>
+          <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Prawie gotowe!</h2>
           <p style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 14 }}>
             Wysłaliśmy link potwierdzający na <strong>{email}</strong>. Kliknij w link, aby aktywować konto.
           </p>
