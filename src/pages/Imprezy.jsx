@@ -48,11 +48,11 @@ function EventCard({ event }) {
 
         <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.82)', marginTop: 4 }}>
           {venue ? `${venue.name} · ${venue.city}` : (event.location_name || event.organizer || '')}
-          {event.location_address && !venue && <span style={{ color: 'rgba(255,255,255,0.35)' }}> · {event.location_address}</span>}
+          {event.location_address && !venue && <span style={{ color: 'rgba(232,230,252,0.72)' }}> · {event.location_address}</span>}
         </div>
 
         {(event.start_time || event.end_time) && (
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>
+          <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.72)', marginTop: 3 }}>
             🕐 {event.start_time?.slice(0, 5)}{event.end_time ? ` – ${event.end_time.slice(0, 5)}` : ''}
           </div>
         )}
@@ -64,7 +64,7 @@ function EventCard({ event }) {
         )}
 
         {event.description && (
-          <div style={{ marginTop: 6, fontSize: 13, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
+          <div style={{ marginTop: 6, fontSize: 13, color: 'rgba(232,230,252,0.72)', lineHeight: 1.5 }}>
             {event.description}
           </div>
         )}
@@ -138,16 +138,16 @@ export function Imprezy() {
 
       <div style={{ padding: '0 16px 80px', display: 'flex', flexDirection: 'column', gap: 24 }}>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.4)' }}>Ładowanie...</div>
+          <div style={{ textAlign: 'center', padding: 60, color: 'rgba(232,230,252,0.72)' }}>Ładowanie...</div>
         ) : grouped.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.3)' }}>
+          <div style={{ textAlign: 'center', padding: 60, color: 'rgba(232,230,252,0.72)' }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>📅</div>
             <div style={{ fontSize: 15 }}>Brak nadchodzących imprez</div>
-            <div style={{ fontSize: 13, marginTop: 6, color: 'rgba(255,255,255,0.25)' }}>Sprawdź ponownie wkrótce</div>
+            <div style={{ fontSize: 13, marginTop: 6, color: 'rgba(232,230,252,0.72)' }}>Sprawdź ponownie wkrótce</div>
           </div>
         ) : grouped.map(([date, evs]) => (
           <div key={date}>
-            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 10 }}>
               {formatDate(date)}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>

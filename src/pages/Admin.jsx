@@ -285,7 +285,7 @@ function ArticlesTab() {
       </div>
       {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#e9c176', marginBottom: 12, fontSize: 13 }}>{msg}</div>}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.4)' }}>Ładowanie...</div>
+        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)' }}>Ładowanie...</div>
       ) : articles.map(a => (
         <div key={a.id} style={card}>
           <div style={{ display: 'flex', gap: 12 }}>
@@ -300,7 +300,7 @@ function ArticlesTab() {
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
                 <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{a.excerpt?.slice(0, 80)}{a.excerpt?.length > 80 ? '…' : ''}</div>
+              <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)' }}>{a.excerpt?.slice(0, 80)}{a.excerpt?.length > 80 ? '…' : ''}</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 10, justifyContent: 'flex-end' }}>
@@ -370,13 +370,13 @@ function StatsTab() {
 
       <div style={card}>
         <div style={head}>Odwiedziny dziennie</div>
-        {dailyAsc.length === 0 ? <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 13 }}>Brak danych — zbieranie dopiero ruszyło.</div> : (
+        {dailyAsc.length === 0 ? <div style={{ color: 'rgba(232,230,252,0.72)', fontSize: 13 }}>Brak danych — zbieranie dopiero ruszyło.</div> : (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 120 }}>
             {dailyAsc.map(([day, v]) => (
               <div key={day} title={`${day}: ${v}`} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
                 <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>{v}</span>
                 <div style={{ width: '100%', background: '#e9c176', borderRadius: '4px 4px 0 0', height: `${(v / maxV) * 100}%`, minHeight: 2 }} />
-                <span style={{ fontSize: 8, color: 'rgba(255,255,255,0.4)' }}>{day.slice(5)}</span>
+                <span style={{ fontSize: 8, color: 'rgba(232,230,252,0.72)' }}>{day.slice(5)}</span>
               </div>
             ))}
           </div>
@@ -435,9 +435,9 @@ function AdsTab() {
     <div>
       <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)', marginBottom: 16 }}>{ads.length} ogłoszeń</div>
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.4)' }}>Ładowanie...</div>
+        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)' }}>Ładowanie...</div>
       ) : ads.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>Brak ogłoszeń</div>
+        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)', fontSize: 14 }}>Brak ogłoszeń</div>
       ) : ads.map(a => (
         <div key={a.id} style={card}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 }}>
@@ -446,9 +446,9 @@ function AdsTab() {
               <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
                 {a.category && <span style={{ fontSize: 11, background: 'rgba(157,78,222,0.15)', color: '#e9c176', borderRadius: 6, padding: '2px 7px' }}>{a.category}</span>}
                 <span style={{ fontSize: 11, background: a.status === 'active' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'active' ? '#e9c176' : 'rgba(255,255,255,0.4)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
-                {a.location && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📍 {a.location}</span>}
+                {a.location && <span style={{ fontSize: 11, color: 'rgba(232,230,252,0.72)' }}>📍 {a.location}</span>}
               </div>
-              <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{a.description?.slice(0, 100)}…</div>
+              <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)' }}>{a.description?.slice(0, 100)}…</div>
             </div>
           </div>
           <div style={{ display: 'flex', gap: 6, marginTop: 10, justifyContent: 'flex-end' }}>
@@ -588,19 +588,19 @@ function EventsTab() {
       {loading ? (
         <div style={{ color: 'rgba(232,230,252,0.8)', textAlign: 'center', padding: 40 }}>Ładowanie…</div>
       ) : events.length === 0 ? (
-        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>Brak imprez. Dodaj pierwszą!</div>
+        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)', fontSize: 14 }}>Brak imprez. Dodaj pierwszą!</div>
       ) : events.map(e => (
         <div key={e.id} style={{ ...card, display: 'flex', alignItems: 'center', gap: 12 }}>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>{e.event_name}</div>
-            <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginTop: 3 }}>
+            <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', marginTop: 3 }}>
               {e.event_date} · {e.swingers_venues?.name || e.location_name || e.organizer || (e.is_external ? 'Zewnętrzna' : '—')}
               {e.start_time && ` · ${e.start_time.slice(0,5)}`}
             </div>
             {e.price && <div style={{ fontSize: 12, color: '#e9c176', marginTop: 2 }}>{e.price}</div>}
           </div>
           <button onClick={() => openEdit(e)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' }}>Edytuj</button>
-          <button onClick={() => del(e)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
+          <button onClick={() => del(e)} style={{ background: 'none', border: 'none', color: 'rgba(232,230,252,0.72)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
         </div>
       ))}
     </div>
@@ -732,7 +732,7 @@ function VenuesTab() {
                 <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.8)' }}>{v.city} · {v.type} · {v.scene}</div>
               </div>
               <button onClick={() => openEdit(v)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' }}>Edytuj</button>
-              <button onClick={() => del(v)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.45)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
+              <button onClick={() => del(v)} style={{ background: 'none', border: 'none', color: 'rgba(232,230,252,0.72)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
             </div>
           ))}
           {list.length === 0 && <div style={{ color: 'rgba(232,230,252,0.8)' }}>Brak lokali.</div>}

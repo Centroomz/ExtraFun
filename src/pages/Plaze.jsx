@@ -109,7 +109,7 @@ function BeachCard({ beach }) {
       </div>
 
       {beach.city && (
-        <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginBottom: 8 }}>
+        <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', marginBottom: 8 }}>
           📍 {beach.city}
         </div>
       )}
@@ -129,7 +129,7 @@ function BeachCard({ beach }) {
       )}
 
       {beach.open_info && (
-        <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(255,255,255,0.4)', display: 'flex', alignItems: 'center', gap: 5 }}>
+        <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(232,230,252,0.72)', display: 'flex', alignItems: 'center', gap: 5 }}>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
           </svg>
@@ -174,14 +174,14 @@ export function Plaze() {
 
         <div style={{ padding: '0 16px 100px' }}>
           {loading ? (
-            <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.3)' }}>Ładowanie…</div>
+            <div style={{ textAlign: 'center', padding: 60, color: 'rgba(232,230,252,0.72)' }}>Ładowanie…</div>
           ) : grouped.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 60, color: 'rgba(255,255,255,0.3)' }}>Brak danych</div>
+            <div style={{ textAlign: 'center', padding: 60, color: 'rgba(232,230,252,0.72)' }}>Brak danych</div>
           ) : (
             grouped.map(({ country, beaches: bs }) => (
               <div key={country} style={{ marginBottom: 28 }}>
                 <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--cyan)', textTransform: 'uppercase', letterSpacing: 1, margin: '0 0 12px' }}>
-                  {country} <span style={{ color: 'rgba(255,255,255,0.3)', fontWeight: 400 }}>({bs.length})</span>
+                  {country} <span style={{ color: 'rgba(232,230,252,0.72)', fontWeight: 400 }}>({bs.length})</span>
                 </h2>
                 {bs.map(b => <BeachCard key={b.id} beach={b} />)}
               </div>

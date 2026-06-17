@@ -667,7 +667,7 @@ body {
   transition: border-color 0.2s;
 }
 .form-input:focus { border-color: var(--cyan); }
-.form-input::placeholder { color: rgba(255,255,255,0.3); }
+.form-input::placeholder { color: rgba(232,230,252,0.72); }
 .form-error {
   padding: 12px 16px;
   background: rgba(157,78,222,0.1);
@@ -2068,12 +2068,12 @@ select.form-input option { background: #151538; }
 .ef-gate-btn--primary { border: 1px solid var(--gold); color: var(--gold); }
 .ef-gate-btn--primary:hover { background: var(--gold); color: var(--onyx); box-shadow: 0 0 24px rgba(157,78,222,0.18); }
 .ef-gate-btn--ghost { border: 1px solid rgba(255,255,255,0.18); color: var(--text-dim); }
-.ef-gate-btn--ghost:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+.ef-gate-btn--ghost:hover { border-color: rgba(232,230,252,0.72); color: #fff; }
 .ef-gate-foot {
   margin-top: 28px;
   font-family: 'Inter', sans-serif;
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.25);
+  color: rgba(232,230,252,0.72);
 }

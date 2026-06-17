@@ -58,7 +58,7 @@ export function SlownikTerm({ slug }) {
       <div className="page-inner">
         <div style={{ padding: '16px 16px 0' }}>
           <Link href="/slownik">
-            <span style={{ color: 'rgba(255,255,255,0.45)', fontSize: 13, cursor: 'pointer' }}>
+            <span style={{ color: 'rgba(232,230,252,0.72)', fontSize: 13, cursor: 'pointer' }}>
               ← Słownik
             </span>
           </Link>
@@ -87,7 +87,7 @@ export function SlownikTerm({ slug }) {
             background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
             borderRadius: 14, padding: '18px 20px', marginBottom: 16,
           }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 10 }}>
               Definicja
             </div>
             <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.88)', lineHeight: 1.7, margin: 0 }}>
@@ -116,7 +116,7 @@ export function SlownikTerm({ slug }) {
           {/* Powiązane terminy */}
           {related.length > 0 && (
             <div style={{ marginTop: 24 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: 10 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 10 }}>
                 Powiązane terminy
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -127,7 +127,7 @@ export function SlownikTerm({ slug }) {
                       borderRadius: 10, padding: '11px 14px', cursor: 'pointer',
                     }}>
                       <div style={{ fontWeight: 700, fontSize: 13, color: '#fff', marginBottom: 3 }}>{r.term}</div>
-                      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5 }}>
+                      <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', lineHeight: 1.5 }}>
                         {r.definition.slice(0, 90)}…
                       </div>
                     </div>

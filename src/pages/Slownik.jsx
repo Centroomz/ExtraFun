@@ -94,15 +94,15 @@ export function Slownik() {
           background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
           borderRadius: 14, padding: '14px 16px', textDecoration: 'none',
         }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 4 }}>Też cię interesuje?</div>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 4 }}>Też cię interesuje?</div>
           <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Słownik LGBT+ →</div>
-          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', marginTop: 2 }}>gay.pl/slownik — orientacje, tożsamości, subkultury</div>
+          <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', marginTop: 2 }}>gay.pl/slownik — orientacje, tożsamości, subkultury</div>
         </a>
 
         {/* Lista terminów */}
         <div style={{ padding: '0 16px 80px', display: 'flex', flexDirection: 'column', gap: 20 }}>
           {sortedFiltered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>
+            <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)', fontSize: 14 }}>
               Brak wyników dla "{q}"
             </div>
           ) : q ? (
