@@ -1835,6 +1835,24 @@ select.form-input option { background: #151538; }
   background: linear-gradient(135deg, rgba(233, 193, 118, 0.15), rgba(157, 78, 222, 0.22));
 }
 
+/* "Magazyn" page headline — was unstyled (default <h1>, wrong font). */
+.mag-mobile-title {
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin: 0;
+  padding: 20px 16px 14px;
+}
+@media (min-width: 900px) { .mag-mobile-title { font-size: 44px; } }
+
+/* Polish: brighter excerpt text (Stitch reads ~0.9, not 0.65) */
+.mag-hero-desc,
+.mag-card-desc { color: rgba(226, 224, 252, 0.78); }
+.mag-card-meta,
+.mag-hero-meta { color: rgba(226, 224, 252, 0.5); }
+
 /* ════════════════════════════════════════════════════
    ARTICLE — faithful reproduction of the Stitch article screen
    (hero + gradient, gold Playfair title, author, drop-cap, blockquote)
