@@ -1967,3 +1967,95 @@ select.form-input option { background: #151538; }
   border-radius: 9999px;
   color: var(--text-dim);
 }
+
+/* ════════════════════════════════════════════════════
+   AGE GATE — faithful reproduction of the Stitch age screen
+   ════════════════════════════════════════════════════ */
+.ef-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(157,78,222,0.16), transparent 45%),
+    radial-gradient(ellipse at 100% 100%, rgba(94,18,18,0.30), transparent 50%),
+    linear-gradient(160deg, var(--midnight), var(--onyx) 60%);
+}
+.ef-gate-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(16, 16, 37, 0.45);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(233, 193, 118, 0.15);
+  border-radius: 16px;
+  padding: 48px 36px;
+  text-align: center;
+}
+.ef-gate-badge {
+  width: 100px; height: 100px;
+  margin: 0 auto 28px;
+  border: 2px solid rgba(255, 179, 172, 0.4);
+  border-radius: 26px;
+  padding: 8px;
+  display: flex;
+}
+.ef-gate-badge-inner {
+  flex: 1;
+  border: 4px solid #ffb3ac;
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+.ef-gate-badge-num {
+  color: #ffb3ac;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+.ef-gate-title {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 16px;
+}
+.ef-gate-desc {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+}
+.ef-gate-btns { display: flex; flex-direction: column; gap: 14px; }
+.ef-gate-btn {
+  width: 100%;
+  padding: 15px;
+  border-radius: 10px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.25s, color 0.25s, border-color 0.25s, transform 0.12s;
+}
+.ef-gate-btn:active { transform: scale(0.98); }
+.ef-gate-btn--primary { border: 1px solid var(--gold); color: var(--gold); }
+.ef-gate-btn--primary:hover { background: var(--gold); color: var(--onyx); box-shadow: 0 0 24px rgba(157,78,222,0.18); }
+.ef-gate-btn--ghost { border: 1px solid rgba(255,255,255,0.18); color: var(--text-dim); }
+.ef-gate-btn--ghost:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+.ef-gate-foot {
+  margin-top: 28px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
