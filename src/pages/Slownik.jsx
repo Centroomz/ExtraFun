@@ -144,7 +144,7 @@ function TermRow({ term }) {
         onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-          <div style={{ fontWeight: 700, fontSize: 14, color: '#fff' }}>{term.term}</div>
+          <div style={{ fontFamily: 'Playfair Display', fontWeight: 600, fontSize: 17, color: '#fff' }}>{term.term}</div>
           <span style={{ fontSize: 10, background: c.bg, color: c.color, borderRadius: 6, padding: '2px 7px', whiteSpace: 'nowrap', flexShrink: 0 }}>
             {term.category}
           </span>

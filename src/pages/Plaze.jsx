@@ -83,7 +83,7 @@ function BeachCard({ beach }) {
       )}
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 8, marginBottom: 6 }}>
-        <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: '#fff', lineHeight: 1.3 }}>
+        <h3 style={{ margin: 0, fontFamily: 'Playfair Display', fontSize: 18, fontWeight: 600, color: '#fff', lineHeight: 1.3 }}>
           🏖️ {beach.name}
         </h3>
         {gpsUrl && (

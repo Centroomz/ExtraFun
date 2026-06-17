@@ -40,7 +40,7 @@ function EventCard({ event }) {
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
-          <div style={{ fontWeight: 700, fontSize: 15, color: '#fff', lineHeight: 1.3 }}>{event.event_name}</div>
+          <div style={{ fontFamily: 'Playfair Display', fontWeight: 600, fontSize: 17, color: '#fff', lineHeight: 1.3 }}>{event.event_name}</div>
           {event.is_external && (
             <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#9D4EDE', borderRadius: 6, padding: '2px 8px', whiteSpace: 'nowrap' }}>Impreza zewnętrzna</span>
           )}
