@@ -16,6 +16,7 @@ import { ArticleDetailPage } from './pages/ArticleDetailPage'
 import { Imprezy } from './pages/Imprezy'
 import { Slownik } from './pages/Slownik'
 import { SlownikTerm } from './pages/SlownikTerm'
+import { Plaze } from './pages/Plaze'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
@@ -61,6 +62,16 @@ const NAV_ITEMS = [
     )
   },
   {
+    id: 'plaze', label: 'Plaże', href: '/plaze',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+        <path d="M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+        <path d="M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 2.6 0 2.4 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/>
+      </svg>
+    )
+  },
+  {
     id: 'ogloszenia', label: 'Ogłoszenia', href: '/ogloszenia',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -77,6 +88,7 @@ function DesktopNav({ user, profile, onSignOut }) {
     : location.startsWith('/magazyn') ? 'magazyn'
     : location.startsWith('/imprezy') ? 'imprezy'
     : location.startsWith('/miejsca') ? 'miejsca'
+    : location.startsWith('/plaze') ? 'plaze'
     : location.startsWith('/slownik') ? 'slownik'
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
     : location.startsWith('/admin') ? 'admin'
@@ -277,6 +289,7 @@ function AppInner() {
             <Route path="/slownik" component={Slownik} />
             <Route path="/miejsca" component={Przewodnik} />
             <Route path="/miejsca/:city">{(params) => <Przewodnik city={params.city} />}</Route>
+            <Route path="/plaze" component={Plaze} />
             <Route path="/czat">{() => <Czat user={user} />}</Route>
             <Route path="/ogloszenia">{() => <Ogloszenia user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
@@ -297,11 +310,12 @@ function AppInner() {
           location === '/' || location.startsWith('/magazyn') ? 'magazyn'
           : location.startsWith('/imprezy') ? 'imprezy'
           : location.startsWith('/miejsca') ? 'przewodnik'
+          : location.startsWith('/plaze') ? 'plaze'
           : location.startsWith('/slownik') ? 'slownik'
           : location.startsWith('/ogloszenia') ? 'ogloszenia'
           : 'magazyn'
         } onNavigate={(id) => {
-          const map = { magazyn: '/magazyn', imprezy: '/imprezy', przewodnik: '/miejsca', slownik: '/slownik', ogloszenia: '/ogloszenia' }
+          const map = { magazyn: '/magazyn', imprezy: '/imprezy', przewodnik: '/miejsca', plaze: '/plaze', slownik: '/slownik', ogloszenia: '/ogloszenia' }
           navigate(map[id] || '/magazyn')
         }} />
 

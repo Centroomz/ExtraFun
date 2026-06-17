@@ -6,8 +6,15 @@ export function registerRoutes(app) {
 
   // === MIEJSCA (swingers venues directory) ===
   app.get('/api/places', async (_req, res) => {
-    const { data: venues, error } = await supabaseAdmin.from('swingers_venues')
-      .select('id, name, type, address, city, description, website, latitude, longitude, logo_url, scene, gay_days, swing_days')
+    // Reads from the merged `venues` table (staging). Swing rows were copied
+    // there with legacy_swing_id = original swingers_venues.id; the 4 duplicates
+    // (Bizarriusz/Heaven/Galla/Berlin) live as native venues rows with swing_days
+    // set. Events stay keyed by the swingers-space id, so we look them up by
+    // legacy_swing_id (copied) or id (native). gay.pl is unaffected: these rows
+    // are is_active=false + gay_days='{}'. No DB mutation — revert = swap table back.
+    const { data: venues, error } = await supabaseAdmin.from('venues')
+      .select('id, name, type, address, city, description, website, lat, lng, cover_image, scene, gay_days, swing_days, legacy_swing_id')
+      .or('legacy_swing_id.not.is.null,swing_days.not.is.null')
       .order('city', { ascending: true })
     if (error) return res.status(500).json({ message: error.message })
     // Attach the weekly schedule (recurring_events) to each venue.
@@ -32,8 +39,10 @@ export function registerRoutes(app) {
       const sd = v.swing_days, gd = v.gay_days
       const allow = (dow) => !sd || sd.includes(dow)
       const label = (dow) => sd ? (gd && gd.includes(dow) ? 'Panie i Panowie' : 'Pary i single') : null
-      const events = (byVenue[v.id] || []).filter(e => allow(e.day_of_week)).map(e => ({ ...e, audience: label(e.day_of_week) }))
-      return { ...v, events, oneTime: otByVenue[v.id] || [] }
+      const key = v.legacy_swing_id || v.id   // events keyed in swingers-space id
+      const events = (byVenue[key] || []).filter(e => allow(e.day_of_week)).map(e => ({ ...e, audience: label(e.day_of_week) }))
+      // Alias venues columns back to the swingers shape the frontend expects.
+      return { ...v, latitude: v.lat, longitude: v.lng, logo_url: v.cover_image, events, oneTime: otByVenue[key] || [] }
     }))
   })
 
