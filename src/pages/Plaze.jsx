@@ -95,7 +95,7 @@ function BeachCard({ beach }) {
               flexShrink: 0,
               display: 'flex', alignItems: 'center', gap: 4,
               fontSize: 11, color: 'var(--cyan)', textDecoration: 'none',
-              background: 'rgba(0,229,255,0.1)', borderRadius: 8,
+              background: 'rgba(233,193,118,0.1)', borderRadius: 8,
               padding: '4px 8px', whiteSpace: 'nowrap',
             }}
           >

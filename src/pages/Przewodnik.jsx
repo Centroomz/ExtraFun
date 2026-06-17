@@ -7,9 +7,9 @@ import { calculateDistance, formatDistance } from '../lib/geo'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
-  club:      { label: 'Klub',    color: '#00E5FF', bg: 'rgba(0,229,255,0.12)',   icon: '🎭' },
-  sauna:     { label: 'Sauna',   color: '#9D4EDD', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
-  bar:       { label: 'Bar',     color: '#FF0080', bg: 'rgba(255,0,128,0.12)',   icon: '🍸' },
+  club:      { label: 'Klub',    color: '#e9c176', bg: 'rgba(233,193,118,0.12)',   icon: '🎭' },
+  sauna:     { label: 'Sauna',   color: '#9D4EDE', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
+  bar:       { label: 'Bar',     color: '#9D4EDE', bg: 'rgba(157,78,222,0.12)',   icon: '🍸' },
   dungeon:   { label: 'Dungeon', color: '#FF4500', bg: 'rgba(255,69,0,0.12)',    icon: '⛓️' },
   spa:       { label: 'Spa',     color: '#00FF96', bg: 'rgba(0,255,150,0.12)',   icon: '🛁' },
   party:     { label: 'Impreza', color: '#FFA500', bg: 'rgba(255,165,0,0.12)',   icon: '🎉' },
@@ -73,7 +73,7 @@ const ARTICLES = [
     id: 'berlin-guide',
     emoji: '🇩🇪',
     tag: 'Europa',
-    tagColor: '#00E5FF',
+    tagColor: '#e9c176',
     title: 'Berlin: Stolica Swingingu Europy',
     lead: 'Ponad 20 klubów, darkroomy, fetysz i wolność – dlaczego Berlin przyciąga co roku tysiące swingersów z całego świata.',
     city: 'Berlin',
@@ -107,7 +107,7 @@ function ArticleReader({ article, onBack }) {
       <div style={{ padding: '0 0 80px' }}>
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, rgba(157,78,221,0.3), rgba(0,229,255,0.15))',
+          background: 'linear-gradient(135deg, rgba(157,78,221,0.3), rgba(233,193,118,0.15))',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           padding: '28px 20px 24px',
           marginBottom: 0,
@@ -196,8 +196,8 @@ function VenueDetail({ venue, onBack }) {
                     : `${DNI[dow][0].toUpperCase()}${DNI[dow].slice(1)} ${d.getDate()} ${MIES[d.getMonth()]}`
                   const isToday = off === 0
                   return (
-                    <div key={off} style={{ marginBottom: 12, paddingLeft: isToday ? 10 : 0, borderLeft: isToday ? '3px solid #00E5FF' : 'none' }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#00E5FF' : 'var(--text)', marginBottom: 4 }}>
+                    <div key={off} style={{ marginBottom: 12, paddingLeft: isToday ? 10 : 0, borderLeft: isToday ? '3px solid #e9c176' : 'none' }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#e9c176' : 'var(--text)', marginBottom: 4 }}>
                         {label}{off > 1 ? '' : ` · ${DNI[dow]} ${d.getDate()} ${MIES[d.getMonth()]}`}
                       </div>
                       {special ? (
@@ -211,7 +211,7 @@ function VenueDetail({ venue, onBack }) {
                       ) : evs.map(e => (
                         <div key={e.id} style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55, marginBottom: 3 }}>
                           <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
-                          {e.audience && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: '#00E5FF', background: 'rgba(0,229,255,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
+                          {e.audience && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: '#e9c176', background: 'rgba(233,193,118,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
                           {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
                           {e.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{e.price}</span></>}
                         </div>
@@ -237,7 +237,7 @@ function VenueDetail({ venue, onBack }) {
             {venue.website && (
               <div style={{ display: 'flex', gap: 10 }}>
                 <span style={{ fontSize: 16 }}>🌐</span>
-                <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#00E5FF', wordBreak: 'break-all' }}>{venue.website}</a>
+                <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#e9c176', wordBreak: 'break-all' }}>{venue.website}</a>
               </div>
             )}
           </div>
@@ -260,7 +260,7 @@ function ArticleCard({ article, hero, onClick }) {
         onClick={onClick}
         style={{
           cursor: 'pointer',
-          background: 'linear-gradient(135deg, rgba(157,78,221,0.25) 0%, rgba(0,229,255,0.15) 100%)',
+          background: 'linear-gradient(135deg, rgba(157,78,221,0.25) 0%, rgba(233,193,118,0.15) 100%)',
           border: '1px solid rgba(157,78,221,0.35)',
           borderRadius: 18,
           padding: '24px 20px 20px',
@@ -284,7 +284,7 @@ function ArticleCard({ article, hero, onClick }) {
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.5 }}>{article.lead}</div>
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#9D4EDD' }}>Czytaj dalej →</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#9D4EDE' }}>Czytaj dalej →</span>
         </div>
       </div>
     )
@@ -353,7 +353,7 @@ function VenueRow({ venue, onClick }) {
             {venue._special.price && <> · {venue._special.price}</>}
           </div>
         ) : venue._eventClub ? (
-          <div style={{ fontSize: 12.5, color: '#00E5FF', marginTop: 6, fontWeight: 600 }}>🟢 Otwarte — sprawdź imprezę na stronie</div>
+          <div style={{ fontSize: 12.5, color: '#e9c176', marginTop: 6, fontWeight: 600 }}>🟢 Otwarte — sprawdź imprezę na stronie</div>
         ) : (venue._dayEvents && venue._dayEvents.length > 0) ? (
           <div style={{ marginTop: 6 }}>
             {venue._dayEvents.map(e => (
@@ -571,7 +571,7 @@ export function Przewodnik({ city: cityParam }) {
           {/* Blisko Ciebie (GPS) */}
           <div style={{ padding: '0 16px', marginBottom: 12 }}>
             <h2 style={{ fontFamily: 'Outfit', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 8px', color: 'var(--text)' }}>📍 Blisko Ciebie</h2>
-            <div style={{ padding: '12px 14px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: location ? 'rgba(0,229,255,0.08)' : 'var(--glass)', border: `1px solid ${location ? 'rgba(0,229,255,0.3)' : 'var(--glass-border)'}` }}>
+            <div style={{ padding: '12px 14px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: location ? 'rgba(233,193,118,0.08)' : 'var(--glass)', border: `1px solid ${location ? 'rgba(233,193,118,0.3)' : 'var(--glass-border)'}` }}>
               <span style={{ fontSize: 16 }}>📡</span>
               <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
                 {geoLoading ? 'Szukam lokalizacji…' :

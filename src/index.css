@@ -1,10 +1,10 @@
 :root {
-  --cyan: #00E5FF;
-  --magenta: #FF0080;
-  --purple: #9D4EDD;
-  --purple-dark: #7209B7;
-  --bg-dark: #0a0a1e;
-  --bg-navy: #151538;
+  --cyan: #e9c176;          /* repurposed: champagne gold (główny akcent ExtraFun) */
+  --magenta: #9D4EDE;       /* repurposed: electric iris (akcent pomocniczy) */
+  --purple: #9D4EDE;
+  --purple-dark: #7a2fb0;
+  --bg-dark: #05050D;       /* onyx */
+  --bg-navy: #0A0A1E;       /* midnight */
   --bg-card: rgba(255, 255, 255, 0.06);
   --text: #ffffff;
   --text-dim: rgba(255, 255, 255, 0.65);
@@ -15,6 +15,15 @@
   --radius-lg: 20px;
   --radius-xl: 24px;
   --nav-height: 68px;
+
+  /* ── "Wyrafinowana Intymność" design tokens (Stitch redesign) ── */
+  --gold: #e9c176;          /* champagne gold — główny akcent nowego layoutu */
+  --gold-bright: #E2C99B;
+  --iris: #9D4EDE;          /* electric iris — fiolet pomocniczy */
+  --onyx: #05050D;          /* najgłębsze tło */
+  --midnight: #0A0A1E;
+  --burgundy: #5E1212;
+  --serif: 'Playfair Display', Georgia, serif;  /* nagłówki edytorialne */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -22,7 +31,7 @@
 html { font-size: 16px; }
 
 body {
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-dark);
   color: var(--text);
   min-height: 100dvh;
@@ -53,7 +62,7 @@ body {
   transform: translateX(-50%);
   width: 90%;
   height: 55%;
-  background: radial-gradient(ellipse, rgba(0,229,255,0.07) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(233,193,118,0.07) 0%, transparent 70%);
 }
 
 /* ── Layout ── */
@@ -102,7 +111,7 @@ body {
   border: none;
   background: none;
   color: var(--text-dim);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -150,16 +159,16 @@ body {
   gap: 8px;
   padding: 14px 28px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--cyan), #00B8D4);
+  background: linear-gradient(135deg, var(--cyan), #caa85f);
   color: #04212a;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
   border: none;
   cursor: pointer;
   transition: opacity 0.2s, transform 0.15s;
   text-decoration: none;
-  box-shadow: 0 4px 20px rgba(0,229,255,0.20);
+  box-shadow: 0 4px 20px rgba(233,193,118,0.20);
 }
 .btn-primary:hover { opacity: 0.9; }
 .btn-primary:active { transform: scale(0.97); }
@@ -175,7 +184,7 @@ body {
   background: var(--glass);
   border: 1px solid var(--glass-border);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -190,7 +199,7 @@ body {
   padding: 20px 16px 12px;
 }
 .section-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 26px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--text), var(--text-dim));
@@ -215,7 +224,7 @@ body {
   border-bottom: 1px solid var(--glass-border);
 }
 .page-header h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 22px;
   font-weight: 800;
   color: var(--text);
@@ -250,7 +259,7 @@ body {
   margin-bottom: 10px;
 }
 .article-card-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.3;
@@ -272,8 +281,8 @@ body {
   margin: 16px;
   padding: 24px 20px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(157,78,221,0.15));
-  border: 1px solid rgba(0,229,255,0.3);
+  background: linear-gradient(135deg, rgba(233,193,118,0.15), rgba(157,78,221,0.15));
+  border: 1px solid rgba(233,193,118,0.3);
   position: relative;
   overflow: hidden;
 }
@@ -282,7 +291,7 @@ body {
   position: absolute;
   top: -40px; right: -40px;
   width: 120px; height: 120px;
-  background: radial-gradient(circle, rgba(0,229,255,0.2) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(233,193,118,0.2) 0%, transparent 70%);
 }
 .hero-quiz-label {
   font-size: 11px;
@@ -293,7 +302,7 @@ body {
   margin-bottom: 8px;
 }
 .hero-quiz-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 22px;
   font-weight: 800;
   line-height: 1.2;
@@ -311,8 +320,8 @@ body {
   margin: 0 16px 16px;
   padding: 20px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(255,0,128,0.12), rgba(157,78,221,0.10));
-  border: 1px solid rgba(255,0,128,0.25);
+  background: linear-gradient(135deg, rgba(157,78,222,0.12), rgba(157,78,221,0.10));
+  border: 1px solid rgba(157,78,222,0.25);
 }
 .word-of-day-label {
   font-size: 10px;
@@ -323,7 +332,7 @@ body {
   margin-bottom: 6px;
 }
 .word-of-day-term {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 24px;
   font-weight: 800;
   color: white;
@@ -338,8 +347,8 @@ body {
   display: inline-block;
   padding: 3px 10px;
   border-radius: 20px;
-  background: rgba(255,0,128,0.15);
-  border: 1px solid rgba(255,0,128,0.3);
+  background: rgba(157,78,222,0.15);
+  border: 1px solid rgba(157,78,222,0.3);
   font-size: 10px;
   color: var(--magenta);
   font-weight: 600;
@@ -369,7 +378,7 @@ body {
   white-space: nowrap;
 }
 .category-chip.active {
-  background: rgba(0,229,255,0.15);
+  background: rgba(233,193,118,0.15);
   border-color: var(--cyan);
   color: var(--cyan);
 }
@@ -389,7 +398,7 @@ body {
   cursor: pointer;
   transition: background 0.2s, border-color 0.2s;
 }
-.venue-card:hover { border-color: rgba(0,229,255,0.35); background: rgba(255,255,255,0.06); }
+.venue-card:hover { border-color: rgba(233,193,118,0.35); background: rgba(255,255,255,0.06); }
 .venue-card:active { opacity: 0.9; }
 .venue-card-img {
   width: 100%;
@@ -411,7 +420,7 @@ body {
   margin-bottom: 6px;
 }
 .venue-card-name {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 16px;
   font-weight: 700;
 }
@@ -419,7 +428,7 @@ body {
   font-size: 12px;
   font-weight: 700;
   color: var(--cyan);
-  background: rgba(0,229,255,0.1);
+  background: rgba(233,193,118,0.1);
   padding: 3px 10px;
   border-radius: 20px;
   white-space: nowrap;
@@ -473,7 +482,7 @@ body {
   letter-spacing: 0.05em;
 }
 .forum-thread-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 6px;
@@ -527,7 +536,7 @@ body {
   color: var(--cyan);
 }
 .classified-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 6px;
@@ -617,7 +626,7 @@ body {
   backdrop-filter: blur(20px);
 }
 .auth-logo {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 36px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--cyan), var(--magenta));
@@ -652,7 +661,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   color: white;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s;
@@ -661,8 +670,8 @@ body {
 .form-input::placeholder { color: rgba(255,255,255,0.3); }
 .form-error {
   padding: 12px 16px;
-  background: rgba(255,0,128,0.1);
-  border: 1px solid rgba(255,0,128,0.3);
+  background: rgba(157,78,222,0.1);
+  border: 1px solid rgba(157,78,222,0.3);
   border-radius: var(--radius-sm);
   font-size: 13px;
   color: #ff6b9d;
@@ -703,7 +712,7 @@ body {
 }
 .age-gate-emoji { font-size: 56px; margin-bottom: 16px; display: block; }
 .age-gate-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 30px;
   font-weight: 800;
   margin-bottom: 12px;
@@ -739,7 +748,7 @@ body {
   margin-bottom: 12px;
 }
 .quiz-question {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 20px;
   font-weight: 700;
   line-height: 1.35;
@@ -759,15 +768,15 @@ body {
   color: var(--text);
   cursor: pointer;
   text-align: left;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.2s;
 }
 .quiz-answer:hover {
-  background: rgba(0,229,255,0.08);
-  border-color: rgba(0,229,255,0.4);
+  background: rgba(233,193,118,0.08);
+  border-color: rgba(233,193,118,0.4);
 }
 .quiz-answer.selected {
-  background: rgba(0,229,255,0.12);
+  background: rgba(233,193,118,0.12);
   border-color: var(--cyan);
   color: white;
 }
@@ -777,7 +786,7 @@ body {
 }
 .quiz-result-emoji { font-size: 72px; display: block; margin-bottom: 16px; }
 .quiz-result-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 26px;
   font-weight: 800;
   margin-bottom: 12px;
@@ -801,21 +810,21 @@ body {
   margin: 0 auto;
 }
 .article-detail h1 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 28px;
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 12px;
 }
 .article-detail h2 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 20px;
   font-weight: 700;
   margin: 24px 0 10px;
   color: var(--cyan);
 }
 .article-detail h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 17px;
   font-weight: 700;
   margin: 18px 0 8px;
@@ -848,7 +857,7 @@ body {
   gap: 16px;
 }
 .loading-logo {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 40px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--cyan), var(--magenta));
@@ -873,7 +882,7 @@ body {
 }
 .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -898,8 +907,8 @@ body {
 .location-bar-btn {
   padding: 6px 14px;
   border-radius: 20px;
-  background: rgba(0,229,255,0.12);
-  border: 1px solid rgba(0,229,255,0.3);
+  background: rgba(233,193,118,0.12);
+  border: 1px solid rgba(233,193,118,0.3);
   color: var(--cyan);
   font-size: 12px;
   font-weight: 700;
@@ -928,7 +937,7 @@ body {
 }
 .profile-info { flex: 1; }
 .profile-name {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 22px;
   font-weight: 800;
 }
@@ -939,8 +948,8 @@ body {
   gap: 4px;
   padding: 2px 8px;
   border-radius: 20px;
-  background: rgba(0,229,255,0.1);
-  border: 1px solid rgba(0,229,255,0.3);
+  background: rgba(233,193,118,0.1);
+  border: 1px solid rgba(233,193,118,0.3);
   font-size: 11px;
   color: var(--cyan);
   font-weight: 600;
@@ -975,7 +984,7 @@ body {
   overflow-y: auto;
 }
 .form-sheet-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 20px;
   font-weight: 800;
   margin-bottom: 20px;
@@ -997,7 +1006,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 6px 24px rgba(0,229,255,0.3);
+  box-shadow: 0 6px 24px rgba(233,193,118,0.3);
   transition: transform 0.2s;
   z-index: 100;
 }
@@ -1026,8 +1035,8 @@ select.form-input option { background: #151538; }
   gap: 6px;
   padding: 3px 12px;
   border-radius: 20px;
-  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(157,78,221,0.15));
-  border: 1px solid rgba(0,229,255,0.3);
+  background: linear-gradient(135deg, rgba(233,193,118,0.15), rgba(157,78,221,0.15));
+  border: 1px solid rgba(233,193,118,0.3);
   font-size: 11px;
   font-weight: 700;
   color: var(--cyan);
@@ -1070,7 +1079,7 @@ select.form-input option { background: #151538; }
   background: var(--glass); border: 1px solid var(--glass-border);
   color: white; font-size: 16px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Outfit'; font-weight: 700;
+  font-family: 'Playfair Display'; font-weight: 700;
 }
 /* old fixed profile btn — keep hidden now handled inline */
 .mobile-profile-btn { display: none; }
@@ -1114,7 +1123,7 @@ select.form-input option { background: #151538; }
   }
 
   .desktop-nav-logo {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Playfair Display', sans-serif;
     font-size: 24px;
     font-weight: 900;
     background: linear-gradient(135deg, var(--cyan), var(--purple), var(--magenta));
@@ -1142,7 +1151,7 @@ select.form-input option { background: #151538; }
     background: none;
     border: none;
     color: var(--text-dim);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -1155,9 +1164,9 @@ select.form-input option { background: #151538; }
     color: var(--text);
   }
   .desktop-nav-item.active {
-    background: rgba(0, 229, 255, 0.1);
+    background: rgba(233, 193, 118, 0.1);
     color: var(--cyan);
-    border: 1px solid rgba(0, 229, 255, 0.2);
+    border: 1px solid rgba(233, 193, 118, 0.2);
   }
   .desktop-nav-item-icon {
     width: 20px;
@@ -1186,7 +1195,7 @@ select.form-input option { background: #151538; }
     justify-content: center;
     font-size: 13px;
     font-weight: 700;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Playfair Display', sans-serif;
     color: white;
   }
 
@@ -1329,7 +1338,7 @@ select.form-input option { background: #151538; }
   flex-shrink: 0;
 }
 .mag-brand-name {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 22px;
   font-weight: 900;
   background: linear-gradient(135deg, var(--cyan), var(--purple), var(--magenta));
@@ -1376,7 +1385,7 @@ select.form-input option { background: #151538; }
   background: var(--glass);
 }
 .mag-cat-btn.active {
-  background: rgba(0,229,255,0.12);
+  background: rgba(233,193,118,0.12);
   border-color: var(--cyan);
   color: var(--cyan);
 }
@@ -1423,7 +1432,7 @@ select.form-input option { background: #151538; }
   display: block;
 }
 .mag-hero-img--placeholder {
-  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(157,78,221,0.2));
+  background: linear-gradient(135deg, rgba(233,193,118,0.15), rgba(157,78,221,0.2));
 }
 @media (min-width: 900px) {
   .mag-hero {
@@ -1452,7 +1461,7 @@ select.form-input option { background: #151538; }
   }
 }
 .mag-hero-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 24px;
   font-weight: 800;
   line-height: 1.2;
@@ -1556,7 +1565,7 @@ select.form-input option { background: #151538; }
   .mag-card-body { padding: 18px 20px 20px; }
 }
 .mag-card-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 15px;
   font-weight: 700;
   line-height: 1.3;
@@ -1599,8 +1608,8 @@ select.form-input option { background: #151538; }
 .mag-sidebar-quiz {
   padding: 24px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(0,229,255,0.10), rgba(157,78,221,0.12));
-  border: 1px solid rgba(0,229,255,0.25);
+  background: linear-gradient(135deg, rgba(233,193,118,0.10), rgba(157,78,221,0.12));
+  border: 1px solid rgba(233,193,118,0.25);
   cursor: pointer;
   transition: transform 0.2s;
 }
@@ -1614,7 +1623,7 @@ select.form-input option { background: #151538; }
   margin-bottom: 8px;
 }
 .mag-sidebar-quiz-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 18px;
   font-weight: 800;
   color: white;
@@ -1631,8 +1640,8 @@ select.form-input option { background: #151538; }
 .mag-sidebar-word {
   padding: 20px 24px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, rgba(255,0,128,0.09), rgba(157,78,221,0.09));
-  border: 1px solid rgba(255,0,128,0.2);
+  background: linear-gradient(135deg, rgba(157,78,222,0.09), rgba(157,78,221,0.09));
+  border: 1px solid rgba(157,78,222,0.2);
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1645,7 +1654,7 @@ select.form-input option { background: #151538; }
   color: var(--magenta);
 }
 .mag-sidebar-word-term {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Playfair Display', sans-serif;
   font-size: 22px;
   font-weight: 800;
   color: white;
@@ -1775,3 +1784,53 @@ select.form-input option { background: #151538; }
   padding: 0;
 }
 .mag-mobile-header .page-header { position: static; }
+
+/* ════════════════════════════════════════════════════
+   PILOT: Magazyn — "Wyrafinowana Intymność" re-skin
+   Override-only (defined last = wins over cyan rules above).
+   Scoped to .mag-* — other pages keep the cyan theme.
+   Revert = delete this block.
+   ════════════════════════════════════════════════════ */
+/* Brand wordmark → champagne gold, serif, spaced */
+.mag-brand-name {
+  font-family: var(--serif);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: none;
+  -webkit-text-fill-color: var(--gold);
+  color: var(--gold);
+}
+.mag-brand-issue { color: var(--gold-bright); }
+
+/* Editorial headlines → Playfair Display */
+.mag-hero-title,
+.mag-card-title,
+.mag-sidebar-quiz-title,
+.mag-sidebar-word-term,
+.mag-sidebar-item-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* Accent: cyan → gold */
+.mag-hero-cta { color: var(--gold); }
+.mag-cat-btn.active {
+  background: rgba(233, 193, 118, 0.12);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.mag-sidebar-quiz {
+  background: linear-gradient(135deg, rgba(233, 193, 118, 0.08), rgba(157, 78, 222, 0.10));
+  border-color: rgba(233, 193, 118, 0.22);
+}
+.mag-sidebar-quiz-label { color: var(--gold); }
+
+/* Cards/hero: warm gold hairline + deeper shadow */
+.mag-hero,
+.mag-card { border-color: rgba(233, 193, 118, 0.12); }
+.mag-card:hover { box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45); }
+.mag-hero-img--placeholder {
+  background: linear-gradient(135deg, rgba(233, 193, 118, 0.15), rgba(157, 78, 222, 0.22));
+}

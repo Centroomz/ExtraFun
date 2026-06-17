@@ -15,7 +15,7 @@ function MessageBubble({ msg, isMe }) {
       {!isMe && (
         <div style={{
           width: 32, height: 32, borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(0,229,255,0.3), rgba(157,78,221,0.3))',
+          background: 'linear-gradient(135deg, rgba(233,193,118,0.3), rgba(157,78,221,0.3))',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: 16, marginRight: 8, flexShrink: 0, alignSelf: 'flex-end',
         }}>👤</div>
@@ -82,7 +82,7 @@ export function Czat({ user }) {
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <div style={{
           width: 36, height: 36, borderRadius: '50%',
-          background: 'linear-gradient(135deg, rgba(0,229,255,0.3), rgba(157,78,221,0.3))',
+          background: 'linear-gradient(135deg, rgba(233,193,118,0.3), rgba(157,78,221,0.3))',
           display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
         }}>💬</div>
         <div>

@@ -3,9 +3,9 @@ import { Helmet } from 'react-helmet-async'
 import { getTerm, DICTIONARY_TERMS } from '../lib/dictionary'
 
 const CATEGORY_COLORS = {
-  'CNM / Poliamoria':    { bg: 'rgba(0,229,255,0.12)',  color: '#00E5FF',  border: 'rgba(0,229,255,0.25)' },
-  'Swinging / Lifestyle':{ bg: 'rgba(255,0,128,0.12)', color: '#FF0080',  border: 'rgba(255,0,128,0.25)' },
-  'BDSM / Kink':         { bg: 'rgba(157,78,221,0.12)', color: '#9D4EDD',  border: 'rgba(157,78,221,0.25)' },
+  'CNM / Poliamoria':    { bg: 'rgba(233,193,118,0.12)',  color: '#e9c176',  border: 'rgba(233,193,118,0.25)' },
+  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#9D4EDE',  border: 'rgba(157,78,222,0.25)' },
+  'BDSM / Kink':         { bg: 'rgba(157,78,221,0.12)', color: '#9D4EDE',  border: 'rgba(157,78,221,0.25)' },
   'Ogólne':              { bg: 'rgba(0,255,150,0.12)',  color: '#00FF96',  border: 'rgba(0,255,150,0.25)' },
 }
 
@@ -19,7 +19,7 @@ export function SlownikTerm({ slug }) {
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
           <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)' }}>Nie znaleziono terminu</div>
           <Link href="/slownik">
-            <div style={{ marginTop: 16, color: '#00E5FF', fontSize: 14, cursor: 'pointer' }}>← Wróć do słownika</div>
+            <div style={{ marginTop: 16, color: '#e9c176', fontSize: 14, cursor: 'pointer' }}>← Wróć do słownika</div>
           </Link>
         </div>
       </div>

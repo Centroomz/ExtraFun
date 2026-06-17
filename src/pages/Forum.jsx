@@ -3,9 +3,9 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
 const CATEGORIES = [
-  { id: 'cnm', label: 'CNM & Polyamory', emoji: '💜', color: '#9D4EDD', bg: 'rgba(157,78,221,0.12)' },
-  { id: 'swinging', label: 'Swinging', emoji: '🔄', color: '#00E5FF', bg: 'rgba(0,229,255,0.12)' },
-  { id: 'bdsm', label: 'BDSM & Fetish', emoji: '⛓️', color: '#FF0080', bg: 'rgba(255,0,128,0.12)' },
+  { id: 'cnm', label: 'CNM & Polyamory', emoji: '💜', color: '#9D4EDE', bg: 'rgba(157,78,221,0.12)' },
+  { id: 'swinging', label: 'Swinging', emoji: '🔄', color: '#e9c176', bg: 'rgba(233,193,118,0.12)' },
+  { id: 'bdsm', label: 'BDSM & Fetish', emoji: '⛓️', color: '#9D4EDE', bg: 'rgba(157,78,222,0.12)' },
   { id: 'newbie', label: 'Kącik Nowicjusza', emoji: '🌱', color: '#00FF96', bg: 'rgba(0,255,150,0.12)' },
   { id: 'clubs', label: 'Kluby i Wydarzenia', emoji: '🏛️', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
   { id: 'kawiarnia', label: 'Kawiarenka', emoji: '☕', color: '#FF6B6B', bg: 'rgba(255,107,107,0.12)' },
@@ -258,8 +258,8 @@ export function Forum({ user }) {
             onClick={() => setSortBy(opt.id)}
             style={{
               padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
-              background: sortBy === opt.id ? 'rgba(0,229,255,0.12)' : 'transparent',
-              border: sortBy === opt.id ? '1px solid rgba(0,229,255,0.4)' : '1px solid var(--glass-border)',
+              background: sortBy === opt.id ? 'rgba(233,193,118,0.12)' : 'transparent',
+              border: sortBy === opt.id ? '1px solid rgba(233,193,118,0.4)' : '1px solid var(--glass-border)',
               color: sortBy === opt.id ? 'var(--cyan)' : 'var(--text-dim)',
               cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0
             }}

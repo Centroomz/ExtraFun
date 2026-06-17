@@ -47,12 +47,12 @@ export function CalendarWidget() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 12 }}>
           <button
             onClick={() => setIdx((idx - 1 + events.length) % events.length)}
-            style={{ background: 'rgba(0,229,255,0.15)', border: '2px solid rgba(0,229,255,0.6)', borderRadius: 8, padding: '6px 18px', color: '#00E5FF', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
+            style={{ background: 'rgba(233,193,118,0.15)', border: '2px solid rgba(233,193,118,0.6)', borderRadius: 8, padding: '6px 18px', color: '#e9c176', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
           >‹</button>
-          <span style={{ fontSize: 12, color: '#00E5FF', fontWeight: 700 }}>{idx + 1} / {events.length}</span>
+          <span style={{ fontSize: 12, color: '#e9c176', fontWeight: 700 }}>{idx + 1} / {events.length}</span>
           <button
             onClick={() => setIdx((idx + 1) % events.length)}
-            style={{ background: 'rgba(0,229,255,0.15)', border: '2px solid rgba(0,229,255,0.6)', borderRadius: 8, padding: '6px 18px', color: '#00E5FF', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
+            style={{ background: 'rgba(233,193,118,0.15)', border: '2px solid rgba(233,193,118,0.6)', borderRadius: 8, padding: '6px 18px', color: '#e9c176', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
           >›</button>
         </div>
       )}

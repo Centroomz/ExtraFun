@@ -37,7 +37,7 @@ export function SignupPage({ onSwitch, onSuccess }) {
           <p style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 14 }}>
             Wysłaliśmy link potwierdzający na <strong>{email}</strong>. Kliknij w link, aby aktywować konto.
           </p>
-          <p style={{ fontSize: 13, color: '#00E5FF', lineHeight: 1.6, marginBottom: 20, background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.3)', borderRadius: 12, padding: '12px 14px' }}>
+          <p style={{ fontSize: 13, color: '#e9c176', lineHeight: 1.6, marginBottom: 20, background: 'rgba(233,193,118,0.08)', border: '1px solid rgba(233,193,118,0.3)', borderRadius: 12, padding: '12px 14px' }}>
             ⚠️ Nie ma maila w ciągu minuty? Zajrzyj do folderu <strong>SPAM / Oferty</strong> i oznacz wiadomość jako „nie spam".
           </p>
           <button className="btn-ghost" style={{ width: '100%' }} onClick={onSwitch}>Wróć do logowania</button>
