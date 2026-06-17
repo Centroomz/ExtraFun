@@ -115,7 +115,7 @@ function BeachCard({ beach }) {
       )}
 
       {desc && (
-        <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.65)', lineHeight: 1.6 }}>
+        <p style={{ margin: 0, fontSize: 13, color: 'rgba(232,230,252,0.88)', lineHeight: 1.6 }}>
           {expanded || !long ? desc : desc.slice(0, 160) + '…'}
           {long && (
             <button
@@ -167,7 +167,7 @@ export function Plaze() {
           <h1 style={{ margin: 0, fontSize: 22, fontWeight: 800 }}>
             🏖️ Plaże naturystyczne
           </h1>
-          <p style={{ margin: '6px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>
+          <p style={{ margin: '6px 0 0', fontSize: 13, color: 'rgba(232,230,252,0.8)' }}>
             Plaże FKK i nudystyczne w Polsce i Europie
           </p>
         </div>

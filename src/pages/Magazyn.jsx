@@ -15,8 +15,8 @@ function estimateReadingTime(content) {
 
 const CATEGORY_COLORS = {
   'CNM 101':        { bg: 'rgba(233,193,118,0.12)',   color: '#e9c176', border: 'rgba(233,193,118,0.3)' },
-  'Pierwszy Raz':   { bg: 'rgba(157,78,222,0.12)',   color: '#9D4EDE', border: 'rgba(157,78,222,0.3)' },
-  'Bez Osądu':      { bg: 'rgba(157,78,221,0.12)',  color: '#9D4EDE', border: 'rgba(157,78,221,0.3)' },
+  'Pierwszy Raz':   { bg: 'rgba(157,78,222,0.12)',   color: '#e9c176', border: 'rgba(157,78,222,0.3)' },
+  'Bez Osądu':      { bg: 'rgba(157,78,221,0.12)',  color: '#e9c176', border: 'rgba(157,78,221,0.3)' },
   'Tam i Tam':      { bg: 'rgba(255,165,0,0.12)',   color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
   'Słownik':        { bg: 'rgba(0,255,150,0.12)',   color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
   'Temat Miesiąca': { bg: 'rgba(255,200,0,0.12)',   color: '#FFC800', border: 'rgba(255,200,0,0.3)' },

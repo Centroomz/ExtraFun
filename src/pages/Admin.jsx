@@ -48,7 +48,7 @@ const inputStyle = {
 
 const labelStyle = {
   fontSize: 11, fontWeight: 700, letterSpacing: '.08em',
-  textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: 6, display: 'block',
+  textTransform: 'uppercase', color: 'rgba(232,230,252,0.8)', marginBottom: 6, display: 'block',
 }
 
 const btnPrimary = {
@@ -280,7 +280,7 @@ function ArticlesTab() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{articles.length} artykułów</div>
+        <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)' }}>{articles.length} artykułów</div>
         <button style={btnPrimary} onClick={() => setMode('add')}>+ Nowy artykuł</button>
       </div>
       {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#e9c176', marginBottom: 12, fontSize: 13 }}>{msg}</div>}
@@ -295,8 +295,8 @@ function ArticlesTab() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#9D4EDE', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
-                <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#e9c176' : 'rgba(255,255,255,0.5)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
+                <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#e9c176', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
+                <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#e9c176' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
                 <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
@@ -330,7 +330,7 @@ function StatsTab() {
     setLoading(false)
   }
 
-  if (loading) return <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.5)' }}>Ładowanie…</div>
+  if (loading) return <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.8)' }}>Ładowanie…</div>
   if (!rows) return null
 
   const totalViews = rows.length
@@ -357,15 +357,15 @@ function StatsTab() {
         {[7, 30, 90].map(d => (
           <button key={d} onClick={() => setDays(d)}
             style={{ fontSize: 12, padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700,
-              background: days === d ? '#e9c176' : 'rgba(255,255,255,0.08)', color: days === d ? '#0a0a1e' : 'rgba(255,255,255,0.6)' }}>
+              background: days === d ? '#e9c176' : 'rgba(255,255,255,0.08)', color: days === d ? '#0a0a1e' : 'rgba(232,230,252,0.86)' }}>
             {d} dni
           </button>
         ))}
       </div>
 
       <div style={{ display: 'flex', gap: 10 }}>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#e9c176' }}>{totalViews}</div></div>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#e9c176' }}>{totalSessions}</div></div>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#e9c176' }}>{totalViews}</div></div>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#e9c176' }}>{totalSessions}</div></div>
       </div>
 
       <div style={card}>
@@ -387,7 +387,7 @@ function StatsTab() {
         <div style={head}>Najpopularniejsze strony</div>
         {top(byPath).map(([p, v]) => (
           <div key={p} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
-            <span>{p}</span><span style={{ color: 'rgba(255,255,255,0.5)' }}>{v}</span>
+            <span>{p}</span><span style={{ color: 'rgba(232,230,252,0.8)' }}>{v}</span>
           </div>
         ))}
       </div>
@@ -395,11 +395,11 @@ function StatsTab() {
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
         <div style={{ ...card, flex: 1, minWidth: 220 }}>
           <div style={head}>Źródła ruchu</div>
-          {top(byRef).map(([r, v]) => (<div key={r} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}><span>{r}</span><span style={{ color: 'rgba(255,255,255,0.5)' }}>{v}</span></div>))}
+          {top(byRef).map(([r, v]) => (<div key={r} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}><span>{r}</span><span style={{ color: 'rgba(232,230,252,0.8)' }}>{v}</span></div>))}
         </div>
         <div style={{ ...card, flex: 1, minWidth: 220 }}>
           <div style={head}>Urządzenia</div>
-          {top(byDev).map(([d, v]) => (<div key={d} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}><span>{d === 'mobile' ? '📱 Telefon' : '💻 Desktop'}</span><span style={{ color: 'rgba(255,255,255,0.5)' }}>{v}</span></div>))}
+          {top(byDev).map(([d, v]) => (<div key={d} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}><span>{d === 'mobile' ? '📱 Telefon' : '💻 Desktop'}</span><span style={{ color: 'rgba(232,230,252,0.8)' }}>{v}</span></div>))}
         </div>
       </div>
     </div>
@@ -433,7 +433,7 @@ function AdsTab() {
 
   return (
     <div>
-      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 16 }}>{ads.length} ogłoszeń</div>
+      <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)', marginBottom: 16 }}>{ads.length} ogłoszeń</div>
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.4)' }}>Ładowanie...</div>
       ) : ads.length === 0 ? (
@@ -444,7 +444,7 @@ function AdsTab() {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{a.title}</div>
               <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                {a.category && <span style={{ fontSize: 11, background: 'rgba(157,78,222,0.15)', color: '#9D4EDE', borderRadius: 6, padding: '2px 7px' }}>{a.category}</span>}
+                {a.category && <span style={{ fontSize: 11, background: 'rgba(157,78,222,0.15)', color: '#e9c176', borderRadius: 6, padding: '2px 7px' }}>{a.category}</span>}
                 <span style={{ fontSize: 11, background: a.status === 'active' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'active' ? '#e9c176' : 'rgba(255,255,255,0.4)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
                 {a.location && <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>📍 {a.location}</span>}
               </div>
@@ -516,7 +516,7 @@ function EventsTab() {
   }
 
   const inp = { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 11px', fontSize: 13, color: '#fff', boxSizing: 'border-box', marginBottom: 8 }
-  const lbl = { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 3, display: 'block' }
+  const lbl = { fontSize: 11, color: 'rgba(232,230,252,0.8)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 3, display: 'block' }
 
   if (mode) {
     return (
@@ -582,11 +582,11 @@ function EventsTab() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{events.length} imprez</div>
+        <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)' }}>{events.length} imprez</div>
         <button onClick={openAdd} style={{ background: '#e9c176', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>+ Dodaj imprezę</button>
       </div>
       {loading ? (
-        <div style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: 40 }}>Ładowanie…</div>
+        <div style={{ color: 'rgba(232,230,252,0.8)', textAlign: 'center', padding: 40 }}>Ładowanie…</div>
       ) : events.length === 0 ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'rgba(255,255,255,0.3)', fontSize: 14 }}>Brak imprez. Dodaj pierwszą!</div>
       ) : events.map(e => (
@@ -678,7 +678,7 @@ function VenuesTab() {
   }
 
   const inp = { width: '100%', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, padding: '9px 11px', fontSize: 13, color: '#fff', boxSizing: 'border-box', marginBottom: 8 }
-  const lbl = { fontSize: 11, color: 'rgba(255,255,255,0.5)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 3, display: 'block' }
+  const lbl = { fontSize: 11, color: 'rgba(232,230,252,0.8)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 3, display: 'block' }
 
   if (mode) {
     return (
@@ -722,20 +722,20 @@ function VenuesTab() {
         <input style={{ ...inp, marginBottom: 0, flex: 1 }} placeholder="Szukaj (nazwa/miasto)…" value={q} onChange={e => setQ(e.target.value)} />
         <button onClick={openAdd} style={{ background: '#e9c176', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Dodaj</button>
       </div>
-      {loading ? <div style={{ color: 'rgba(255,255,255,0.5)' }}>Ładowanie…</div> : (
+      {loading ? <div style={{ color: 'rgba(232,230,252,0.8)' }}>Ładowanie…</div> : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
           {list.map(v => (
             <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: '10px 12px' }}>
               {v.logo_url ? <img src={v.logo_url} alt="" style={{ width: 36, height: 36, objectFit: 'contain', background: '#000', borderRadius: 6, flexShrink: 0 }} /> : <div style={{ width: 36, height: 36, background: 'rgba(255,255,255,0.06)', borderRadius: 6, flexShrink: 0 }} />}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: 14 }}>{v.name}</div>
-                <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{v.city} · {v.type} · {v.scene}</div>
+                <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.8)' }}>{v.city} · {v.type} · {v.scene}</div>
               </div>
               <button onClick={() => openEdit(v)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' }}>Edytuj</button>
               <button onClick={() => del(v)} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.45)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
             </div>
           ))}
-          {list.length === 0 && <div style={{ color: 'rgba(255,255,255,0.5)' }}>Brak lokali.</div>}
+          {list.length === 0 && <div style={{ color: 'rgba(232,230,252,0.8)' }}>Brak lokali.</div>}
         </div>
       )}
     </div>
@@ -750,7 +750,7 @@ export function Admin() {
     return (
       <div style={{ padding: 32, textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
-        <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)' }}>Zaloguj się, aby uzyskać dostęp do panelu admina.</div>
+        <div style={{ fontSize: 16, color: 'rgba(232,230,252,0.86)' }}>Zaloguj się, aby uzyskać dostęp do panelu admina.</div>
       </div>
     )
   }
@@ -759,7 +759,7 @@ export function Admin() {
     return (
       <div style={{ padding: 32, textAlign: 'center' }}>
         <div style={{ fontSize: 40, marginBottom: 16 }}>⛔</div>
-        <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)' }}>Brak dostępu. Tylko administrator może korzystać z tego panelu.</div>
+        <div style={{ fontSize: 16, color: 'rgba(232,230,252,0.86)' }}>Brak dostępu. Tylko administrator może korzystać z tego panelu.</div>
       </div>
     )
   }
@@ -787,7 +787,7 @@ export function Admin() {
             style={{
               background: tab === t.id ? 'rgba(233,193,118,0.12)' : 'transparent',
               border: tab === t.id ? '1px solid rgba(233,193,118,0.3)' : '1px solid transparent',
-              borderRadius: 10, color: tab === t.id ? '#e9c176' : 'rgba(255,255,255,0.55)',
+              borderRadius: 10, color: tab === t.id ? '#e9c176' : 'rgba(232,230,252,0.82)',
               fontWeight: 600, fontSize: 13, padding: '8px 14px', cursor: 'pointer',
             }}>
             {t.label}

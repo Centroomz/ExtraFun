@@ -8,8 +8,8 @@ import { calculateDistance, formatDistance } from '../lib/geo'
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
   club:      { label: 'Klub',    color: '#e9c176', bg: 'rgba(233,193,118,0.12)',   icon: '🎭' },
-  sauna:     { label: 'Sauna',   color: '#9D4EDE', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
-  bar:       { label: 'Bar',     color: '#9D4EDE', bg: 'rgba(157,78,222,0.12)',   icon: '🍸' },
+  sauna:     { label: 'Sauna',   color: '#e9c176', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
+  bar:       { label: 'Bar',     color: '#e9c176', bg: 'rgba(157,78,222,0.12)',   icon: '🍸' },
   dungeon:   { label: 'Dungeon', color: '#FF4500', bg: 'rgba(255,69,0,0.12)',    icon: '⛓️' },
   spa:       { label: 'Spa',     color: '#00FF96', bg: 'rgba(0,255,150,0.12)',   icon: '🛁' },
   party:     { label: 'Impreza', color: '#FFA500', bg: 'rgba(255,165,0,0.12)',   icon: '🎉' },
@@ -284,7 +284,7 @@ function ArticleCard({ article, hero, onClick }) {
         </div>
         <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.5 }}>{article.lead}</div>
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#9D4EDE' }}>Czytaj dalej →</span>
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#e9c176' }}>Czytaj dalej →</span>
         </div>
       </div>
     )

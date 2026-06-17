@@ -7,7 +7,7 @@
   --bg-navy: #0A0A1E;       /* midnight */
   --bg-card: rgba(255, 255, 255, 0.06);
   --text: #ffffff;
-  --text-dim: rgba(255, 255, 255, 0.65);
+  --text-dim: rgba(232, 230, 252, 0.86);
   --glass: rgba(255, 255, 255, 0.08);
   --glass-border: rgba(255, 255, 255, 0.15);
   --radius-sm: 12px;
@@ -328,7 +328,7 @@ body {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--magenta);
+  color: var(--cyan);
   margin-bottom: 6px;
 }
 .word-of-day-term {
@@ -350,7 +350,7 @@ body {
   background: rgba(157,78,222,0.15);
   border: 1px solid rgba(157,78,222,0.3);
   font-size: 10px;
-  color: var(--magenta);
+  color: var(--cyan);
   font-weight: 600;
   margin-top: 10px;
 }
@@ -1651,7 +1651,7 @@ select.form-input option { background: #151538; }
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--magenta);
+  color: var(--cyan);
 }
 .mag-sidebar-word-term {
   font-family: 'Playfair Display', sans-serif;

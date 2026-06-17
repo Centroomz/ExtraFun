@@ -38,7 +38,7 @@ function MessageBubble({ msg, isMe }) {
           </div>
         )}
         {msg.content}
-        <div style={{ fontSize: 10, color: isMe ? 'rgba(255,255,255,0.6)' : 'var(--text-dim)', marginTop: 4 }}>
+        <div style={{ fontSize: 10, color: isMe ? 'rgba(232,230,252,0.86)' : 'var(--text-dim)', marginTop: 4 }}>
           {new Date(msg.created_at).toLocaleTimeString('pl', { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>

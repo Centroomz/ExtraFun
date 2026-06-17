@@ -42,11 +42,11 @@ function EventCard({ event }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
           <div style={{ fontFamily: 'Playfair Display', fontWeight: 600, fontSize: 17, color: '#fff', lineHeight: 1.3 }}>{event.event_name}</div>
           {event.is_external && (
-            <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#9D4EDE', borderRadius: 6, padding: '2px 8px', whiteSpace: 'nowrap' }}>Impreza zewnętrzna</span>
+            <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#e9c176', borderRadius: 6, padding: '2px 8px', whiteSpace: 'nowrap' }}>Impreza zewnętrzna</span>
           )}
         </div>
 
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>
+        <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.82)', marginTop: 4 }}>
           {venue ? `${venue.name} · ${venue.city}` : (event.location_name || event.organizer || '')}
           {event.location_address && !venue && <span style={{ color: 'rgba(255,255,255,0.35)' }}> · {event.location_address}</span>}
         </div>
@@ -71,7 +71,7 @@ function EventCard({ event }) {
 
         {event.event_url && (
           <a href={event.event_url} target="_blank" rel="noopener noreferrer"
-            style={{ display: 'inline-block', marginTop: 8, fontSize: 12, color: '#9D4EDE', textDecoration: 'none' }}>
+            style={{ display: 'inline-block', marginTop: 8, fontSize: 12, color: '#e9c176', textDecoration: 'none' }}>
             Więcej info →
           </a>
         )}
@@ -115,7 +115,7 @@ export function Imprezy() {
       </Helmet>
       <div className="page-header">
         <h1>Imprezy</h1>
-        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, marginTop: 4 }}>Nadchodzące eventi — kluby i imprezy prywatne</p>
+        <p style={{ color: 'rgba(232,230,252,0.8)', fontSize: 14, marginTop: 4 }}>Nadchodzące eventi — kluby i imprezy prywatne</p>
       </div>
 
       {/* Filtry */}
@@ -129,7 +129,7 @@ export function Imprezy() {
             style={{
               fontSize: 13, padding: '7px 14px', borderRadius: 20, border: 'none', cursor: 'pointer', fontWeight: 600,
               background: filter === f.id ? 'linear-gradient(135deg,#e9c176,#9D4EDE)' : 'rgba(255,255,255,0.08)',
-              color: filter === f.id ? '#fff' : 'rgba(255,255,255,0.6)',
+              color: filter === f.id ? '#fff' : 'rgba(232,230,252,0.86)',
             }}>
             {f.label}
           </button>

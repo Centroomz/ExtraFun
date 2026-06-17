@@ -4,8 +4,8 @@ import { getTerm, DICTIONARY_TERMS } from '../lib/dictionary'
 
 const CATEGORY_COLORS = {
   'CNM / Poliamoria':    { bg: 'rgba(233,193,118,0.12)',  color: '#e9c176',  border: 'rgba(233,193,118,0.25)' },
-  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#9D4EDE',  border: 'rgba(157,78,222,0.25)' },
-  'BDSM / Kink':         { bg: 'rgba(157,78,221,0.12)', color: '#9D4EDE',  border: 'rgba(157,78,221,0.25)' },
+  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#e9c176',  border: 'rgba(157,78,222,0.25)' },
+  'BDSM / Kink':         { bg: 'rgba(157,78,221,0.12)', color: '#e9c176',  border: 'rgba(157,78,221,0.25)' },
   'Ogólne':              { bg: 'rgba(0,255,150,0.12)',  color: '#00FF96',  border: 'rgba(0,255,150,0.25)' },
 }
 
@@ -17,7 +17,7 @@ export function SlownikTerm({ slug }) {
       <div className="page-inner">
         <div style={{ padding: '60px 16px', textAlign: 'center' }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-          <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)' }}>Nie znaleziono terminu</div>
+          <div style={{ fontSize: 16, color: 'rgba(232,230,252,0.86)' }}>Nie znaleziono terminu</div>
           <Link href="/slownik">
             <div style={{ marginTop: 16, color: '#e9c176', fontSize: 14, cursor: 'pointer' }}>← Wróć do słownika</div>
           </Link>
@@ -26,7 +26,7 @@ export function SlownikTerm({ slug }) {
     )
   }
 
-  const c = CATEGORY_COLORS[term.category] || { bg: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)', border: 'rgba(255,255,255,0.15)' }
+  const c = CATEGORY_COLORS[term.category] || { bg: 'rgba(255,255,255,0.08)', color: 'rgba(232,230,252,0.86)', border: 'rgba(255,255,255,0.15)' }
 
   // 3 losowe terminy z tej samej kategorii (nie ten sam)
   const related = DICTIONARY_TERMS
@@ -75,7 +75,7 @@ export function SlownikTerm({ slug }) {
 
           <h1 style={{
             fontSize: 28, fontWeight: 900, marginTop: 12, marginBottom: 0,
-            background: 'linear-gradient(135deg, #fff 60%, rgba(255,255,255,0.6))',
+            background: 'linear-gradient(135deg, #fff 60%, rgba(232,230,252,0.86))',
             WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
             lineHeight: 1.2,
           }}>{term.term}</h1>
@@ -142,7 +142,7 @@ export function SlownikTerm({ slug }) {
             <div style={{
               marginTop: 24, padding: '14px 18px', borderRadius: 12,
               background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-              textAlign: 'center', cursor: 'pointer', fontSize: 14, color: 'rgba(255,255,255,0.6)',
+              textAlign: 'center', cursor: 'pointer', fontSize: 14, color: 'rgba(232,230,252,0.86)',
             }}>
               Zobacz wszystkie {DICTIONARY_TERMS.length} terminów →
             </div>

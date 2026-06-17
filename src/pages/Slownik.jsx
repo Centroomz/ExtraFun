@@ -5,8 +5,8 @@ import { DICTIONARY_TERMS, getTermsByCategory } from '../lib/dictionary'
 
 const CATEGORY_COLORS = {
   'CNM / Poliamoria':   { bg: 'rgba(233,193,118,0.12)',  color: '#e9c176',  border: 'rgba(233,193,118,0.25)' },
-  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#9D4EDE',  border: 'rgba(157,78,222,0.25)' },
-  'BDSM / Kink':        { bg: 'rgba(157,78,221,0.12)', color: '#9D4EDE',  border: 'rgba(157,78,221,0.25)' },
+  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#e9c176',  border: 'rgba(157,78,222,0.25)' },
+  'BDSM / Kink':        { bg: 'rgba(157,78,221,0.12)', color: '#e9c176',  border: 'rgba(157,78,221,0.25)' },
   'Ogólne':             { bg: 'rgba(0,255,150,0.12)',  color: '#00FF96',  border: 'rgba(0,255,150,0.25)' },
 }
 
@@ -41,7 +41,7 @@ export function Slownik() {
       <div className="page-inner">
         <div className="page-header">
           <h1>Słownik</h1>
-          <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 14, marginTop: 4 }}>
+          <p style={{ color: 'rgba(232,230,252,0.8)', fontSize: 14, marginTop: 4 }}>
             {DICTIONARY_TERMS.length} terminów — CNM, poliamoria, swinging, BDSM
           </p>
         </div>
@@ -66,7 +66,7 @@ export function Slownik() {
           <button onClick={() => setActiveCategory('all')} style={{
             fontSize: 12, padding: '6px 13px', borderRadius: 20, border: 'none', cursor: 'pointer', fontWeight: 600,
             background: activeCategory === 'all' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)',
-            color: activeCategory === 'all' ? '#fff' : 'rgba(255,255,255,0.5)',
+            color: activeCategory === 'all' ? '#fff' : 'rgba(232,230,252,0.8)',
           }}>Wszystkie ({DICTIONARY_TERMS.length})</button>
           {categories.map(cat => {
             const c = CATEGORY_COLORS[cat] || { bg: 'rgba(255,255,255,0.08)', color: '#fff', border: 'transparent' }
@@ -75,7 +75,7 @@ export function Slownik() {
                 fontSize: 12, padding: '6px 13px', borderRadius: 20, border: `1px solid ${activeCategory === cat ? c.border : 'transparent'}`,
                 cursor: 'pointer', fontWeight: 600,
                 background: activeCategory === cat ? c.bg : 'rgba(255,255,255,0.06)',
-                color: activeCategory === cat ? c.color : 'rgba(255,255,255,0.5)',
+                color: activeCategory === cat ? c.color : 'rgba(232,230,252,0.8)',
               }}>{cat} ({byCategory[cat].length})</button>
             )
           })}
@@ -132,7 +132,7 @@ export function Slownik() {
 }
 
 function TermRow({ term }) {
-  const c = CATEGORY_COLORS[term.category] || { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: 'transparent' }
+  const c = CATEGORY_COLORS[term.category] || { bg: 'rgba(255,255,255,0.06)', color: 'rgba(232,230,252,0.8)', border: 'transparent' }
   return (
     <Link href={`/slownik/${term.slug}`}>
       <div style={{
@@ -149,7 +149,7 @@ function TermRow({ term }) {
             {term.category}
           </span>
         </div>
-        <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 4, lineHeight: 1.5 }}>
+        <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)', marginTop: 4, lineHeight: 1.5 }}>
           {term.definition.slice(0, 120)}{term.definition.length > 120 ? '…' : ''}
         </div>
       </div>
