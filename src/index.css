@@ -1670,7 +1670,7 @@ select.form-input option { background: #151538; }
   .mag-sidebar {
     position: sticky;
     top: 80px;
-    grid-row: 1 / span 99;
+    grid-row: 1 / span 2;
     grid-column: 2;
   }
 }
