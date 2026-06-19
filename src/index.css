@@ -1322,7 +1322,7 @@ select.form-input option { background: #151538; }
   }
 }
 .mag-masthead-inner {
-  max-width: 1320px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 40px;
   height: 60px;
@@ -1400,9 +1400,9 @@ select.form-input option { background: #151538; }
 @media (min-width: 900px) {
   .mag-layout {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 360px;
     gap: 40px;
-    max-width: 1320px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 40px 40px 60px;
     align-items: start;
