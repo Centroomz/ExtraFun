@@ -1434,6 +1434,42 @@ select.form-input option { background: #151538; }
 .mag-hero-img--placeholder {
   background: linear-gradient(135deg, rgba(233,193,118,0.15), rgba(157,78,221,0.2));
 }
+.mag-hero-img--featured {
+  background: linear-gradient(135deg, rgba(157,78,221,0.25), rgba(233,193,118,0.1));
+}
+.mag-hero-title--featured {
+  color: var(--gold);
+}
+.mag-hero-dual {
+  display: none;
+}
+.mag-hero-mobile-only {
+  display: block;
+  text-decoration: none;
+}
+@media (min-width: 900px) {
+  .mag-hero-dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .mag-hero-dual-slot {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .mag-hero-dual-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: rgba(233,193,118,0.45);
+  }
+  .mag-hero-mobile-only {
+    display: none;
+  }
+}
 @media (min-width: 900px) {
   .mag-hero {
     display: grid;

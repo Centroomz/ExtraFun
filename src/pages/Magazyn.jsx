@@ -135,8 +135,10 @@ export function Magazyn() {
     ? allArticles
     : allArticles.filter(a => a.category === activeCategory)
 
-  const hero = filtered.find(a => a.featured) || filtered[0]
-  const rest = filtered.filter(a => a !== hero)
+  const featuredArticle = filtered.find(a => a.featured)
+  const newestArticle = filtered.find(a => !a.featured) || (featuredArticle ? filtered.find(a => a !== featuredArticle) : null)
+  const hero = featuredArticle || filtered[0]
+  const rest = filtered.filter(a => a !== featuredArticle && a !== newestArticle)
 
   if (showQuiz) return <QuizView onBack={() => setShowQuiz(false)} />
 
@@ -189,25 +191,76 @@ export function Magazyn() {
       <div className="mag-layout">
         <main className="mag-content">
 
-          {/* Hero */}
-          {hero && (
-            <Link href={`/magazyn/${hero.slug}`}>
-              <article className="mag-hero" style={{ cursor: 'pointer' }}>
-                {hero.cover_image
-                  ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
-                  : <div className="mag-hero-img mag-hero-img--placeholder" />
-                }
-                <div className="mag-hero-body">
-                  <CatTag category={hero.category} />
-                  <h2 className="mag-hero-title">{hero.title}</h2>
-                  <p className="mag-hero-desc">{hero.description}</p>
-                  <div className="mag-hero-meta">
-                    <span>{hero.reading_time} min czytania</span>
-                    <span className="mag-hero-cta">Czytaj →</span>
+          {/* Hero — desktop: newest left + featured right; mobile: featured only */}
+          {(newestArticle || featuredArticle) && (
+            <>
+              {/* Desktop dual hero */}
+              <div className="mag-hero-dual">
+                {newestArticle && (
+                  <div className="mag-hero-dual-slot">
+                    <span className="mag-hero-dual-label">Najnowszy</span>
+                    <Link href={`/magazyn/${newestArticle.slug}`}>
+                      <article className="mag-hero" style={{ cursor: 'pointer' }}>
+                        {newestArticle.cover_image
+                          ? <img src={newestArticle.cover_image} className="mag-hero-img" alt={newestArticle.title} />
+                          : <div className="mag-hero-img mag-hero-img--placeholder" />
+                        }
+                        <div className="mag-hero-body">
+                          <CatTag category={newestArticle.category} />
+                          <h2 className="mag-hero-title">{newestArticle.title}</h2>
+                          <p className="mag-hero-desc">{newestArticle.description}</p>
+                          <div className="mag-hero-meta">
+                            <span>{newestArticle.reading_time} min czytania</span>
+                            <span className="mag-hero-cta">Czytaj →</span>
+                          </div>
+                        </div>
+                      </article>
+                    </Link>
                   </div>
-                </div>
-              </article>
-            </Link>
+                )}
+                {featuredArticle && (
+                  <div className="mag-hero-dual-slot">
+                    <span className="mag-hero-dual-label">Wyróżniony</span>
+                    <Link href={`/magazyn/${featuredArticle.slug}`}>
+                      <article className="mag-hero mag-hero--featured" style={{ cursor: 'pointer' }}>
+                        {featuredArticle.cover_image
+                          ? <img src={featuredArticle.cover_image} className="mag-hero-img" alt={featuredArticle.title} />
+                          : <div className="mag-hero-img mag-hero-img--placeholder mag-hero-img--featured" />
+                        }
+                        <div className="mag-hero-body">
+                          <CatTag category={featuredArticle.category} />
+                          <h2 className="mag-hero-title mag-hero-title--featured">{featuredArticle.title}</h2>
+                          <p className="mag-hero-desc">{featuredArticle.description}</p>
+                          <div className="mag-hero-meta">
+                            <span>{featuredArticle.reading_time} min czytania</span>
+                            <span className="mag-hero-cta">Czytaj →</span>
+                          </div>
+                        </div>
+                      </article>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Mobile single hero — featured (or newest fallback) */}
+              <Link href={`/magazyn/${hero.slug}`} className="mag-hero-mobile-only">
+                <article className="mag-hero" style={{ cursor: 'pointer' }}>
+                  {hero.cover_image
+                    ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
+                    : <div className="mag-hero-img mag-hero-img--placeholder" />
+                  }
+                  <div className="mag-hero-body">
+                    <CatTag category={hero.category} />
+                    <h2 className="mag-hero-title">{hero.title}</h2>
+                    <p className="mag-hero-desc">{hero.description}</p>
+                    <div className="mag-hero-meta">
+                      <span>{hero.reading_time} min czytania</span>
+                      <span className="mag-hero-cta">Czytaj →</span>
+                    </div>
+                  </div>
+                </article>
+              </Link>
+            </>
           )}
 
           {/* Grid */}
