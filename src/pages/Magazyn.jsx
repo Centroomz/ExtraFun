@@ -189,13 +189,12 @@ export function Magazyn() {
 
       {/* ── Main layout ── */}
       <div className="mag-layout">
-        <main className="mag-content">
 
-          {/* Hero — desktop: newest left + featured right; mobile: featured only */}
-          {(newestArticle || featuredArticle) && (
-            <>
-              {/* Desktop dual hero */}
-              <div className="mag-hero-dual">
+        {/* Hero — desktop: newest left + featured right; mobile: featured only */}
+        {(newestArticle || featuredArticle) && (
+          <>
+            {/* Desktop dual hero — full width (spans content + sidebar) */}
+            <div className="mag-hero-dual">
                 {newestArticle && (
                   <div className="mag-hero-dual-slot">
                     <span className="mag-hero-dual-label">Najnowszy</span>
@@ -243,26 +242,27 @@ export function Magazyn() {
               </div>
 
               {/* Mobile single hero — featured (or newest fallback) */}
-              <Link href={`/magazyn/${hero.slug}`} className="mag-hero-mobile-only">
-                <article className="mag-hero" style={{ cursor: 'pointer' }}>
-                  {hero.cover_image
-                    ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
-                    : <div className="mag-hero-img mag-hero-img--placeholder" />
-                  }
-                  <div className="mag-hero-body">
-                    <CatTag category={hero.category} />
-                    <h2 className="mag-hero-title">{hero.title}</h2>
-                    <p className="mag-hero-desc">{hero.description}</p>
-                    <div className="mag-hero-meta">
-                      <span>{hero.reading_time} min czytania</span>
-                      <span className="mag-hero-cta">Czytaj →</span>
-                    </div>
+            <Link href={`/magazyn/${hero.slug}`} className="mag-hero-mobile-only">
+              <article className="mag-hero" style={{ cursor: 'pointer' }}>
+                {hero.cover_image
+                  ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
+                  : <div className="mag-hero-img mag-hero-img--placeholder" />
+                }
+                <div className="mag-hero-body">
+                  <CatTag category={hero.category} />
+                  <h2 className="mag-hero-title">{hero.title}</h2>
+                  <p className="mag-hero-desc">{hero.description}</p>
+                  <div className="mag-hero-meta">
+                    <span>{hero.reading_time} min czytania</span>
+                    <span className="mag-hero-cta">Czytaj →</span>
                   </div>
-                </article>
-              </Link>
-            </>
-          )}
+                </div>
+              </article>
+            </Link>
+          </>
+        )}
 
+        <main className="mag-content">
           {/* Grid */}
           {rest.length > 0 && (
             <div className="mag-grid">

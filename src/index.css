@@ -1451,8 +1451,9 @@ select.form-input option { background: #151538; }
   .mag-hero-dual {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-column: 1 / -1;
     gap: 16px;
-    margin-bottom: 28px;
+    margin-bottom: 0;
   }
   .mag-hero-dual-slot {
     display: flex;
