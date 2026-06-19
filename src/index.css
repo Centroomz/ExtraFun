@@ -1451,7 +1451,7 @@ select.form-input option { background: #151538; }
   .mag-hero-dual {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-column: 1 / -1;
+    grid-column: 1;
     gap: 16px;
     margin-bottom: 0;
   }
@@ -1459,6 +1459,12 @@ select.form-input option { background: #151538; }
     display: flex;
     flex-direction: column;
     gap: 8px;
+    align-items: stretch;
+  }
+  .mag-hero-dual-slot > a,
+  .mag-hero-dual-slot > a > article {
+    flex: 1;
+    height: 100%;
   }
   .mag-hero-dual-label {
     font-size: 11px;
@@ -1638,6 +1644,8 @@ select.form-input option { background: #151538; }
   .mag-sidebar {
     position: sticky;
     top: 80px;
+    grid-row: 1 / span 99;
+    grid-column: 2;
   }
 }
 

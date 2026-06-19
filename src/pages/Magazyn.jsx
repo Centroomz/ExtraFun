@@ -313,6 +313,9 @@ export function Magazyn() {
             <div className="mag-sidebar-word-term">{word.term}</div>
             <div className="mag-sidebar-word-def">{word.definition}</div>
             <span className="word-of-day-badge">{word.category}</span>
+            <Link href="/slownik" style={{ fontSize: 12, color: 'var(--gold)', opacity: 0.8, marginTop: 4, display: 'inline-block' }}>
+              Cały słownik CNM →
+            </Link>
           </div>
 
           {rest.length > 2 && (
