@@ -202,7 +202,15 @@ function ArticlesTab() {
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    // Views increment server-side on each article visit; re-fetch when the
+    // admin tab regains focus so counts reflect reality instead of a stale
+    // load-time snapshot.
+    const onFocus = () => load()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [])
 
   const handleSave = async (form) => {
     setSaving(true)
