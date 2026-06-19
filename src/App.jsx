@@ -304,6 +304,13 @@ function AppInner() {
             }</Route>
             <Route>{() => <Magazyn />}</Route>
           </Switch>
+
+          {/* Sister site — inside content column so it doesn't become a flex
+              row sibling stealing ~155px of page width on desktop */}
+          <div style={{ textAlign: 'center', padding: '8px 16px 20px', color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>
+            Portal partnerski:{' '}
+            <a href="https://gay.pl" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(232,230,252,0.72)', textDecoration: 'none' }}>gay.pl</a>
+          </div>
         </div>
 
         <BottomNav active={
@@ -328,12 +335,6 @@ function AppInner() {
             : '👤'
           }
         </button>
-
-        {/* Sister site */}
-        <div style={{ textAlign: 'center', padding: '8px 16px 20px', color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>
-          Portal partnerski:{' '}
-          <a href="https://gay.pl" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(232,230,252,0.72)', textDecoration: 'none' }}>gay.pl</a>
-        </div>
 
       </div>
       <PWAInstallBanner />
