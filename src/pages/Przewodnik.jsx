@@ -326,6 +326,12 @@ function slugify(s) {
 }
 const PL_CITY_SET = ['Warszawa', 'Kraków', 'Wrocław', 'Gdańsk', 'Poznań', 'Łódź', 'Katowice', 'Sopot', 'Szczecin', 'Lublin', 'Czeladź', 'Lubliniec']
 
+// Per-venue URL slug — id-prefixed (like gay.pl) so each club has its own
+// shareable, indexable, AI-citable page: /miejsca/123-heaven-warszawa.
+function venueSlug(v) {
+  return `${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`
+}
+
 // One venue row (used in city listings + "blisko Ciebie"). `venue` carries the
 // attached day status (_special / _dayEvents / _eventClub).
 function VenueRow({ venue, onClick }) {
@@ -514,6 +520,14 @@ export function Przewodnik({ city: cityParam }) {
   if (selectedArticle) {
     return <ArticleReader article={selectedArticle} onBack={() => window.history.back()} />
   }
+  // Venue deep-link: /miejsca/{id}-slug → own page (shareable, indexable, AI-citable)
+  if (cityParam && /^\d+(-|$)/.test(cityParam)) {
+    const vid = parseInt(cityParam, 10)
+    const v = venuesWithDist.find(x => x.id === vid)
+    if (v) return <VenueDetail venue={v} onBack={() => navigate('/miejsca')} />
+    if (loading) return <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
+    // unknown id → fall through to hub
+  }
   if (selectedVenue) {
     const v = venuesWithDist.find(v => v.id === selectedVenue)
     if (v) return <VenueDetail venue={v} onBack={() => window.history.back()} />
@@ -551,7 +565,7 @@ export function Przewodnik({ city: cityParam }) {
             <div className="empty-state"><div className="empty-icon">🏙️</div><div className="empty-title">Brak lokali</div></div>
           ) : (
             <div className="venue-list" style={{ paddingBottom: 80 }}>
-              {cityVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => setSelectedVenue(v.id)} />)}
+              {cityVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
             </div>
           )}
         </>
@@ -584,7 +598,7 @@ export function Przewodnik({ city: cityParam }) {
           </div>
           {location && nearby.length > 0 && (
             <div className="venue-list" style={{ marginBottom: 20 }}>
-              {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => setSelectedVenue(v.id)} />)}
+              {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
             </div>
           )}
 

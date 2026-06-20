@@ -103,6 +103,61 @@ export function sendHomeHtml(_req, res, dist) {
   }
 }
 
+// For /miejsca/:slug (id-prefixed, e.g. 123-heaven-warszawa) inject per-venue
+// meta + LocalBusiness JSON-LD so each club is a real indexable, AI-citable page.
+export async function sendVenueHtml(req, res, dist) {
+  const html = readFileSync(join(dist, 'index.html'), 'utf8')
+  try {
+    const id = parseInt(req.params.slug, 10)
+    if (Number.isNaN(id)) return res.send(html)
+    const { data } = await supabaseAdmin.from('venues')
+      .select('id, name, type, address, city, description, website, phone, lat, lng, cover_image')
+      .eq('id', id).maybeSingle()
+    if (!data) return res.send(html)
+    const title = esc(`${data.name}${data.city ? ' – ' + data.city : ''} | ExtraFun`)
+    const desc = esc((data.description || `${data.name} — klub lifestyle w ${data.city || 'Polsce'}.`).slice(0, 160))
+    const url = `https://extrafun.pl/miejsca/${req.params.slug}`
+    const img = data.cover_image ? esc(data.cover_image) : 'https://extrafun.pl/og-default.jpg'
+    const ld = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      name: data.name,
+      ...(data.description ? { description: data.description } : {}),
+      ...(data.cover_image ? { image: data.cover_image } : {}),
+      url,
+      ...(data.website ? { sameAs: [data.website] } : {}),
+      ...(data.phone ? { telephone: data.phone } : {}),
+      address: {
+        '@type': 'PostalAddress',
+        ...(data.address ? { streetAddress: data.address } : {}),
+        ...(data.city ? { addressLocality: data.city } : {}),
+        addressCountry: 'PL',
+      },
+      ...(data.lat && data.lng
+        ? { geo: { '@type': 'GeoCoordinates', latitude: Number(data.lat), longitude: Number(data.lng) } }
+        : {}),
+    }).replace(/</g, '\\u003c')
+    const tags = `<title>${title}</title>
+<meta name="description" content="${desc}" />
+<link rel="canonical" href="${url}" />
+<meta property="og:type" content="business.business" />
+<meta property="og:title" content="${title}" />
+<meta property="og:description" content="${desc}" />
+<meta property="og:url" content="${url}" />
+<meta property="og:image" content="${img}" />
+<script type="application/ld+json">${ld}</script>`
+    const injected = html
+      .replace(/<title>[\s\S]*?<\/title>/i, '')
+      .replace(/<link[^>]+rel="canonical"[^>]*>/i, '')
+      .replace(/<meta[^>]+name="description"[^>]*>/i, '')
+      .replace(/<meta[^>]+property="og:(?:title|description|url|image)"[^>]*>/gi, '')
+      .replace('</head>', `${tags}\n</head>`)
+    res.send(injected)
+  } catch {
+    res.send(html)
+  }
+}
+
 // For /slownik/:slug, inject the term's real title/description/DefinedTerm JSON-LD
 // into index.html before sending, so crawlers get the glossary entry despite the SPA.
 export function sendDictTermHtml(req, res, dist) {

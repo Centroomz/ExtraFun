@@ -431,7 +431,21 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
       const { DICTIONARY_TERMS: terms } = await import('../src/lib/dictionary.js')
       dictUrls = terms.map(t => ({ loc: `https://extrafun.pl/slownik/${t.slug}`, priority: '0.7' }))
     } catch {}
-    const urls = [...staticUrls, ...articleUrls, ...dictUrls]
+    // Per-venue pages (same set the catalog shows: swing/lifestyle rows).
+    let venueUrls = []
+    try {
+      const slugify = (s) => String(s).toLowerCase().replace(/ł/g, 'l')
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+      const { data: vs } = await supabaseAdmin.from('venues')
+        .select('id, name, city')
+        .or('legacy_swing_id.not.is.null,swing_days.not.is.null')
+      venueUrls = (vs || []).map(v => ({
+        loc: `https://extrafun.pl/miejsca/${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`,
+        priority: '0.6',
+      }))
+    } catch {}
+    const urls = [...staticUrls, ...articleUrls, ...dictUrls, ...venueUrls]
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')}

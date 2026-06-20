@@ -2,7 +2,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
-import { sendArticleHtml, sendDictTermHtml, sendHomeHtml } from './meta.js'
+import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml } from './meta.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -27,6 +27,10 @@ registerRoutes(app)
 app.get('/', (req, res) => sendHomeHtml(req, res, DIST))
 app.get('/magazyn/:slug', (req, res) => sendArticleHtml(req, res, DIST))
 app.get('/slownik/:slug', (req, res) => sendDictTermHtml(req, res, DIST))
+// Venue deep-link: only id-prefixed slugs (123-...) are real venue pages; the
+// bare /miejsca list + city slugs (warszawa) fall through to the SPA.
+app.get('/miejsca/:slug', (req, res, next) =>
+  /^\d+(-|$)/.test(req.params.slug) ? sendVenueHtml(req, res, DIST) : next())
 
 app.use(express.static(DIST))
 app.use((_req, res) => res.sendFile(join(DIST, 'index.html')))
