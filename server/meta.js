@@ -14,7 +14,7 @@ export async function sendArticleHtml(req, res, dist) {
   const html = readFileSync(join(dist, 'index.html'), 'utf8')
   try {
     const { data } = await supabaseAdmin.from('articles')
-      .select('title, excerpt, slug, cover_image, seo_title, seo_description, author, publish_date, created_at, updated_at')
+      .select('title, excerpt, slug, cover_image, seo_title, seo_description, author, publish_date, created_at, updated_at, content')
       .eq('site', 'extrafun').eq('status', 'published').eq('slug', req.params.slug)
       .maybeSingle()
     if (!data) return res.send(html)
@@ -42,6 +42,11 @@ export async function sendArticleHtml(req, res, dist) {
         logo: { '@type': 'ImageObject', url: 'https://extrafun.pl/icon-192.png' },
       },
       mainEntityOfPage: url,
+      // Full text in JSON-LD so AI crawlers (no JS) read the whole article
+      // despite the client-rendered SPA body.
+      ...(data.content
+        ? { articleBody: String(data.content).replace(/<[^>]+>/g, ' ').replace(/[#*_`>\[\]]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 12000) }
+        : {}),
     }).replace(/</g, '\\u003c')
     const tags = `<title>${title}</title>
 <meta name="description" content="${desc}" />

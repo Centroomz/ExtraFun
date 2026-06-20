@@ -12,6 +12,15 @@ const PORT = process.env.PORT || 3000
 
 app.use(express.json({ limit: '12mb' }))  // logo uploads arrive as base64 dataURL
 
+// Security headers (trust signals + basic hardening). Cheap, no behavior change.
+app.use((_req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains')
+  res.setHeader('X-Content-Type-Options', 'nosniff')
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN')
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin')
+  next()
+})
+
 // Domain redirect (.fun/.club → .pl) — preserved from old server.js
 app.use((req, res, next) => {
   const host = req.hostname || ''
