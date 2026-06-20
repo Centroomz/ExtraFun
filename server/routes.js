@@ -375,7 +375,39 @@ Allow: /
 Disallow: /admin
 Disallow: /profil
 
+# AI usage preferences (IETF draft content-signals)
+Content-Signal: ai-train=yes, search=yes, ai-retrieval=yes
+
 Sitemap: https://extrafun.pl/sitemap.xml`)
+  })
+
+  // llms.txt — site summary for AI engines. Real route so the SPA fallback
+  // doesn't shadow it with index.html.
+  app.get('/llms.txt', (_req, res) => {
+    res.type('text/markdown').send(
+`# ExtraFun
+
+> ExtraFun — polski magazyn i społeczność CNM/lifestyle: konsensualna niemonogamia, poliamoria, swing, fetysz oraz katalog klubów lifestyle i miejsc w Polsce.
+
+## Magazyn
+- [Magazyn](https://extrafun.pl/magazyn): Artykuły o CNM, poliamorii, swingu, otwartych związkach, fetyszu i lifestyle.
+
+## Słownik CNM
+- [Słownik](https://extrafun.pl/slownik): Wyjaśnienia pojęć CNM, poliamorii, swingu i BDSM po polsku.
+
+## Miejsca i wydarzenia
+- [Miejsca](https://extrafun.pl/miejsca): Katalog klubów lifestyle, swingers i miejsc w Polsce.
+- [Imprezy](https://extrafun.pl/imprezy): Wydarzenia i imprezy lifestyle.
+- [Plaże](https://extrafun.pl/plaze): Plaże naturystyczne i przyjazne lifestyle.
+
+## Key Facts
+- ExtraFun to polski portal lifestyle/CNM: magazyn + słownik + katalog miejsc.
+- Tematyka: konsensualna niemonogamia, poliamoria, swing, otwarte związki, fetysz, naturyzm.
+- Język: polski.
+
+## Contact
+- Website: https://extrafun.pl
+`)
   })
 
   app.get('/sitemap.xml', async (_req, res) => {
