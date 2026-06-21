@@ -223,8 +223,11 @@ function AppInner() {
   useEffect(() => {
     if (isBot) return
     try {
-      let sid = sessionStorage.getItem('ef_sid')
-      if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36); sessionStorage.setItem('ef_sid', sid) }
+      // localStorage (persists across visits) so returning visitors keep the same
+      // id — sessionStorage reset every visit and made ~100% of traffic look "new".
+      let sid = localStorage.getItem('ef_sid') || sessionStorage.getItem('ef_sid')
+      if (!sid) { sid = Math.random().toString(36).slice(2) + Date.now().toString(36) }
+      try { localStorage.setItem('ef_sid', sid) } catch { sessionStorage.setItem('ef_sid', sid) }
       let ref = 'direct'
       try { if (document.referrer) ref = new URL(document.referrer).hostname.replace(/^www\./, '') } catch {}
       const device = window.matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop'
