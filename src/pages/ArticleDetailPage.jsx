@@ -65,6 +65,28 @@ function pickRelated(list, current, slug, limit = 4) {
     }))
 }
 
+// Bottom CTA steered by category — points to a topically relevant section
+// instead of a generic nudge.
+const CTA_MAP = {
+  'tam-i-tam':    { icon: '📍', title: 'Miejsca i kluby', sub: 'Zobacz sceny lifestyle w Polsce i na świecie →', href: '/miejsca' },
+  'slownik':      { icon: '📖', title: 'Cały słownik CNM', sub: 'Pojęcia od compersion po polycule →', href: '/slownik' },
+  'pierwszy-raz': { icon: '🎉', title: 'Najbliższe wydarzenia', sub: 'Znajdź imprezę dla par i singli →', href: '/imprezy' },
+}
+const CTA_DEFAULT = { icon: '📖', title: 'Słownik CNM', sub: 'Poznaj język niemonogamii i lifestyle →', href: '/slownik' }
+
+function CtaBox({ categorySlug }) {
+  const cta = CTA_MAP[categorySlug] || CTA_DEFAULT
+  return (
+    <Link href={cta.href} className="ef-art-cta">
+      <span className="ef-art-cta-icon">{cta.icon}</span>
+      <div className="ef-art-cta-body">
+        <span className="ef-art-cta-title">{cta.title}</span>
+        <span className="ef-art-cta-sub">{cta.sub}</span>
+      </div>
+    </Link>
+  )
+}
+
 export function ArticleDetailPage() {
   const { slug } = useParams()
   const [article, setArticle] = useState(null)
@@ -84,6 +106,7 @@ export function ArticleDetailPage() {
           title: data.title,
           description: data.excerpt || '',
           category: SLUG_TO_DISPLAY[data.category_slug] || data.category_slug || 'CNM 101',
+          categorySlug: data.category_slug || null,
           content: data.content || '',
           cover_image: data.cover_image || null,
           author: data.author || 'Redakcja',
@@ -246,6 +269,8 @@ export function ArticleDetailPage() {
             </div>
           </section>
         )}
+
+        <CtaBox categorySlug={article.categorySlug} />
       </article>
     </div>
   )

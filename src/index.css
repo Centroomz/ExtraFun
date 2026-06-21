@@ -2132,6 +2132,28 @@ select.form-input option { background: #151538; }
 }
 .ef-art-related-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-dim); }
 
+.ef-art-cta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 28px;
+  padding: 16px 20px;
+  border: 1px solid rgba(233,193,118,0.3);
+  border-radius: 10px;
+  background: rgba(233,193,118,0.08);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.ef-art-cta:hover { background: rgba(233,193,118,0.14); }
+.ef-art-cta-icon { font-size: 22px; flex-shrink: 0; }
+.ef-art-cta-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ef-art-cta-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 700;
+  color: var(--gold);
+}
+.ef-art-cta-sub { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-dim); }
+
 /* ════════════════════════════════════════════════════
    AGE GATE — faithful reproduction of the Stitch age screen
    ════════════════════════════════════════════════════ */
