@@ -42,14 +42,39 @@ function renderContent(content) {
   })
 }
 
+// Pick onward reads: shared tags first (bridges categories), then same
+// category, then whatever's left — so every article has a path forward.
+function pickRelated(list, current, slug, limit = 4) {
+  const meTags = Array.isArray(current.tags) ? current.tags : []
+  const meCat = current.category_slug
+  return (list || [])
+    .filter(a => a.slug && a.slug !== slug)
+    .map(a => {
+      const tags = Array.isArray(a.tags) ? a.tags : []
+      const overlap = meTags.filter(t => tags.includes(t)).length
+      return { a, overlap, sameCat: a.category_slug === meCat ? 1 : 0 }
+    })
+    .sort((x, y) => (y.overlap - x.overlap) || (y.sameCat - x.sameCat) || (y.a.featured ? 1 : 0) - (x.a.featured ? 1 : 0))
+    .slice(0, limit)
+    .map(({ a }) => ({
+      slug: a.slug,
+      title: a.title,
+      category: SLUG_TO_DISPLAY[a.category_slug] || a.category_slug || 'CNM 101',
+      cover_image: a.cover_image || null,
+      reading_time: Math.max(1, Math.ceil((a.content || '').split(/\s+/).length / 200)),
+    }))
+}
+
 export function ArticleDetailPage() {
   const { slug } = useParams()
   const [article, setArticle] = useState(null)
+  const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       setLoading(true)
+      setRelated([])
       try {
         // 1. Try backend API (view increment happens server-side)
         const data = await apiFetch(`/api/articles/${slug}`)
@@ -68,11 +93,22 @@ export function ArticleDetailPage() {
           seoDescription: data.seo_description || data.excerpt || '',
           reading_time: Math.max(1, Math.ceil((data.content || '').split(/\s+/).length / 200)),
         })
+        // Onward reads (client-side, no backend change).
+        apiFetch('/api/articles')
+          .then(list => setRelated(pickRelated(list, data, slug)))
+          .catch(() => setRelated([]))
       } catch {
         // 2. Fallback to static articles
         const found = ARTICLES.find(a => a.slug === slug)
-        if (found) setArticle({ ...found, seoTitle: found.title, seoDescription: found.description })
-        else setArticle(null)
+        if (found) {
+          setArticle({ ...found, seoTitle: found.title, seoDescription: found.description })
+          setRelated(
+            ARTICLES.filter(a => a.slug !== slug && a.category === found.category)
+              .concat(ARTICLES.filter(a => a.slug !== slug && a.category !== found.category))
+              .slice(0, 4)
+              .map(a => ({ slug: a.slug, title: a.title, category: a.category, cover_image: a.cover_image || null, reading_time: a.reading_time || Math.max(1, Math.ceil((a.content || '').split(/\s+/).length / 200)) }))
+          )
+        } else setArticle(null)
       }
       setLoading(false)
     }
@@ -166,6 +202,14 @@ export function ArticleDetailPage() {
           </div>
         </div>
 
+        {related[0] && (
+          <Link href={`/magazyn/${related[0].slug}`} className="ef-art-teaser">
+            <span className="ef-art-teaser-label">Czytaj też</span>
+            <span className="ef-art-teaser-title">{related[0].title}</span>
+            <span className="ef-art-teaser-arrow">→</span>
+          </Link>
+        )}
+
         {(() => {
           const raw = (article.content || '').trim()
           const isHtml = raw.startsWith('<')
@@ -183,6 +227,24 @@ export function ArticleDetailPage() {
               <span key={i} className="ef-art-tag">{t}</span>
             ))}
           </div>
+        )}
+
+        {related.length > 0 && (
+          <section className="ef-art-related">
+            <h2 className="ef-art-related-head">Czytaj dalej</h2>
+            <div className="ef-art-related-grid">
+              {related.map(r => (
+                <Link key={r.slug} href={`/magazyn/${r.slug}`} className="ef-art-related-card">
+                  {r.cover_image && <img src={r.cover_image} alt="" loading="lazy" />}
+                  <div className="ef-art-related-body">
+                    <span className="ef-art-related-cat">{r.category}</span>
+                    <h3 className="ef-art-related-title">{r.title}</h3>
+                    <span className="ef-art-related-meta">{r.reading_time} min</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
       </article>
     </div>

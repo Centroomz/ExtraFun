@@ -2057,6 +2057,81 @@ select.form-input option { background: #151538; }
   color: var(--text-dim);
 }
 
+/* ── Onward reads: "Czytaj też" teaser (high) + "Czytaj dalej" grid (bottom) ── */
+.ef-art-teaser {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 36px;
+  padding: 14px 18px;
+  border: 1px solid rgba(233,193,118,0.25);
+  border-radius: 8px;
+  background: rgba(233,193,118,0.06);
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+.ef-art-teaser:hover { background: rgba(233,193,118,0.12); }
+.ef-art-teaser-label {
+  flex-shrink: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--gold);
+}
+.ef-art-teaser-title {
+  flex: 1; min-width: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ef-art-teaser-arrow { flex-shrink: 0; color: var(--gold); }
+
+.ef-art-related { margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(233,193,118,0.12); }
+.ef-art-related-head {
+  font-family: var(--serif);
+  font-size: 22px; font-weight: 600;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+.ef-art-related-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+@media (max-width: 560px) { .ef-art-related-grid { grid-template-columns: 1fr; } }
+.ef-art-related-card {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(233,193,118,0.12);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.02);
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.ef-art-related-card:hover { border-color: rgba(233,193,118,0.3); background: rgba(233,193,118,0.05); }
+.ef-art-related-card img {
+  width: 64px; height: 64px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.ef-art-related-body { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.ef-art-related-cat {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--gold);
+}
+.ef-art-related-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 14px; font-weight: 600; line-height: 1.3;
+  color: var(--text);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.ef-art-related-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-dim); }
+
 /* ════════════════════════════════════════════════════
    AGE GATE — faithful reproduction of the Stitch age screen
    ════════════════════════════════════════════════════ */
