@@ -605,6 +605,20 @@ export function Przewodnik({ city: cityParam }) {
             </div>
           )}
 
+          {/* Category: Plaże — dedicated browse entry into the (existing) /plaze list */}
+          <div style={{ padding: '0 16px 8px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Kategorie</div>
+          <div style={{ padding: '0 16px 20px' }}>
+            <div onClick={() => navigate('/plaze')}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(57,192,237,0.10)', border: '1px solid rgba(57,192,237,0.30)', borderRadius: 16, padding: '14px 16px' }}>
+              <span style={{ fontSize: 28 }}>🏖️</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontFamily: 'Playfair Display', fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>Plaże</div>
+                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Naturystyczne i FKK w Polsce i Europie</div>
+              </div>
+              <span style={{ marginLeft: 'auto', color: '#39c0ed', fontSize: 18 }}>→</span>
+            </div>
+          </div>
+
           {/* City cards */}
           <div style={{ padding: '0 16px 8px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Przeglądaj wg miasta</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, padding: '0 16px 80px' }}>
