@@ -14,7 +14,7 @@ export function registerRoutes(app) {
     // are is_active=false + gay_days='{}'. No DB mutation — revert = swap table back.
     const { data: venues, error } = await supabaseAdmin.from('venues')
       .select('id, name, type, address, city, description, website, lat, lng, cover_image, scene, gay_days, swing_days, legacy_swing_id')
-      .or('legacy_swing_id.not.is.null,swing_days.not.is.null')
+      .or('legacy_swing_id.not.is.null,swing_days.not.is.null,type.eq.plaża')
       .order('city', { ascending: true })
     if (error) return res.status(500).json({ message: error.message })
     // Attach the weekly schedule (recurring_events) to each venue.

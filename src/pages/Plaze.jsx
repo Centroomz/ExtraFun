@@ -145,9 +145,10 @@ export function Plaze() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    apiFetch('/api/venues?type=plaża')
+    apiFetch('/api/places')
       .then(data => {
-        setBeaches(Array.isArray(data) ? data : [])
+        const list = Array.isArray(data) ? data.filter(v => v.type === 'plaża') : []
+        setBeaches(list)
         setLoading(false)
       })
       .catch(() => setLoading(false))

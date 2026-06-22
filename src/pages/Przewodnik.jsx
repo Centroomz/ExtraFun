@@ -13,6 +13,7 @@ const TYPE_CONFIG = {
   dungeon:   { label: 'Dungeon', color: '#FF4500', bg: 'rgba(255,69,0,0.12)',    icon: '⛓️' },
   spa:       { label: 'Spa',     color: '#00FF96', bg: 'rgba(0,255,150,0.12)',   icon: '🛁' },
   party:     { label: 'Impreza', color: '#FFA500', bg: 'rgba(255,165,0,0.12)',   icon: '🎉' },
+  plaża:     { label: 'Plaża',   color: '#39c0ed', bg: 'rgba(57,192,237,0.12)',  icon: '🏖️' },
   other:     { label: 'Inne',    color: '#888',    bg: 'rgba(136,136,136,0.12)', icon: '📍' },
 }
 
@@ -352,7 +353,9 @@ function VenueRow({ venue, onClick }) {
           <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>{t.label}</span>
           <span>📍 {venue.city}</span>
         </div>
-        {venue._special ? (
+        {venue.type === 'plaża' ? (
+          <div style={{ fontSize: 12.5, color: '#39c0ed', marginTop: 6, fontWeight: 600 }}>🏖️ Plaża naturystyczna / FKK</div>
+        ) : venue._special ? (
           <div style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginTop: 6 }}>
             <strong style={{ color: '#FFC824' }}>⭐ {venue._special.event_name}</strong>
             {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
