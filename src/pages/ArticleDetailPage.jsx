@@ -24,11 +24,33 @@ const SLUG_TO_DISPLAY = {
   'temat-miesiaca': 'Temat Miesiąca',
 }
 
+// Inline parser: supports **bold** and [label](url) in any nesting order.
+// Internal links (starting with "/") use wouter <Link> for SPA navigation;
+// external links (http/https) render as <a target="_blank">.
 function parseBold(text) {
-  const parts = text.split(/\*\*(.*?)\*\*/g)
-  return parts.map((part, i) =>
-    i % 2 === 1 ? <strong key={i}>{part}</strong> : part
-  )
+  const nodes = []
+  const re = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g
+  let last = 0
+  let m
+  let i = 0
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) nodes.push(text.slice(last, m.index))
+    if (m[1] !== undefined) {
+      const url = m[2]
+      const inner = parseBold(m[1])
+      if (/^https?:/i.test(url)) {
+        nodes.push(<a key={`a${i}`} href={url} target="_blank" rel="noopener noreferrer">{inner}</a>)
+      } else {
+        nodes.push(<Link key={`a${i}`} href={url}>{inner}</Link>)
+      }
+    } else {
+      nodes.push(<strong key={`b${i}`}>{parseBold(m[3])}</strong>)
+    }
+    last = re.lastIndex
+    i++
+  }
+  if (last < text.length) nodes.push(text.slice(last))
+  return nodes
 }
 
 function renderContent(content) {
