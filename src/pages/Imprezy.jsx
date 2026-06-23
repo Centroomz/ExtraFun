@@ -92,8 +92,8 @@ export function Imprezy() {
   const grouped = groupByDate(filtered)
 
   const chip = (active) =>
-    `font-body text-label-caps uppercase px-4 py-2 border transition-colors ${
-      active ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
+    `font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
+      active ? 'border-primary-container text-primary-container' : 'border-transparent text-on-surface-variant hover:text-on-surface'
     }`
 
   return (

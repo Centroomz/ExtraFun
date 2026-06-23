@@ -151,15 +151,15 @@ export function Magazyn() {
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
         {/* Category filter */}
-        <div className="flex flex-wrap gap-3 mb-16">
+        <div className="flex flex-wrap gap-x-7 gap-y-3 mb-16">
           {CATEGORIES.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`font-body text-label-caps uppercase px-4 py-2 border transition-colors ${
+              className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
                 activeCategory === cat
                   ? 'border-primary-container text-primary-container'
-                  : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
               }`}
             >
               {cat}

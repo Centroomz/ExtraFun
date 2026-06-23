@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
+import { Button } from '../components/nocturne'
 
 const TYPES = [
-  { id: 'looking', label: 'Szukam', emoji: '🔍', color: '#d4af37', bg: 'rgba(233,193,118,0.12)' },
-  { id: 'event', label: 'Wydarzenie', emoji: '🎉', color: '#d4af37', bg: 'rgba(157,78,222,0.12)' },
-  { id: 'sale', label: 'Sprzedaż', emoji: '🛍️', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
+  { id: 'looking', label: 'Szukam', emoji: '🔍' },
+  { id: 'event', label: 'Wydarzenie', emoji: '🎉' },
+  { id: 'sale', label: 'Sprzedaż', emoji: '🛍️' },
 ]
 
 const DEMO_ADS = [
@@ -25,39 +26,44 @@ const DISTANCE_FILTERS = [
   { id: '100', label: 'Do 100 km' },
 ]
 
+const chip = (active) =>
+  `font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
+    active ? 'border-primary-container text-primary-container' : 'border-transparent text-on-surface-variant hover:text-on-surface'
+  }`
+
+function typeLabel(id) {
+  const t = TYPES.find(x => x.id === id) || TYPES[0]
+  return `${t.emoji} ${t.label}`
+}
+
 function AdDetail({ ad, onBack, user }) {
-  const typeConfig = TYPES.find(t => t.id === ad.type) || TYPES[0]
   return (
-    <div>
-      <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 22, padding: 0 }}>←</button>
-        <h1 style={{ fontSize: 16 }}>Ogłoszenie</h1>
-      </div>
-      <div style={{ padding: '16px 16px 80px' }}>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 12, alignItems: 'center' }}>
-          <span style={{ padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700, background: typeConfig.bg, color: typeConfig.color }}>
-            {typeConfig.emoji} {typeConfig.label}
-          </span>
-          {ad.distance != null && (
-            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--cyan)' }}>{formatDistance(ad.distance)}</span>
-          )}
+    <div className="bg-background min-h-screen text-on-surface">
+      <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
+        <button onClick={onBack} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Ogłoszenia</button>
+
+        <div className="flex items-center gap-4 mb-4 font-body text-label-caps uppercase">
+          <span className="text-primary-container">{typeLabel(ad.type)}</span>
+          {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
         </div>
-        <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 800, lineHeight: 1.2, marginBottom: 16 }}>{ad.title}</h2>
-        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
+
+        <h1 className="font-display italic font-semibold text-display-lg-mobile text-on-surface leading-tight mb-4">{ad.title}</h1>
+
+        <div className="flex flex-wrap gap-4 font-body text-body-md text-on-surface-variant mb-8">
           <span>{ad.author_emoji} {ad.author_name}</span>
-          <span>📍 {ad.city}</span>
+          <span>{ad.city}</span>
           <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
         </div>
-        <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.8, marginBottom: 24 }}>{ad.description}</p>
-        <div style={{ display: 'flex', gap: 10 }}>
-          {user ? (
-            <button className="btn-primary" style={{ flex: 1 }}>💬 Napisz wiadomość</button>
-          ) : (
-            <button className="btn-ghost" style={{ flex: 1 }}>Zaloguj się, aby kontaktować</button>
-          )}
-          <button className="btn-ghost" style={{ padding: '12px 16px' }}>🚨</button>
+
+        <p className="font-body text-body-lg text-on-surface leading-relaxed mb-10">{ad.description}</p>
+
+        <div className="flex items-center gap-6">
+          {user
+            ? <Button>Napisz wiadomość</Button>
+            : <Button>Zaloguj się, aby kontaktować</Button>}
+          <button className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zgłoś</button>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
@@ -119,144 +125,102 @@ export function Ogloszenia({ user }) {
     if (ad) return <AdDetail ad={ad} onBack={() => setSelectedAd(null)} user={user} />
   }
 
+  const inputCls = 'w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50'
+
   return (
-    <div>
-      <div className="page-header">
-        <h1>📢 Ogłoszenia</h1>
-      </div>
+    <div className="bg-background min-h-screen text-on-surface">
+      <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
+        <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-2 leading-none">Ogłoszenia</h1>
+        <p className="font-body text-body-md text-on-surface-variant mb-8">Szukam · wydarzenia · sprzedaż — od społeczności</p>
 
-      {/* Location bar */}
-      <div className="location-bar">
-        <span className="location-bar-icon">📡</span>
-        <span className="location-bar-text">
-          {geoLoading ? 'Szukam lokalizacji...' :
-           location ? <><strong>Lokalizacja aktywna</strong> – sortuję po odległości</> :
-           'Włącz lokalizację, aby zobaczyć odległości'}
-        </span>
-        {!location && !geoLoading && (
-          <button className="location-bar-btn" onClick={requestLocation}>GPS</button>
-        )}
-      </div>
+        {/* Location bar */}
+        <div className={`flex items-center gap-4 flex-wrap p-4 border mb-8 ${location ? 'border-primary-container/40' : 'border-outline-variant/30'}`}>
+          <span className="flex-1 min-w-[150px] font-body text-body-md text-on-surface-variant">
+            {geoLoading ? 'Szukam lokalizacji…' :
+             location ? 'Lokalizacja aktywna — sortuję po odległości' :
+             'Włącz lokalizację, aby zobaczyć odległości'}
+          </span>
+          {!location && !geoLoading && <Button onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</Button>}
+        </div>
 
-      {/* Type filter */}
-      <div className="category-filter">
-        <button
-          className={`category-chip ${activeType === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveType('all')}
-        >
-          Wszystkie
-        </button>
-        {TYPES.map(t => (
-          <button
-            key={t.id}
-            className={`category-chip ${activeType === t.id ? 'active' : ''}`}
-            onClick={() => setActiveType(t.id)}
-          >
-            {t.emoji} {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Distance filter */}
-      {location && (
-        <div className="category-filter" style={{ paddingTop: 0 }}>
-          {DISTANCE_FILTERS.map(f => (
-            <button
-              key={f.id}
-              className={`category-chip ${distanceFilter === f.id ? 'active' : ''}`}
-              onClick={() => setDistanceFilter(f.id)}
-            >
-              {f.label}
-            </button>
+        {/* Type filter */}
+        <div className="flex flex-wrap gap-x-7 gap-y-3 mb-6">
+          <button className={chip(activeType === 'all')} onClick={() => setActiveType('all')}>Wszystkie</button>
+          {TYPES.map(t => (
+            <button key={t.id} className={chip(activeType === t.id)} onClick={() => setActiveType(t.id)}>{t.emoji} {t.label}</button>
           ))}
         </div>
-      )}
 
-      {loading ? (
-        <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
-      ) : displayAds.length === 0 ? (
-        <div className="empty-state">
-          <div className="empty-icon">📭</div>
-          <div className="empty-title">Brak ogłoszeń</div>
-          <div className="empty-desc">Nie znaleziono ogłoszeń spełniających kryteria.</div>
-        </div>
-      ) : (
-        <div className="classified-list">
-          {displayAds.map(ad => {
-            const typeConfig = TYPES.find(t => t.id === ad.type) || TYPES[0]
-            return (
-              <div key={ad.id} className="classified-card" onClick={() => setSelectedAd(ad.id)}>
-                <div className="classified-top">
-                  <span className="classified-type" style={{ background: typeConfig.bg, color: typeConfig.color }}>
-                    {typeConfig.emoji} {typeConfig.label}
-                  </span>
-                  {ad.distance != null && (
-                    <span className="classified-distance">{formatDistance(ad.distance)}</span>
-                  )}
+        {/* Distance filter */}
+        {location && (
+          <div className="flex flex-wrap gap-x-7 gap-y-3 mb-10">
+            {DISTANCE_FILTERS.map(f => (
+              <button key={f.id} className={chip(distanceFilter === f.id)} onClick={() => setDistanceFilter(f.id)}>{f.label}</button>
+            ))}
+          </div>
+        )}
+
+        {/* List */}
+        {loading ? (
+          <div className="py-24 text-center font-body text-body-md text-on-surface-variant">Ładowanie…</div>
+        ) : displayAds.length === 0 ? (
+          <div className="py-24 text-center">
+            <div className="font-display italic text-headline-sm text-on-surface mb-2">Brak ogłoszeń</div>
+            <div className="font-body text-body-md text-on-surface-variant">Nie znaleziono ogłoszeń spełniających kryteria.</div>
+          </div>
+        ) : (
+          <div>
+            {displayAds.map(ad => (
+              <div key={ad.id} onClick={() => setSelectedAd(ad.id)} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
+                <div className="flex items-center justify-between gap-3 mb-1.5 font-body text-label-caps uppercase">
+                  <span className="text-primary-container">{typeLabel(ad.type)}</span>
+                  {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
                 </div>
-                <div className="classified-title">{ad.title}</div>
-                <div className="classified-desc">{ad.description}</div>
-                <div className="classified-meta">
+                <div className="font-display italic font-medium text-body-lg text-on-surface leading-tight group-hover:text-primary-container transition-colors">{ad.title}</div>
+                <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed line-clamp-2">{ad.description}</div>
+                <div className="flex flex-wrap gap-4 mt-2 font-body text-label-caps uppercase text-outline">
                   <span>{ad.author_emoji || '👤'} {ad.author_name || 'Użytkownik'}</span>
-                  <span>📍 {ad.city}</span>
+                  <span>{ad.city}</span>
                   <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
                 </div>
               </div>
-            )
-          })}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </main>
 
       {/* FAB */}
       {user && (
-        <button className="fab" onClick={() => setShowNewAd(true)}>+</button>
+        <button onClick={() => setShowNewAd(true)}
+          className="fixed bottom-24 right-6 z-40 w-14 h-14 bg-primary-container text-[#1a1400] text-2xl font-semibold flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity">
+          +
+        </button>
       )}
 
       {/* New ad sheet */}
       {showNewAd && (
-        <div className="form-sheet">
-          <div className="form-sheet-bg" onClick={() => setShowNewAd(false)} />
-          <div className="form-sheet-card">
-            <div className="form-sheet-title">Dodaj ogłoszenie</div>
-            <div className="form-group">
-              <label className="form-label">Typ</label>
-              <select
-                className="form-input"
-                value={newAd.type}
-                onChange={e => setNewAd(prev => ({ ...prev, type: e.target.value }))}
-              >
-                {TYPES.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.label}</option>)}
-              </select>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Tytuł</label>
-              <input
-                className="form-input"
-                placeholder="Tytuł ogłoszenia..."
-                value={newAd.title}
-                onChange={e => setNewAd(prev => ({ ...prev, title: e.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Opis</label>
-              <textarea
-                className="form-input"
-                placeholder="Szczegółowy opis..."
-                value={newAd.description}
-                onChange={e => setNewAd(prev => ({ ...prev, description: e.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">Miasto</label>
-              <input
-                className="form-input"
-                placeholder="Np. Warszawa"
-                value={newAd.city}
-                onChange={e => setNewAd(prev => ({ ...prev, city: e.target.value }))}
-              />
-            </div>
-            <button className="btn-primary" style={{ width: '100%' }} onClick={submitAd} disabled={!newAd.title.trim() || submitting}>
-              {submitting ? 'Dodaję...' : 'Opublikuj ogłoszenie →'}
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+          <div className="absolute inset-0 bg-black/70" onClick={() => setShowNewAd(false)} />
+          <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 max-h-[90vh] overflow-y-auto">
+            <div className="font-display italic font-semibold text-headline-sm text-on-surface mb-6">Dodaj ogłoszenie</div>
+
+            <label className="block font-body text-label-caps uppercase text-outline mb-1">Typ</label>
+            <select className={`${inputCls} mb-4`} value={newAd.type} onChange={e => setNewAd(prev => ({ ...prev, type: e.target.value }))}>
+              {TYPES.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.label}</option>)}
+            </select>
+
+            <label className="block font-body text-label-caps uppercase text-outline mb-1">Tytuł</label>
+            <input className={`${inputCls} mb-4`} placeholder="Tytuł ogłoszenia…" value={newAd.title} onChange={e => setNewAd(prev => ({ ...prev, title: e.target.value }))} />
+
+            <label className="block font-body text-label-caps uppercase text-outline mb-1">Opis</label>
+            <textarea className={`${inputCls} mb-4 min-h-[100px]`} placeholder="Szczegółowy opis…" value={newAd.description} onChange={e => setNewAd(prev => ({ ...prev, description: e.target.value }))} />
+
+            <label className="block font-body text-label-caps uppercase text-outline mb-1">Miasto</label>
+            <input className={`${inputCls} mb-6`} placeholder="Np. Warszawa" value={newAd.city} onChange={e => setNewAd(prev => ({ ...prev, city: e.target.value }))} />
+
+            <button onClick={submitAd} disabled={!newAd.title.trim() || submitting}
+              className="w-full bg-primary-container text-[#1a1400] py-4 font-body text-label-caps uppercase font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+              {submitting ? 'Dodaję…' : 'Opublikuj ogłoszenie'}
             </button>
           </div>
         </div>

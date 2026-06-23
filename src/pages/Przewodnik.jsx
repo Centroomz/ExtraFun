@@ -521,7 +521,7 @@ export function Przewodnik({ city: cityParam }) {
           <div className="flex gap-3 mb-8">
             {[['Dziś', 0], ['Jutro', 1], ['Pojutrze', 2]].map(([label, off]) => (
               <button key={off} onClick={() => setDayOffset(off)}
-                className={`font-body text-label-caps uppercase px-4 py-2 border transition-colors ${dayOffset === off ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'}`}>
+                className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${dayOffset === off ? 'border-primary-container text-primary-container' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}>
                 {label}
               </button>
             ))}
