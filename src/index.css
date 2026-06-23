@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
   --cyan: #e9c176;          /* repurposed: champagne gold (główny akcent ExtraFun) */
   --magenta: #9D4EDE;       /* repurposed: electric iris (akcent pomocniczy) */
