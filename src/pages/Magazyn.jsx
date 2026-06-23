@@ -1,25 +1,17 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'wouter'
+import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { getWordOfTheDay } from '../lib/dictionary'
 import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult } from '../lib/quiz'
 import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
+import { Hero, ArticleCard, SectionHeader, Button } from '../components/nocturne'
 
 const BASE_URL = 'https://extrafun.pl'
 
 function estimateReadingTime(content) {
   return Math.max(1, Math.ceil((content || '').split(/\s+/).length / 200))
-}
-
-const CATEGORY_COLORS = {
-  'CNM 101':        { bg: 'rgba(233,193,118,0.12)',   color: '#e9c176', border: 'rgba(233,193,118,0.3)' },
-  'Pierwszy Raz':   { bg: 'rgba(157,78,222,0.12)',   color: '#e9c176', border: 'rgba(157,78,222,0.3)' },
-  'Bez Osądu':      { bg: 'rgba(157,78,221,0.12)',  color: '#e9c176', border: 'rgba(157,78,221,0.3)' },
-  'Tam i Tam':      { bg: 'rgba(255,165,0,0.12)',   color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
-  'Słownik':        { bg: 'rgba(0,255,150,0.12)',   color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
-  'Temat Miesiąca': { bg: 'rgba(255,200,0,0.12)',   color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
 }
 
 const SLUG_TO_DISPLAY = {
@@ -91,18 +83,9 @@ function QuizView({ onBack }) {
   )
 }
 
-/* ─── Category Tag ────────────────────────────────────────────── */
-function CatTag({ category }) {
-  const c = CATEGORY_COLORS[category] || CATEGORY_COLORS['CNM 101']
-  return (
-    <span className="article-card-tag" style={{ background: c.bg, color: c.color, border: `1px solid ${c.border}` }}>
-      {category}
-    </span>
-  )
-}
-
 /* ─── Magazyn Main ────────────────────────────────────────────── */
 export function Magazyn() {
+  const [, navigate] = useLocation()
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const [showQuiz, setShowQuiz] = useState(false)
   const [dbArticles, setDbArticles] = useState(null)
@@ -135,15 +118,13 @@ export function Magazyn() {
     ? allArticles
     : allArticles.filter(a => a.category === activeCategory)
 
-  const featuredArticle = filtered.find(a => a.featured)
-  const newestArticle = filtered.find(a => !a.featured) || (featuredArticle ? filtered.find(a => a !== featuredArticle) : null)
-  const hero = featuredArticle || filtered[0]
-  const rest = filtered.filter(a => a !== featuredArticle && a !== newestArticle)
+  const hero = filtered.find(a => a.featured) || filtered[0]
+  const rest = filtered.filter(a => a !== hero)
 
   if (showQuiz) return <QuizView onBack={() => setShowQuiz(false)} />
 
   return (
-    <div className="mag-root">
+    <div className="bg-background min-h-screen text-on-surface">
       <Helmet>
         <title>Magazyn – CNM, Poliamoria, Swing, Fetysz | ExtraFun</title>
         <meta name="description" content="ExtraFun – magazyn o konsensulanej niemonogamii, poliamorii, swingu, fetyszu i BDSM. Artykuły, przewodniki i społeczność dla dorosłych w Polsce." />
@@ -156,187 +137,87 @@ export function Magazyn() {
         <meta property="og:site_name" content="ExtraFun" />
       </Helmet>
 
-      {/* ── Masthead ── */}
-      <header className="mag-masthead">
-        <div className="mag-masthead-inner">
-          <div className="mag-brand">
-            <span className="mag-brand-name">ExtraFun</span>
-            <span className="mag-brand-divider" />
-            <span className="mag-brand-issue">Wydanie 2 · Czerwiec 2026</span>
-          </div>
-          <nav className="mag-cats">
-            {CATEGORIES.map(cat => (
-              <button key={cat}
-                className={`mag-cat-btn ${activeCategory === cat ? 'active' : ''}`}
-                onClick={() => setActiveCategory(cat)}>
-                {cat}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
+      {/* Editorial hero — featured/newest article */}
+      {hero && (
+        <Hero
+          image={hero.cover_image || undefined}
+          label={hero.featured ? 'WYRÓŻNIONY' : 'NAJNOWSZY'}
+          title={hero.title}
+          lead={hero.description}
+          ctaLabel="Czytaj"
+          onCta={() => navigate(`/magazyn/${hero.slug}`)}
+        />
+      )}
 
-      {/* ── Mobile header ── */}
-      <div className="mag-mobile-header">
-        <h1 className="mag-mobile-title">Magazyn</h1>
-        <div className="category-filter">
+      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        {/* Category filter */}
+        <div className="flex flex-wrap gap-3 mb-16">
           {CATEGORIES.map(cat => (
-            <button key={cat} className={`category-chip ${activeCategory === cat ? 'active' : ''}`}
-              onClick={() => setActiveCategory(cat)}>{cat}</button>
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`font-body text-label-caps uppercase px-4 py-2 border transition-colors ${
+                activeCategory === cat
+                  ? 'border-primary-container text-primary-container'
+                  : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              {cat}
+            </button>
           ))}
         </div>
-      </div>
 
-      {/* ── Main layout ── */}
-      <div className="mag-layout">
-
-        {/* Hero — desktop: newest left + featured right; mobile: featured only */}
-        {(newestArticle || featuredArticle) && (
-          <>
-            {/* Desktop dual hero — full width (spans content + sidebar) */}
-            <div className="mag-hero-dual">
-                {newestArticle && (
-                  <div className="mag-hero-dual-slot">
-                    <span className="mag-hero-dual-label">Najnowszy</span>
-                    <Link href={`/magazyn/${newestArticle.slug}`}>
-                      <article className="mag-hero" style={{ cursor: 'pointer' }}>
-                        {newestArticle.cover_image
-                          ? <img src={newestArticle.cover_image} className="mag-hero-img" alt={newestArticle.title} />
-                          : <div className="mag-hero-img mag-hero-img--placeholder" />
-                        }
-                        <div className="mag-hero-body">
-                          <CatTag category={newestArticle.category} />
-                          <h2 className="mag-hero-title">{newestArticle.title}</h2>
-                          <p className="mag-hero-desc">{newestArticle.description}</p>
-                          <div className="mag-hero-meta">
-                            <span>{newestArticle.reading_time} min czytania</span>
-                            <span className="mag-hero-cta">Czytaj →</span>
-                          </div>
-                        </div>
-                      </article>
-                    </Link>
+        {/* Article grid — left-aligned 12-col, asymmetric */}
+        {rest.length > 0 ? (
+          <section>
+            <SectionHeader title={activeCategory === 'Wszystkie' ? 'Wszystkie artykuły' : activeCategory} />
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-16">
+              {rest.map((article, idx) => {
+                const big = idx % 3 === 0
+                return (
+                  <div key={article.id} className={big ? 'md:col-span-8' : 'md:col-span-4'}>
+                    <ArticleCard
+                      image={article.cover_image || undefined}
+                      tag={article.category}
+                      title={article.title}
+                      lead={article.description}
+                      meta={`${article.reading_time} min czytania`}
+                      variant={big ? 'large' : 'small'}
+                      onClick={() => navigate(`/magazyn/${article.slug}`)}
+                    />
                   </div>
-                )}
-                {featuredArticle && (
-                  <div className="mag-hero-dual-slot">
-                    <span className="mag-hero-dual-label">Wyróżniony</span>
-                    <Link href={`/magazyn/${featuredArticle.slug}`}>
-                      <article className="mag-hero mag-hero--featured" style={{ cursor: 'pointer' }}>
-                        {featuredArticle.cover_image
-                          ? <img src={featuredArticle.cover_image} className="mag-hero-img" alt={featuredArticle.title} />
-                          : <div className="mag-hero-img mag-hero-img--placeholder mag-hero-img--featured" />
-                        }
-                        <div className="mag-hero-body">
-                          <CatTag category={featuredArticle.category} />
-                          <h2 className="mag-hero-title mag-hero-title--featured">{featuredArticle.title}</h2>
-                          <p className="mag-hero-desc">{featuredArticle.description}</p>
-                          <div className="mag-hero-meta">
-                            <span>{featuredArticle.reading_time} min czytania</span>
-                            <span className="mag-hero-cta">Czytaj →</span>
-                          </div>
-                        </div>
-                      </article>
-                    </Link>
-                  </div>
-                )}
-              </div>
-
-              {/* Mobile single hero — featured (or newest fallback) */}
-            <Link href={`/magazyn/${hero.slug}`} className="mag-hero-mobile-only">
-              <article className="mag-hero" style={{ cursor: 'pointer' }}>
-                {hero.cover_image
-                  ? <img src={hero.cover_image} className="mag-hero-img" alt={hero.title} />
-                  : <div className="mag-hero-img mag-hero-img--placeholder" />
-                }
-                <div className="mag-hero-body">
-                  <CatTag category={hero.category} />
-                  <h2 className="mag-hero-title">{hero.title}</h2>
-                  <p className="mag-hero-desc">{hero.description}</p>
-                  <div className="mag-hero-meta">
-                    <span>{hero.reading_time} min czytania</span>
-                    <span className="mag-hero-cta">Czytaj →</span>
-                  </div>
-                </div>
-              </article>
-            </Link>
-          </>
+                )
+              })}
+            </div>
+          </section>
+        ) : (
+          <div className="py-24 text-center">
+            <div className="font-display text-headline-sm text-on-surface mb-2">Brak artykułów</div>
+            <div className="font-body text-body-md text-on-surface-variant">W tej kategorii nie ma jeszcze żadnych artykułów.</div>
+          </div>
         )}
 
-        <main className="mag-content">
-          {/* Grid */}
-          {rest.length > 0 && (
-            <div className="mag-grid">
-              {rest.map(article => (
-                <Link key={article.id} href={`/magazyn/${article.slug}`}>
-                  <article className="mag-card" style={{ cursor: 'pointer' }}>
-                    {article.cover_image && (
-                      <div className="mag-card-img-wrap">
-                        <img src={article.cover_image} className="mag-card-img" alt={article.title} />
-                      </div>
-                    )}
-                    <div className="mag-card-body">
-                      <CatTag category={article.category} />
-                      <h3 className="mag-card-title">{article.title}</h3>
-                      <p className="mag-card-desc">{article.description}</p>
-                      <span className="mag-card-meta">{article.reading_time} min czytania</span>
-                    </div>
-                  </article>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          {filtered.length === 0 && (
-            <div className="empty-state" style={{ padding: '80px 24px' }}>
-              <div className="empty-icon">📭</div>
-              <div className="empty-title">Brak artykułów</div>
-              <div className="empty-desc">W tej kategorii nie ma jeszcze żadnych artykułów.</div>
-            </div>
-          )}
-        </main>
-
-        {/* Sidebar */}
-        <aside className="mag-sidebar">
-          <CalendarWidget />
-
-          <div className="mag-sidebar-quiz" onClick={() => setShowQuiz(true)} style={{ cursor: 'pointer' }}>
-            <div className="mag-sidebar-quiz-label">✨ Quiz tygodnia</div>
-            <div className="mag-sidebar-quiz-title">Czy CNM jest dla Ciebie?</div>
-            <div className="mag-sidebar-quiz-desc">12 pytań które pomogą zrozumieć siebie</div>
-            <button className="btn-primary" style={{ width: '100%', marginTop: 16, fontSize: 13, padding: '10px 16px' }}>
-              Zacznij →
-            </button>
+        {/* Secondary rail — słówko dnia · quiz · kalendarz */}
+        <section className="mt-32 grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="md:col-span-4 border border-outline-variant/20 p-6">
+            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Słówko dnia</div>
+            <div className="font-display text-headline-sm text-on-surface mb-2">{word.term}</div>
+            <p className="font-body text-body-md text-on-surface-variant">{word.definition}</p>
+            <Link href="/slownik" className="inline-block mt-4 font-body text-label-caps uppercase text-primary-container hover:opacity-80">Cały słownik →</Link>
           </div>
 
-          <div className="mag-sidebar-word">
-            <div className="mag-sidebar-word-label">📖 Słówko dnia</div>
-            <div className="mag-sidebar-word-term">{word.term}</div>
-            <div className="mag-sidebar-word-def">{word.definition}</div>
-            <span className="word-of-day-badge">{word.category}</span>
-            <Link href="/slownik" style={{ fontSize: 12, color: 'var(--gold)', opacity: 0.8, marginTop: 4, display: 'inline-block' }}>
-              Cały słownik CNM →
-            </Link>
+          <div className="md:col-span-4 border border-outline-variant/20 p-6">
+            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Quiz tygodnia</div>
+            <div className="font-display text-headline-sm text-on-surface mb-2">Czy CNM jest dla Ciebie?</div>
+            <p className="font-body text-body-md text-on-surface-variant mb-5">12 pytań które pomogą zrozumieć siebie.</p>
+            <Button onClick={() => setShowQuiz(true)}>Zacznij</Button>
           </div>
 
-          {rest.length > 2 && (
-            <div className="mag-sidebar-more">
-              <div className="mag-sidebar-more-label">Więcej artykułów</div>
-              {rest.slice(0, 4).map(a => (
-                <Link key={a.id} href={`/magazyn/${a.slug}`}>
-                  <div className="mag-sidebar-item" style={{ cursor: 'pointer' }}>
-                    {a.cover_image && <img src={a.cover_image} className="mag-sidebar-item-img" alt="" />}
-                    <div className="mag-sidebar-item-body">
-                      <CatTag category={a.category} />
-                      <div className="mag-sidebar-item-title">{a.title}</div>
-                      <div className="mag-sidebar-item-meta">{a.reading_time} min</div>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </aside>
-      </div>
+          <div className="md:col-span-4">
+            <CalendarWidget />
+          </div>
+        </section>
+      </main>
     </div>
   )
 }
