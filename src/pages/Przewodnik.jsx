@@ -8,9 +8,9 @@ import { Hero, SectionHeader, Button } from '../components/nocturne'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
-  club:      { label: 'Klub',    color: '#e9c176', bg: 'rgba(233,193,118,0.12)',   icon: '🎭' },
-  sauna:     { label: 'Sauna',   color: '#e9c176', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
-  bar:       { label: 'Bar',     color: '#e9c176', bg: 'rgba(157,78,222,0.12)',   icon: '🍸' },
+  club:      { label: 'Klub',    color: '#d4af37', bg: 'rgba(233,193,118,0.12)',   icon: '🎭' },
+  sauna:     { label: 'Sauna',   color: '#d4af37', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
+  bar:       { label: 'Bar',     color: '#d4af37', bg: 'rgba(157,78,222,0.12)',   icon: '🍸' },
   dungeon:   { label: 'Dungeon', color: '#FF4500', bg: 'rgba(255,69,0,0.12)',    icon: '⛓️' },
   spa:       { label: 'Spa',     color: '#00FF96', bg: 'rgba(0,255,150,0.12)',   icon: '🛁' },
   party:     { label: 'Impreza', color: '#FFA500', bg: 'rgba(255,165,0,0.12)',   icon: '🎉' },
@@ -75,7 +75,7 @@ const ARTICLES = [
     id: 'berlin-guide',
     emoji: '🇩🇪',
     tag: 'Europa',
-    tagColor: '#e9c176',
+    tagColor: '#d4af37',
     title: 'Berlin: Stolica Swingingu Europy',
     lead: 'Ponad 20 klubów, darkroomy, fetysz i wolność – dlaczego Berlin przyciąga co roku tysiące swingersów z całego świata.',
     city: 'Berlin',
@@ -198,8 +198,8 @@ function VenueDetail({ venue, onBack }) {
                     : `${DNI[dow][0].toUpperCase()}${DNI[dow].slice(1)} ${d.getDate()} ${MIES[d.getMonth()]}`
                   const isToday = off === 0
                   return (
-                    <div key={off} style={{ marginBottom: 12, paddingLeft: isToday ? 10 : 0, borderLeft: isToday ? '3px solid #e9c176' : 'none' }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#e9c176' : 'var(--text)', marginBottom: 4 }}>
+                    <div key={off} style={{ marginBottom: 12, paddingLeft: isToday ? 10 : 0, borderLeft: isToday ? '3px solid #d4af37' : 'none' }}>
+                      <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#d4af37' : 'var(--text)', marginBottom: 4 }}>
                         {label}{off > 1 ? '' : ` · ${DNI[dow]} ${d.getDate()} ${MIES[d.getMonth()]}`}
                       </div>
                       {special ? (
@@ -213,7 +213,7 @@ function VenueDetail({ venue, onBack }) {
                       ) : evs.map(e => (
                         <div key={e.id} style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55, marginBottom: 3 }}>
                           <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
-                          {e.audience && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: '#e9c176', background: 'rgba(233,193,118,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
+                          {e.audience && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: '#d4af37', background: 'rgba(233,193,118,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
                           {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
                           {e.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{e.price}</span></>}
                         </div>
@@ -239,7 +239,7 @@ function VenueDetail({ venue, onBack }) {
             {venue.website && (
               <div style={{ display: 'flex', gap: 10 }}>
                 <span style={{ fontSize: 16 }}>🌐</span>
-                <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#e9c176', wordBreak: 'break-all' }}>{venue.website}</a>
+                <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#d4af37', wordBreak: 'break-all' }}>{venue.website}</a>
               </div>
             )}
           </div>

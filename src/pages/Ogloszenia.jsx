@@ -4,8 +4,8 @@ import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 
 const TYPES = [
-  { id: 'looking', label: 'Szukam', emoji: '🔍', color: '#e9c176', bg: 'rgba(233,193,118,0.12)' },
-  { id: 'event', label: 'Wydarzenie', emoji: '🎉', color: '#e9c176', bg: 'rgba(157,78,222,0.12)' },
+  { id: 'looking', label: 'Szukam', emoji: '🔍', color: '#d4af37', bg: 'rgba(233,193,118,0.12)' },
+  { id: 'event', label: 'Wydarzenie', emoji: '🎉', color: '#d4af37', bg: 'rgba(157,78,222,0.12)' },
   { id: 'sale', label: 'Sprzedaż', emoji: '🛍️', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
 ]
 

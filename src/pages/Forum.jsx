@@ -3,9 +3,9 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 
 const CATEGORIES = [
-  { id: 'cnm', label: 'CNM & Polyamory', emoji: '💜', color: '#e9c176', bg: 'rgba(157,78,221,0.12)' },
-  { id: 'swinging', label: 'Swinging', emoji: '🔄', color: '#e9c176', bg: 'rgba(233,193,118,0.12)' },
-  { id: 'bdsm', label: 'BDSM & Fetish', emoji: '⛓️', color: '#e9c176', bg: 'rgba(157,78,222,0.12)' },
+  { id: 'cnm', label: 'CNM & Polyamory', emoji: '💜', color: '#d4af37', bg: 'rgba(157,78,221,0.12)' },
+  { id: 'swinging', label: 'Swinging', emoji: '🔄', color: '#d4af37', bg: 'rgba(233,193,118,0.12)' },
+  { id: 'bdsm', label: 'BDSM & Fetish', emoji: '⛓️', color: '#d4af37', bg: 'rgba(157,78,222,0.12)' },
   { id: 'newbie', label: 'Kącik Nowicjusza', emoji: '🌱', color: '#00FF96', bg: 'rgba(0,255,150,0.12)' },
   { id: 'clubs', label: 'Kluby i Wydarzenia', emoji: '🏛️', color: '#FFA500', bg: 'rgba(255,165,0,0.12)' },
   { id: 'kawiarnia', label: 'Kawiarenka', emoji: '☕', color: '#FF6B6B', bg: 'rgba(255,107,107,0.12)' },

@@ -52,7 +52,7 @@ const labelStyle = {
 }
 
 const btnPrimary = {
-  background: 'linear-gradient(135deg,#e9c176,#9D4EDE)',
+  background: 'linear-gradient(135deg,#d4af37,#9D4EDE)',
   border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700,
   fontSize: 14, padding: '10px 18px', cursor: 'pointer',
 }
@@ -279,7 +279,7 @@ function ArticlesTab() {
           <button style={btnGhost} onClick={() => setMode(null)}>← Wróć</button>
           <h2 style={{ fontSize: 16, fontWeight: 700 }}>{mode?.id ? 'Edytuj artykuł' : 'Nowy artykuł'}</h2>
         </div>
-        {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#e9c176', marginBottom: 16, fontSize: 13 }}>{msg}</div>}
+        {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#d4af37', marginBottom: 16, fontSize: 13 }}>{msg}</div>}
         <ArticleForm initial={initial} onSave={handleSave} onCancel={() => setMode(null)} saving={saving} />
       </div>
     )
@@ -291,7 +291,7 @@ function ArticlesTab() {
         <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)' }}>{articles.length} artykułów</div>
         <button style={btnPrimary} onClick={() => setMode('add')}>+ Nowy artykuł</button>
       </div>
-      {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#e9c176', marginBottom: 12, fontSize: 13 }}>{msg}</div>}
+      {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#d4af37', marginBottom: 12, fontSize: 13 }}>{msg}</div>}
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)' }}>Ładowanie...</div>
       ) : articles.map(a => (
@@ -303,8 +303,8 @@ function ArticlesTab() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
-                <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#e9c176', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
-                <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#e9c176' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
+                <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#d4af37', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
+                <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#d4af37' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
                 <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
@@ -365,15 +365,15 @@ function StatsTab() {
         {[7, 30, 90].map(d => (
           <button key={d} onClick={() => setDays(d)}
             style={{ fontSize: 12, padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700,
-              background: days === d ? '#e9c176' : 'rgba(255,255,255,0.08)', color: days === d ? '#0a0a1e' : 'rgba(232,230,252,0.86)' }}>
+              background: days === d ? '#d4af37' : 'rgba(255,255,255,0.08)', color: days === d ? '#0a0a1e' : 'rgba(232,230,252,0.86)' }}>
             {d} dni
           </button>
         ))}
       </div>
 
       <div style={{ display: 'flex', gap: 10 }}>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#e9c176' }}>{totalViews}</div></div>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#e9c176' }}>{totalSessions}</div></div>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalViews}</div></div>
+        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalSessions}</div></div>
       </div>
 
       <div style={card}>
@@ -383,7 +383,7 @@ function StatsTab() {
             {dailyAsc.map(([day, v]) => (
               <div key={day} title={`${day}: ${v}`} style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center', gap: 3 }}>
                 <span style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.85)', whiteSpace: 'nowrap' }}>{v}</span>
-                <div style={{ width: '100%', background: '#e9c176', borderRadius: '4px 4px 0 0', height: `${(v / maxV) * 100}%`, minHeight: 2 }} />
+                <div style={{ width: '100%', background: '#d4af37', borderRadius: '4px 4px 0 0', height: `${(v / maxV) * 100}%`, minHeight: 2 }} />
                 <span style={{ fontSize: 8, color: 'rgba(232,230,252,0.72)' }}>{day.slice(5)}</span>
               </div>
             ))}
@@ -452,8 +452,8 @@ function AdsTab() {
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{a.title}</div>
               <div style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
-                {a.category && <span style={{ fontSize: 11, background: 'rgba(157,78,222,0.15)', color: '#e9c176', borderRadius: 6, padding: '2px 7px' }}>{a.category}</span>}
-                <span style={{ fontSize: 11, background: a.status === 'active' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'active' ? '#e9c176' : 'rgba(255,255,255,0.4)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
+                {a.category && <span style={{ fontSize: 11, background: 'rgba(157,78,222,0.15)', color: '#d4af37', borderRadius: 6, padding: '2px 7px' }}>{a.category}</span>}
+                <span style={{ fontSize: 11, background: a.status === 'active' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'active' ? '#d4af37' : 'rgba(255,255,255,0.4)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
                 {a.location && <span style={{ fontSize: 11, color: 'rgba(232,230,252,0.72)' }}>📍 {a.location}</span>}
               </div>
               <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)' }}>{a.description?.slice(0, 100)}…</div>
@@ -529,7 +529,7 @@ function EventsTab() {
   if (mode) {
     return (
       <div style={{ maxWidth: 580 }}>
-        <button onClick={() => setMode(null)} style={{ background: 'none', border: 'none', color: '#e9c176', cursor: 'pointer', fontSize: 13, marginBottom: 12 }}>← Lista imprez</button>
+        <button onClick={() => setMode(null)} style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', fontSize: 13, marginBottom: 12 }}>← Lista imprez</button>
         <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>{mode === 'add' ? 'Nowa impreza' : `Edytuj: ${form.event_name}`}</h2>
 
         <label style={lbl}>Nazwa imprezy *</label>
@@ -578,10 +578,10 @@ function EventsTab() {
         <textarea style={{ ...inp, minHeight: 80, resize: 'vertical' }} value={form.description} onChange={e => set('description', e.target.value)} />
 
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
-          <button onClick={save} disabled={saving} style={{ background: '#e9c176', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
+          <button onClick={save} disabled={saving} style={{ background: '#d4af37', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>
             {saving ? '…' : 'Zapisz'}
           </button>
-          {msg && <span style={{ fontSize: 13, color: msg.startsWith('Błąd') ? '#ff6b6b' : '#e9c176' }}>{msg}</span>}
+          {msg && <span style={{ fontSize: 13, color: msg.startsWith('Błąd') ? '#ff6b6b' : '#d4af37' }}>{msg}</span>}
         </div>
       </div>
     )
@@ -591,7 +591,7 @@ function EventsTab() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)' }}>{events.length} imprez</div>
-        <button onClick={openAdd} style={{ background: '#e9c176', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>+ Dodaj imprezę</button>
+        <button onClick={openAdd} style={{ background: '#d4af37', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer' }}>+ Dodaj imprezę</button>
       </div>
       {loading ? (
         <div style={{ color: 'rgba(232,230,252,0.8)', textAlign: 'center', padding: 40 }}>Ładowanie…</div>
@@ -605,7 +605,7 @@ function EventsTab() {
               {e.event_date} · {e.swingers_venues?.name || e.location_name || e.organizer || (e.is_external ? 'Zewnętrzna' : '—')}
               {e.start_time && ` · ${e.start_time.slice(0,5)}`}
             </div>
-            {e.price && <div style={{ fontSize: 12, color: '#e9c176', marginTop: 2 }}>{e.price}</div>}
+            {e.price && <div style={{ fontSize: 12, color: '#d4af37', marginTop: 2 }}>{e.price}</div>}
           </div>
           <button onClick={() => openEdit(e)} style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#fff', borderRadius: 8, padding: '6px 12px', fontSize: 12, cursor: 'pointer' }}>Edytuj</button>
           <button onClick={() => del(e)} style={{ background: 'none', border: 'none', color: 'rgba(232,230,252,0.72)', fontSize: 16, cursor: 'pointer' }}>🗑️</button>
@@ -691,7 +691,7 @@ function VenuesTab() {
   if (mode) {
     return (
       <div style={{ maxWidth: 560 }}>
-        <button onClick={() => setMode(null)} style={{ background: 'none', border: 'none', color: '#e9c176', cursor: 'pointer', fontSize: 13, marginBottom: 12 }}>← Lista lokali</button>
+        <button onClick={() => setMode(null)} style={{ background: 'none', border: 'none', color: '#d4af37', cursor: 'pointer', fontSize: 13, marginBottom: 12 }}>← Lista lokali</button>
         <h2 style={{ fontSize: 18, fontWeight: 800, marginBottom: 12 }}>{mode === 'add' ? 'Nowy lokal' : `Edytuj: ${form.name}`}</h2>
         <label style={lbl}>Nazwa *</label><input style={inp} value={form.name} onChange={e => set('name', e.target.value)} />
         <div style={{ display: 'flex', gap: 8 }}>
@@ -709,15 +709,15 @@ function VenuesTab() {
         <label style={lbl}>Logo</label>
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 8 }}>
           {form.logo_url ? <img src={form.logo_url} alt="" style={{ width: 56, height: 56, objectFit: 'contain', background: '#000', borderRadius: 8 }} /> : <div style={{ width: 56, height: 56, background: 'rgba(255,255,255,0.06)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22 }}>🏠</div>}
-          <label style={{ background: 'rgba(233,193,118,0.15)', border: '1px solid rgba(233,193,118,0.3)', color: '#e9c176', borderRadius: 8, padding: '8px 12px', fontSize: 13, cursor: 'pointer' }}>
+          <label style={{ background: 'rgba(233,193,118,0.15)', border: '1px solid rgba(233,193,118,0.3)', color: '#d4af37', borderRadius: 8, padding: '8px 12px', fontSize: 13, cursor: 'pointer' }}>
             Wgraj logo
             <input type="file" accept="image/*" style={{ display: 'none' }} onChange={e => e.target.files[0] && uploadLogo(e.target.files[0])} />
           </label>
         </div>
         <input style={inp} placeholder="…lub wklej URL logo" value={form.logo_url} onChange={e => set('logo_url', e.target.value)} />
         <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 6 }}>
-          <button onClick={save} disabled={saving} style={{ background: '#e9c176', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? '…' : 'Zapisz'}</button>
-          {msg && <span style={{ fontSize: 13, color: msg.startsWith('Błąd') ? '#ff6b6b' : '#e9c176' }}>{msg}</span>}
+          <button onClick={save} disabled={saving} style={{ background: '#d4af37', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '10px 18px', fontWeight: 800, fontSize: 13, cursor: 'pointer', opacity: saving ? 0.6 : 1 }}>{saving ? '…' : 'Zapisz'}</button>
+          {msg && <span style={{ fontSize: 13, color: msg.startsWith('Błąd') ? '#ff6b6b' : '#d4af37' }}>{msg}</span>}
         </div>
       </div>
     )
@@ -728,7 +728,7 @@ function VenuesTab() {
     <div>
       <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
         <input style={{ ...inp, marginBottom: 0, flex: 1 }} placeholder="Szukaj (nazwa/miasto)…" value={q} onChange={e => setQ(e.target.value)} />
-        <button onClick={openAdd} style={{ background: '#e9c176', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Dodaj</button>
+        <button onClick={openAdd} style={{ background: '#d4af37', color: '#0a0a1e', border: 'none', borderRadius: 10, padding: '9px 16px', fontWeight: 800, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>+ Dodaj</button>
       </div>
       {loading ? <div style={{ color: 'rgba(232,230,252,0.8)' }}>Ładowanie…</div> : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -783,7 +783,7 @@ export function Admin() {
   return (
     <div>
       <div className="page-header" style={{ paddingBottom: 0 }}>
-        <h1 style={{ background: 'linear-gradient(135deg,#e9c176,#9D4EDE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <h1 style={{ background: 'linear-gradient(135deg,#d4af37,#9D4EDE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           ⚙️ Panel Admina
         </h1>
       </div>
@@ -795,7 +795,7 @@ export function Admin() {
             style={{
               background: tab === t.id ? 'rgba(233,193,118,0.12)' : 'transparent',
               border: tab === t.id ? '1px solid rgba(233,193,118,0.3)' : '1px solid transparent',
-              borderRadius: 10, color: tab === t.id ? '#e9c176' : 'rgba(232,230,252,0.82)',
+              borderRadius: 10, color: tab === t.id ? '#d4af37' : 'rgba(232,230,252,0.82)',
               fontWeight: 600, fontSize: 13, padding: '8px 14px', cursor: 'pointer',
             }}>
             {t.label}

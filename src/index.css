@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --cyan: #e9c176;          /* repurposed: champagne gold (główny akcent ExtraFun) */
+  --cyan: #d4af37;          /* Nocturne champagne gold (główny akcent) */
   --magenta: #9D4EDE;       /* repurposed: electric iris (akcent pomocniczy) */
   --purple: #9D4EDE;
   --purple-dark: #7a2fb0;
-  --bg-dark: #05050D;       /* onyx */
-  --bg-navy: #0A0A1E;       /* midnight */
+  --bg-dark: #121414;       /* Nocturne onyx */
+  --bg-navy: #1a1c1c;       /* Nocturne surface-low */
   --bg-card: rgba(255, 255, 255, 0.06);
   --text: #ffffff;
   --text-dim: rgba(232, 230, 252, 0.86);
@@ -21,13 +21,13 @@
   --nav-height: 68px;
 
   /* ── "Wyrafinowana Intymność" design tokens (Stitch redesign) ── */
-  --gold: #e9c176;          /* champagne gold — główny akcent nowego layoutu */
-  --gold-bright: #E2C99B;
+  --gold: #d4af37;          /* Nocturne champagne gold — główny akcent */
+  --gold-bright: #f2ca50;
   --iris: #9D4EDE;          /* electric iris — fiolet pomocniczy */
-  --onyx: #05050D;          /* najgłębsze tło */
-  --midnight: #0A0A1E;
+  --onyx: #121414;          /* najgłębsze tło */
+  --midnight: #1a1c1c;
   --burgundy: #5E1212;
-  --serif: 'Playfair Display', Georgia, serif;  /* nagłówki edytorialne */
+  --serif: 'Bodoni Moda', Georgia, serif;  /* nagłówki edytorialne (Nocturne) */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -35,7 +35,7 @@
 html { font-size: 16px; }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
   background: var(--bg-dark);
   color: var(--text);
   min-height: 100dvh;
@@ -115,7 +115,7 @@ body {
   border: none;
   background: none;
   color: var(--text-dim);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -165,7 +165,7 @@ body {
   border-radius: var(--radius-md);
   background: linear-gradient(135deg, var(--cyan), #caa85f);
   color: #04212a;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   font-weight: 700;
   border: none;
@@ -188,7 +188,7 @@ body {
   background: var(--glass);
   border: 1px solid var(--glass-border);
   color: var(--text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -203,7 +203,7 @@ body {
   padding: 20px 16px 12px;
 }
 .section-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 26px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--text), var(--text-dim));
@@ -228,7 +228,7 @@ body {
   border-bottom: 1px solid var(--glass-border);
 }
 .page-header h1 {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 22px;
   font-weight: 800;
   color: var(--text);
@@ -263,7 +263,7 @@ body {
   margin-bottom: 10px;
 }
 .article-card-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.3;
@@ -306,7 +306,7 @@ body {
   margin-bottom: 8px;
 }
 .hero-quiz-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 22px;
   font-weight: 800;
   line-height: 1.2;
@@ -336,7 +336,7 @@ body {
   margin-bottom: 6px;
 }
 .word-of-day-term {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 24px;
   font-weight: 800;
   color: white;
@@ -424,7 +424,7 @@ body {
   margin-bottom: 6px;
 }
 .venue-card-name {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 16px;
   font-weight: 700;
 }
@@ -486,7 +486,7 @@ body {
   letter-spacing: 0.05em;
 }
 .forum-thread-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 15px;
   font-weight: 700;
   margin-bottom: 6px;
@@ -540,7 +540,7 @@ body {
   color: var(--cyan);
 }
 .classified-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 6px;
@@ -630,7 +630,7 @@ body {
   backdrop-filter: blur(20px);
 }
 .auth-logo {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 36px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--cyan), var(--magenta));
@@ -665,7 +665,7 @@ body {
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   color: white;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s;
@@ -716,7 +716,7 @@ body {
 }
 .age-gate-emoji { font-size: 56px; margin-bottom: 16px; display: block; }
 .age-gate-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 30px;
   font-weight: 800;
   margin-bottom: 12px;
@@ -752,7 +752,7 @@ body {
   margin-bottom: 12px;
 }
 .quiz-question {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 20px;
   font-weight: 700;
   line-height: 1.35;
@@ -772,7 +772,7 @@ body {
   color: var(--text);
   cursor: pointer;
   text-align: left;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   transition: all 0.2s;
 }
 .quiz-answer:hover {
@@ -790,7 +790,7 @@ body {
 }
 .quiz-result-emoji { font-size: 72px; display: block; margin-bottom: 16px; }
 .quiz-result-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 26px;
   font-weight: 800;
   margin-bottom: 12px;
@@ -814,21 +814,21 @@ body {
   margin: 0 auto;
 }
 .article-detail h1 {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 28px;
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 12px;
 }
 .article-detail h2 {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 20px;
   font-weight: 700;
   margin: 24px 0 10px;
   color: var(--cyan);
 }
 .article-detail h3 {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 17px;
   font-weight: 700;
   margin: 18px 0 8px;
@@ -861,7 +861,7 @@ body {
   gap: 16px;
 }
 .loading-logo {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 40px;
   font-weight: 800;
   background: linear-gradient(135deg, var(--cyan), var(--magenta));
@@ -886,7 +886,7 @@ body {
 }
 .empty-icon { font-size: 48px; margin-bottom: 12px; }
 .empty-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 8px;
@@ -941,7 +941,7 @@ body {
 }
 .profile-info { flex: 1; }
 .profile-name {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 22px;
   font-weight: 800;
 }
@@ -988,7 +988,7 @@ body {
   overflow-y: auto;
 }
 .form-sheet-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 20px;
   font-weight: 800;
   margin-bottom: 20px;
@@ -1083,7 +1083,7 @@ select.form-input option { background: #151538; }
   background: var(--glass); border: 1px solid var(--glass-border);
   color: white; font-size: 16px; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display'; font-weight: 700;
+  font-family: 'Bodoni Moda'; font-weight: 700;
 }
 /* old fixed profile btn — keep hidden now handled inline */
 .mobile-profile-btn { display: none; }
@@ -1127,7 +1127,7 @@ select.form-input option { background: #151538; }
   }
 
   .desktop-nav-logo {
-    font-family: 'Playfair Display', sans-serif;
+    font-family: 'Bodoni Moda', sans-serif;
     font-size: 24px;
     font-weight: 900;
     background: linear-gradient(135deg, var(--cyan), var(--purple), var(--magenta));
@@ -1155,7 +1155,7 @@ select.form-input option { background: #151538; }
     background: none;
     border: none;
     color: var(--text-dim);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -1199,7 +1199,7 @@ select.form-input option { background: #151538; }
     justify-content: center;
     font-size: 13px;
     font-weight: 700;
-    font-family: 'Playfair Display', sans-serif;
+    font-family: 'Bodoni Moda', sans-serif;
     color: white;
   }
 
@@ -1342,7 +1342,7 @@ select.form-input option { background: #151538; }
   flex-shrink: 0;
 }
 .mag-brand-name {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 22px;
   font-weight: 900;
   background: linear-gradient(135deg, var(--cyan), var(--purple), var(--magenta));
@@ -1534,7 +1534,7 @@ select.form-input option { background: #151538; }
   }
 }
 .mag-hero-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 24px;
   font-weight: 800;
   line-height: 1.2;
@@ -1638,7 +1638,7 @@ select.form-input option { background: #151538; }
   .mag-card-body { padding: 18px 20px 20px; }
 }
 .mag-card-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 15px;
   font-weight: 700;
   line-height: 1.3;
@@ -1698,7 +1698,7 @@ select.form-input option { background: #151538; }
   margin-bottom: 8px;
 }
 .mag-sidebar-quiz-title {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 18px;
   font-weight: 800;
   color: white;
@@ -1729,7 +1729,7 @@ select.form-input option { background: #151538; }
   color: var(--cyan);
 }
 .mag-sidebar-word-term {
-  font-family: 'Playfair Display', sans-serif;
+  font-family: 'Bodoni Moda', sans-serif;
   font-size: 22px;
   font-weight: 800;
   color: white;
@@ -1960,7 +1960,7 @@ select.form-input option { background: #151538; }
   align-items: center;
   gap: 10px;
   color: var(--gold);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -1997,20 +1997,20 @@ select.form-input option { background: #151538; }
   flex-shrink: 0;
 }
 .ef-art-author-name {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px; font-weight: 600;
   letter-spacing: 0.08em; text-transform: uppercase;
   color: #fff;
 }
 .ef-art-author-date {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10px; text-transform: uppercase;
   letter-spacing: 0.02em; color: var(--text-dim);
   margin-top: 2px;
 }
 
 .ef-art-text {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 18px;
   line-height: 1.8;
   color: rgba(226, 224, 252, 0.92);
@@ -2053,7 +2053,7 @@ select.form-input option { background: #151538; }
 .ef-art-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 44px; }
 .ef-art-tag {
   padding: 8px 16px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
   border: 1px solid rgba(233,193,118,0.14);
   background: rgba(255,255,255,0.03);
@@ -2077,14 +2077,14 @@ select.form-input option { background: #151538; }
 .ef-art-teaser:hover { background: rgba(233,193,118,0.12); }
 .ef-art-teaser-label {
   flex-shrink: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10px; font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--gold);
 }
 .ef-art-teaser-title {
   flex: 1; min-width: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px; font-weight: 600;
   color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -2123,18 +2123,18 @@ select.form-input option { background: #151538; }
 }
 .ef-art-related-body { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
 .ef-art-related-cat {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 10px; font-weight: 700;
   letter-spacing: 0.08em; text-transform: uppercase;
   color: var(--gold);
 }
 .ef-art-related-title {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 14px; font-weight: 600; line-height: 1.3;
   color: var(--text);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.ef-art-related-meta { font-family: 'Inter', sans-serif; font-size: 11px; color: var(--text-dim); }
+.ef-art-related-meta { font-family: 'Montserrat', sans-serif; font-size: 11px; color: var(--text-dim); }
 
 .ef-art-cta {
   display: flex;
@@ -2152,11 +2152,11 @@ select.form-input option { background: #151538; }
 .ef-art-cta-icon { font-size: 22px; flex-shrink: 0; }
 .ef-art-cta-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ef-art-cta-title {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px; font-weight: 700;
   color: var(--gold);
 }
-.ef-art-cta-sub { font-family: 'Inter', sans-serif; font-size: 13px; color: var(--text-dim); }
+.ef-art-cta-sub { font-family: 'Montserrat', sans-serif; font-size: 13px; color: var(--text-dim); }
 
 /* ════════════════════════════════════════════════════
    AGE GATE — faithful reproduction of the Stitch age screen
@@ -2203,7 +2203,7 @@ select.form-input option { background: #151538; }
 }
 .ef-gate-badge-num {
   color: #ffb3ac;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-weight: 800;
   font-size: 28px;
   letter-spacing: -0.03em;
@@ -2216,7 +2216,7 @@ select.form-input option { background: #151538; }
   margin-bottom: 16px;
 }
 .ef-gate-desc {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 15px;
   line-height: 1.7;
   color: var(--text-dim);
@@ -2227,7 +2227,7 @@ select.form-input option { background: #151538; }
   width: 100%;
   padding: 15px;
   border-radius: 10px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
@@ -2243,7 +2243,7 @@ select.form-input option { background: #151538; }
 .ef-gate-btn--ghost:hover { border-color: rgba(232,230,252,0.72); color: #fff; }
 .ef-gate-foot {
   margin-top: 28px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
