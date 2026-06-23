@@ -118,8 +118,9 @@ export function Magazyn() {
     ? allArticles
     : allArticles.filter(a => a.category === activeCategory)
 
-  const hero = filtered.find(a => a.featured) || filtered[0]
-  const rest = filtered.filter(a => a !== hero)
+  // Featured first, then the rest — shown in the grid (hero is a stable brand
+  // banner, so it never swaps/flashes when DB articles load in).
+  const ordered = [...filtered].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
 
   if (showQuiz) return <QuizView onBack={() => setShowQuiz(false)} />
 
@@ -137,17 +138,13 @@ export function Magazyn() {
         <meta property="og:site_name" content="ExtraFun" />
       </Helmet>
 
-      {/* Editorial hero — featured/newest article */}
-      {hero && (
-        <Hero
-          image="/editorial/hero-magazyn.jpg"
-          label={hero.featured ? 'WYRÓŻNIONY' : 'NAJNOWSZY'}
-          title={hero.title}
-          lead={hero.description}
-          ctaLabel="Czytaj"
-          onCta={() => navigate(`/magazyn/${hero.slug}`)}
-        />
-      )}
+      {/* Stable brand hero — never swaps on data load (no flash/cover) */}
+      <Hero
+        image="/editorial/hero-magazyn.jpg"
+        label="MAGAZYN"
+        title="Lifestyle bez tabu"
+        lead="CNM, poliamoria, swing i fetysz — eksperckie teksty, przewodniki i społeczność dla dorosłych."
+      />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
         {/* Category filter */}
@@ -168,11 +165,11 @@ export function Magazyn() {
         </div>
 
         {/* Article grid — left-aligned 12-col, asymmetric */}
-        {rest.length > 0 ? (
+        {ordered.length > 0 ? (
           <section>
             <SectionHeader title={activeCategory === 'Wszystkie' ? 'Wszystkie artykuły' : activeCategory} />
             <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-16">
-              {rest.map((article, idx) => {
+              {ordered.map((article, idx) => {
                 const big = idx % 3 === 0
                 return (
                   <div key={article.id} className={big ? 'md:col-span-8' : 'md:col-span-4'}>
