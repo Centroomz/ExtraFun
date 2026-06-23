@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
+import { Hero, SectionHeader, Button } from '../components/nocturne'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
@@ -120,18 +121,18 @@ function ArticleReader({ article, onBack }) {
             border: `1px solid ${article.tagColor}44`,
             borderRadius: 20, padding: '3px 10px', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '.08em',
           }}>{article.tag} · {article.readTime} czytania</div>
-          <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 900, lineHeight: 1.25, marginBottom: 12 }}>{article.title}</h2>
+          <h2 className="font-display italic font-semibold text-headline-md text-on-surface" style={{ lineHeight: 1.2, marginBottom: 12 }}>{article.title}</h2>
           <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.6 }}>{article.lead}</p>
         </div>
         {/* Body */}
-        <div style={{ padding: '24px 20px' }}>
+        <div className="max-w-2xl" style={{ padding: '24px 20px' }}>
           {article.content.map((block, i) =>
             block.h ? (
-              <h3 key={i} style={{ fontFamily: 'Playfair Display', fontSize: 18, fontWeight: 800, marginTop: i === 0 ? 0 : 28, marginBottom: 10, color: 'var(--text)' }}>
+              <h3 key={i} className="font-display italic font-medium text-headline-sm text-on-surface" style={{ marginTop: i === 0 ? 0 : 28, marginBottom: 10 }}>
                 {block.h}
               </h3>
             ) : (
-              <p key={i} style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 16 }}>
+              <p key={i} className="font-body" style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 16 }}>
                 {block.p}
               </p>
             )
@@ -154,16 +155,16 @@ function VenueDetail({ venue, onBack }) {
         >←</button>
         <h1 style={{ fontSize: 16 }}>Szczegóły</h1>
       </div>
-      <div style={{ padding: '0 0 80px' }}>
+      <div className="max-w-3xl mx-auto" style={{ padding: '0 0 80px' }}>
         <div style={{ padding: '20px 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
-            <div style={{ width: 72, height: 72, borderRadius: 14, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+            <div style={{ width: 72, height: 72, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {venue.logo_url
                 ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8, boxSizing: 'border-box' }} />
                 : <span style={{ fontSize: 34 }}>{t.icon}</span>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 800 }}>{venue.name}</h2>
+              <h2 className="font-display italic font-semibold text-headline-md text-on-surface">{venue.name}</h2>
               {venue.distance != null && (
                 <span className="venue-card-distance">{formatDistance(venue.distance)}</span>
               )}
@@ -182,7 +183,7 @@ function VenueDetail({ venue, onBack }) {
           )}
           {venue.events && venue.events.length > 0 && (
             <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
-              <div style={{ fontFamily: 'Playfair Display', fontSize: 16, fontWeight: 800, marginBottom: 12 }}>📅 Najbliższe dni</div>
+              <div className="font-display italic font-medium text-headline-sm text-on-surface" style={{ marginBottom: 12 }}>Najbliższe dni</div>
               {(() => {
                 const DNI = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota']
                 const MIES = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru']
@@ -257,63 +258,26 @@ function VenueDetail({ venue, onBack }) {
 function ArticleCard({ article, hero, onClick }) {
   if (hero) {
     return (
-      <div
-        onClick={onClick}
-        style={{
-          cursor: 'pointer',
-          background: 'linear-gradient(135deg, rgba(157,78,221,0.25) 0%, rgba(233,193,118,0.15) 100%)',
-          border: '1px solid rgba(157,78,221,0.35)',
-          borderRadius: 18,
-          padding: '24px 20px 20px',
-          marginBottom: 14,
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <div style={{ position: 'absolute', top: -20, right: -10, fontSize: 80, opacity: 0.12 }}>🏆</div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 10 }}>
-          <span style={{
-            fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em',
-            color: article.tagColor, background: `${article.tagColor}22`,
-            border: `1px solid ${article.tagColor}44`,
-            borderRadius: 20, padding: '3px 10px',
-          }}>{article.tag}</span>
-          <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>{article.readTime} czytania</span>
+      <div onClick={onClick} className="group cursor-pointer border border-outline-variant/20 p-6 hover:border-primary-container/40 transition-colors h-full">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="font-body text-label-caps uppercase text-primary-container">{article.tag}</span>
+          <span className="font-body text-label-caps uppercase text-outline">{article.readTime} czytania</span>
         </div>
-        <div style={{ fontFamily: 'Playfair Display', fontSize: 21, fontWeight: 900, lineHeight: 1.25, marginBottom: 10, color: 'var(--text)' }}>
+        <div className="font-display italic font-semibold text-headline-md text-on-surface leading-tight mb-3 group-hover:text-primary-container transition-colors">
           {article.title}
         </div>
-        <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.5 }}>{article.lead}</div>
-        <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#e9c176' }}>Czytaj dalej →</span>
-        </div>
+        <p className="font-body italic text-body-md text-on-surface-variant leading-relaxed">{article.lead}</p>
+        <div className="mt-6 font-body text-label-caps uppercase text-primary-container">Czytaj dalej →</div>
       </div>
     )
   }
   return (
-    <div
-      onClick={onClick}
-      style={{
-        cursor: 'pointer',
-        background: 'var(--card-bg)',
-        border: '1px solid var(--border)',
-        borderRadius: 14,
-        padding: '16px 14px',
-        flex: '1 1 0',
-        minWidth: 0,
-      }}
-    >
-      <div style={{ fontSize: 28, marginBottom: 8 }}>{article.emoji}</div>
-      <div style={{
-        fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.08em',
-        color: article.tagColor, marginBottom: 6,
-      }}>{article.tag}</div>
-      <div style={{ fontFamily: 'Playfair Display', fontSize: 15, fontWeight: 800, lineHeight: 1.3, marginBottom: 6, color: 'var(--text)' }}>
+    <div onClick={onClick} className="group cursor-pointer border border-outline-variant/20 p-5 hover:border-primary-container/40 transition-colors">
+      <div className="font-body text-label-caps uppercase text-primary-container mb-2">{article.tag}</div>
+      <div className="font-display italic font-medium text-body-lg text-on-surface leading-tight mb-2 group-hover:text-primary-container transition-colors">
         {article.title}
       </div>
-      <div style={{ fontSize: 12, color: 'var(--text-dim)', lineHeight: 1.4 }}>
-        {article.lead.slice(0, 80)}…
-      </div>
+      <p className="font-body italic text-body-md text-on-surface-variant leading-relaxed">{article.lead.slice(0, 80)}…</p>
     </div>
   )
 }
@@ -338,43 +302,43 @@ function venueSlug(v) {
 function VenueRow({ venue, onClick }) {
   const t = getTypeConfig(venue.type)
   return (
-    <div className="venue-card" onClick={onClick} style={{ display: 'flex', gap: 12, padding: 12, alignItems: 'flex-start' }}>
-      <div style={{ width: 64, height: 64, borderRadius: 12, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+    <div onClick={onClick} className="group flex gap-4 py-5 border-b border-outline-variant/15 cursor-pointer">
+      <div className="w-16 h-16 flex-shrink-0 overflow-hidden bg-surface-container flex items-center justify-center">
         {venue.logo_url
-          ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
-          : <span style={{ fontSize: 26 }}>{t.icon}</span>}
+          ? <img src={venue.logo_url} alt={venue.name} className="w-full h-full object-contain p-1.5" />
+          : <span className="text-2xl">{t.icon}</span>}
       </div>
-      <div className="venue-card-body" style={{ flex: 1, minWidth: 0, padding: 0 }}>
-        <div className="venue-card-top">
-          <div className="venue-card-name">{venue.name}</div>
-          {venue.distance != null && <span className="venue-card-distance">{formatDistance(venue.distance)}</span>}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline justify-between gap-2">
+          <div className="font-display italic font-medium text-body-lg text-on-surface group-hover:text-primary-container transition-colors truncate">{venue.name}</div>
+          {venue.distance != null && <span className="font-body text-label-caps uppercase text-outline flex-shrink-0">{formatDistance(venue.distance)}</span>}
         </div>
-        <div className="venue-card-meta">
-          <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>{t.label}</span>
-          <span>📍 {venue.city}</span>
+        <div className="flex items-center gap-3 mt-1 font-body text-label-caps uppercase text-on-surface-variant">
+          <span className="text-primary-container">{t.label}</span>
+          <span>{venue.city}</span>
         </div>
         {venue.type === 'plaża' ? (
-          <div style={{ fontSize: 12.5, color: '#39c0ed', marginTop: 6, fontWeight: 600 }}>🏖️ Plaża naturystyczna / FKK</div>
+          <div className="mt-2 font-body italic text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</div>
         ) : venue._special ? (
-          <div style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginTop: 6 }}>
-            <strong style={{ color: '#FFC824' }}>⭐ {venue._special.event_name}</strong>
+          <div className="mt-2 font-body text-body-md text-on-surface">
+            <span className="text-primary-container font-semibold">★ {venue._special.event_name}</span>
             {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
             {venue._special.price && <> · {venue._special.price}</>}
           </div>
         ) : venue._eventClub ? (
-          <div style={{ fontSize: 12.5, color: '#e9c176', marginTop: 6, fontWeight: 600 }}>🟢 Otwarte — sprawdź imprezę na stronie</div>
+          <div className="mt-2 font-body text-body-md text-primary-container">Otwarte — sprawdź imprezę na stronie</div>
         ) : (venue._dayEvents && venue._dayEvents.length > 0) ? (
-          <div style={{ marginTop: 6 }}>
+          <div className="mt-2 space-y-1">
             {venue._dayEvents.map(e => (
-              <div key={e.id} style={{ fontSize: 12.5, color: '#fff', lineHeight: 1.45, marginBottom: 2 }}>
-                <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
+              <div key={e.id} className="font-body text-body-md text-on-surface">
+                <span className="font-semibold">{e.event_name}</span>
                 {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
                 {e.price && <> · {e.price}</>}
               </div>
             ))}
           </div>
         ) : (
-          <div style={{ fontSize: 12.5, color: 'var(--text-dim)', marginTop: 6 }}>Dziś nieczynne</div>
+          <div className="mt-2 font-body text-body-md text-on-surface-variant/60">Dziś nieczynne</div>
         )}
       </div>
     </div>
@@ -537,7 +501,7 @@ export function Przewodnik({ city: cityParam }) {
   }
 
   return (
-    <div>
+    <div className="bg-background min-h-screen text-on-surface">
       <Helmet>
         <title>Przewodnik po klubach lifestyle – swing, BDSM, fetysz | ExtraFun</title>
         <meta name="description" content="Mapa i lista klubów lifestyle, swing i BDSM w Polsce. Znajdź miejsce blisko siebie — filtruj po mieście, typie i dniu tygodnia." />
@@ -545,91 +509,104 @@ export function Przewodnik({ city: cityParam }) {
       </Helmet>
       {cityParam ? (
         /* ════════ CITY PAGE ════════ */
-        <>
-          <div style={{ padding: '20px 16px 6px', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button onClick={() => navigate('/miejsca')} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 24, padding: 0, lineHeight: 1 }}>←</button>
-            <h1 style={{ fontFamily: 'Playfair Display', fontSize: 28, fontWeight: 800, letterSpacing: '-0.5px', margin: 0, color: 'var(--text)' }}>
-              {isPolska ? '🇵🇱 Polska' : cityName}
-            </h1>
-          </div>
-          <p style={{ padding: '0 16px 6px', fontSize: 13, color: 'var(--text-dim)' }}>
+        <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
+          <button onClick={() => navigate('/miejsca')} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Przewodnik</button>
+          <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-2 leading-none">
+            {isPolska ? 'Polska' : cityName}
+          </h1>
+          <p className="font-body text-body-md text-on-surface-variant mb-10">
             {loading ? 'Ładowanie…' : `${cityVenues.length} ${cityVenues.length === 1 ? 'lokal' : 'lokali'} · ${dayOffset === 0 ? 'dziś' : dayOffset === 1 ? 'jutro' : 'pojutrze'}`}
           </p>
 
-          <div className="category-filter" style={{ marginBottom: 8 }}>
+          <div className="flex gap-3 mb-8">
             {[['Dziś', 0], ['Jutro', 1], ['Pojutrze', 2]].map(([label, off]) => (
-              <button key={off} className={`category-chip ${dayOffset === off ? 'active' : ''}`} onClick={() => setDayOffset(off)}>{label}</button>
+              <button key={off} onClick={() => setDayOffset(off)}
+                className={`font-body text-label-caps uppercase px-4 py-2 border transition-colors ${dayOffset === off ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'}`}>
+                {label}
+              </button>
             ))}
           </div>
 
           {loading ? (
-            <div className="empty-state"><div className="spinner" style={{ margin: '0 auto' }} /></div>
+            <div className="py-24 text-center font-body text-body-md text-on-surface-variant">Ładowanie…</div>
           ) : cityVenues.length === 0 ? (
-            <div className="empty-state"><div className="empty-icon">🏙️</div><div className="empty-title">Brak lokali</div></div>
+            <div className="py-24 text-center font-display italic text-headline-sm text-on-surface">Brak lokali</div>
           ) : (
-            <div className="venue-list" style={{ paddingBottom: 80 }}>
+            <div>
               {cityVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
             </div>
           )}
-        </>
+        </main>
       ) : (
         /* ════════ HUB ════════ */
         <>
-          {/* Top 10 */}
-          <div style={{ padding: '24px 16px 12px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--cyan)' }}>Polecane</div>
-          <div style={{ padding: '0 16px' }}>
-            <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
-          </div>
-          <div style={{ padding: '10px 16px 10px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Polska i Europa</div>
-          <div style={{ display: 'flex', gap: 10, padding: '0 16px', marginBottom: 24 }}>
-            {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
-          </div>
+          <Hero
+            label="PRZEWODNIK"
+            title="Scena lifestyle — blisko Ciebie"
+            lead="Kluby, sauny i miejsca dla par i singli. Filtruj po mieście, typie i dniu."
+          />
+          <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
 
-          {/* Blisko Ciebie (GPS) */}
-          <div style={{ padding: '0 16px', marginBottom: 12 }}>
-            <h2 style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 800, letterSpacing: '-0.5px', margin: '0 0 8px', color: 'var(--text)' }}>📍 Blisko Ciebie</h2>
-            <div style={{ padding: '12px 14px', borderRadius: 14, display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', background: location ? 'rgba(233,193,118,0.08)' : 'var(--glass)', border: `1px solid ${location ? 'rgba(233,193,118,0.3)' : 'var(--glass-border)'}` }}>
-              <span style={{ fontSize: 16 }}>📡</span>
-              <span style={{ flex: 1, minWidth: 150, fontSize: 13, color: 'var(--text-dim)' }}>
-                {geoLoading ? 'Szukam lokalizacji…' :
-                 location ? <><strong style={{ color: 'var(--cyan)' }}>GPS aktywny</strong> — najbliższe otwarte dziś</> :
-                 geoError ? geoError :
-                 'Włącz GPS — pokażę co jest blisko'}
-              </span>
-              {!location && !geoLoading && <button className="location-bar-btn" onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</button>}
-            </div>
-          </div>
-          {location && nearby.length > 0 && (
-            <div className="venue-list" style={{ marginBottom: 20 }}>
-              {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
-            </div>
-          )}
-
-          {/* Category: Plaże — dedicated browse entry into the (existing) /plaze list */}
-          <div style={{ padding: '0 16px 8px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Kategorie</div>
-          <div style={{ padding: '0 16px 20px' }}>
-            <div onClick={() => navigate('/plaze')}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(57,192,237,0.10)', border: '1px solid rgba(57,192,237,0.30)', borderRadius: 16, padding: '14px 16px' }}>
-              <span style={{ fontSize: 28 }}>🏖️</span>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontFamily: 'Playfair Display', fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>Plaże</div>
-                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 2 }}>Naturystyczne i FKK w Polsce i Europie</div>
+            {/* Polecane (guide articles) */}
+            <section className="mb-24">
+              <SectionHeader title="Polecane" />
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                <div className="md:col-span-8">
+                  <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
+                </div>
+                <div className="md:col-span-4 flex flex-col gap-8">
+                  {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
+                </div>
               </div>
-              <span style={{ marginLeft: 'auto', color: '#39c0ed', fontSize: 18 }}>→</span>
-            </div>
-          </div>
+            </section>
 
-          {/* City cards */}
-          <div style={{ padding: '0 16px 8px', fontSize: 12, fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Przeglądaj wg miasta</div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, padding: '0 16px 80px' }}>
-            {[{ label: '🇵🇱 Polska', count: plCount, slug: 'polska' }, ...foreignCities.map(c => ({ label: c, count: cityCounts[c], slug: slugify(c) }))].map(cardItem => (
-              <div key={cardItem.slug} onClick={() => navigate('/miejsca/' + cardItem.slug)}
-                style={{ cursor: 'pointer', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '16px 14px', transition: 'border-color .2s' }}>
-                <div style={{ fontFamily: 'Playfair Display', fontSize: 16, fontWeight: 800, color: 'var(--text)' }}>{cardItem.label}</div>
-                <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>{cardItem.count} {cardItem.count === 1 ? 'lokal' : 'lokali'}</div>
+            {/* Blisko Ciebie (GPS) */}
+            <section className="mb-24">
+              <SectionHeader title="Blisko Ciebie" />
+              <div className={`flex items-center gap-4 flex-wrap p-4 border ${location ? 'border-primary-container/40' : 'border-outline-variant/30'}`}>
+                <span className="flex-1 min-w-[150px] font-body text-body-md text-on-surface-variant">
+                  {geoLoading ? 'Szukam lokalizacji…' :
+                   location ? 'GPS aktywny — najbliższe otwarte dziś' :
+                   geoError ? geoError :
+                   'Włącz GPS — pokażę co jest blisko'}
+                </span>
+                {!location && !geoLoading && <Button onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</Button>}
               </div>
-            ))}
-          </div>
+              {location && nearby.length > 0 && (
+                <div className="mt-4">
+                  {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
+                </div>
+              )}
+            </section>
+
+            {/* Kategorie — Plaże */}
+            <section className="mb-24">
+              <SectionHeader title="Kategorie" />
+              <div onClick={() => navigate('/plaze')}
+                className="group flex items-center gap-4 p-6 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">
+                <span className="text-3xl">🏖️</span>
+                <div className="min-w-0">
+                  <div className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">Plaże</div>
+                  <div className="font-body text-body-md text-on-surface-variant mt-1">Naturystyczne i FKK w Polsce i Europie</div>
+                </div>
+                <span className="ml-auto text-primary-container text-xl">→</span>
+              </div>
+            </section>
+
+            {/* Przeglądaj wg miasta */}
+            <section>
+              <SectionHeader title="Przeglądaj wg miasta" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[{ label: 'Polska', count: plCount, slug: 'polska' }, ...foreignCities.map(c => ({ label: c, count: cityCounts[c], slug: slugify(c) }))].map(cardItem => (
+                  <div key={cardItem.slug} onClick={() => navigate('/miejsca/' + cardItem.slug)}
+                    className="group p-5 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">
+                    <div className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">{cardItem.label}</div>
+                    <div className="font-body text-label-caps uppercase text-outline mt-2">{cardItem.count} {cardItem.count === 1 ? 'lokal' : 'lokali'}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </main>
         </>
       )}
     </div>
