@@ -3,7 +3,7 @@ import { Button } from './Button'
 // Full-bleed editorial hero spread: moody image + vignette + left-aligned Bodoni headline.
 export function Hero({ image, label, title, lead, ctaLabel, onCta }) {
   return (
-    <section className="relative w-full h-[80vh] min-h-[560px] flex flex-col justify-end overflow-hidden mb-24">
+    <section className="relative w-full h-[58vh] min-h-[420px] flex flex-col justify-end overflow-hidden mb-16">
       <div className="absolute inset-0">
         {image
           ? <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${image}')` }} />
