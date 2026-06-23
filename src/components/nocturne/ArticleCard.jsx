@@ -2,7 +2,7 @@
 // `image` optional — falls back to a gold-tinted gradient + vignette.
 export function ArticleCard({ image, tag, title, lead, meta, onClick, variant = 'large' }) {
   const heights = { hero: 'h-[60vh] min-h-[420px]', large: 'h-80', small: 'h-56' }
-  const titleSize = { hero: 'text-display-lg-mobile font-display', large: 'text-headline-sm font-display', small: 'text-body-lg font-display' }
+  const titleSize = { hero: 'text-display-lg-mobile font-display italic font-semibold', large: 'text-headline-sm font-display italic font-medium', small: 'text-body-lg font-display italic font-medium' }
   return (
     <article onClick={onClick} className="group cursor-pointer">
       <div className={`relative w-full ${heights[variant]} overflow-hidden`}>
@@ -19,7 +19,7 @@ export function ArticleCard({ image, tag, title, lead, meta, onClick, variant = 
       </div>
       <div className="pt-5">
         <h3 className={`${titleSize[variant]} text-on-surface leading-tight mb-2`}>{title}</h3>
-        {lead && <p className="font-body text-body-md text-on-surface-variant leading-relaxed">{lead}</p>}
+        {lead && <p className="font-body italic text-body-md text-on-surface-variant leading-relaxed">{lead}</p>}
         {meta && <div className="font-body text-label-caps uppercase text-outline mt-3">{meta}</div>}
       </div>
     </article>
