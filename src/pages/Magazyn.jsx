@@ -140,7 +140,7 @@ export function Magazyn() {
       {/* Editorial hero — featured/newest article */}
       {hero && (
         <Hero
-          image={hero.cover_image || '/editorial/hero-magazyn.jpg'}
+          image="/editorial/hero-magazyn.jpg"
           label={hero.featured ? 'WYRÓŻNIONY' : 'NAJNOWSZY'}
           title={hero.title}
           lead={hero.description}

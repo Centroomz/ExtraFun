@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useLocation } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
@@ -37,6 +38,7 @@ function typeLabel(id) {
 }
 
 function AdDetail({ ad, onBack, user }) {
+  const [, navigate] = useLocation()
   return (
     <div className="bg-background min-h-screen text-on-surface">
       <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
@@ -59,8 +61,8 @@ function AdDetail({ ad, onBack, user }) {
 
         <div className="flex items-center gap-6">
           {user
-            ? <Button>Napisz wiadomość</Button>
-            : <Button>Zaloguj się, aby kontaktować</Button>}
+            ? <Button onClick={() => navigate('/czat')}>Napisz na czacie</Button>
+            : <Button onClick={() => navigate('/login')}>Zaloguj się, aby kontaktować</Button>}
           <button className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zgłoś</button>
         </div>
       </main>
