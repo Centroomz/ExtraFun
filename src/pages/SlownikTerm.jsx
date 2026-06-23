@@ -2,33 +2,23 @@ import { Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { getTerm, DICTIONARY_TERMS } from '../lib/dictionary'
 
-const CATEGORY_COLORS = {
-  'CNM / Poliamoria':    { bg: 'rgba(233,193,118,0.12)',  color: '#e9c176',  border: 'rgba(233,193,118,0.25)' },
-  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#e9c176',  border: 'rgba(157,78,222,0.25)' },
-  'BDSM / Kink':         { bg: 'rgba(157,78,221,0.12)', color: '#e9c176',  border: 'rgba(157,78,221,0.25)' },
-  'Ogólne':              { bg: 'rgba(0,255,150,0.12)',  color: '#00FF96',  border: 'rgba(0,255,150,0.25)' },
-}
-
 export function SlownikTerm({ slug }) {
   const term = getTerm(slug)
 
   if (!term) {
     return (
-      <div className="page-inner">
-        <div style={{ padding: '60px 16px', textAlign: 'center' }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-          <div style={{ fontSize: 16, color: 'rgba(232,230,252,0.86)' }}>Nie znaleziono terminu</div>
+      <div className="bg-background min-h-screen text-on-surface">
+        <main className="max-w-2xl mx-auto px-6 md:px-16 py-24 text-center">
+          <div className="font-display italic text-headline-md text-on-surface mb-4">Nie znaleziono terminu</div>
           <Link href="/slownik">
-            <div style={{ marginTop: 16, color: '#e9c176', fontSize: 14, cursor: 'pointer' }}>← Wróć do słownika</div>
+            <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer">← Wróć do słownika</span>
           </Link>
-        </div>
+        </main>
       </div>
     )
   }
 
-  const c = CATEGORY_COLORS[term.category] || { bg: 'rgba(255,255,255,0.08)', color: 'rgba(232,230,252,0.86)', border: 'rgba(255,255,255,0.15)' }
-
-  // 3 losowe terminy z tej samej kategorii (nie ten sam)
+  // 3 terminy z tej samej kategorii (nie ten sam)
   const related = DICTIONARY_TERMS
     .filter(t => t.category === term.category && t.slug !== term.slug)
     .slice(0, 3)
@@ -37,7 +27,7 @@ export function SlownikTerm({ slug }) {
   const seoDesc = term.definition.slice(0, 155) + (term.definition.length > 155 ? '…' : '')
 
   return (
-    <>
+    <div className="bg-background min-h-screen text-on-surface">
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDesc} />
@@ -55,100 +45,56 @@ export function SlownikTerm({ slug }) {
         })}</script>
       </Helmet>
 
-      <div className="page-inner">
-        <div style={{ padding: '16px 16px 0' }}>
-          <Link href="/slownik">
-            <span style={{ color: 'rgba(232,230,252,0.72)', fontSize: 13, cursor: 'pointer' }}>
-              ← Słownik
-            </span>
-          </Link>
+      <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
+        <Link href="/slownik">
+          <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer hover:opacity-80">← Słownik</span>
+        </Link>
+
+        <div className="mt-6 mb-10">
+          <span className="font-body text-label-caps uppercase text-primary-container">{term.category}</span>
+          <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-none mt-3">{term.term}</h1>
         </div>
 
-        <div style={{ padding: '20px 16px 0' }}>
-          <span style={{
-            fontSize: 11, fontWeight: 700, background: c.bg, color: c.color,
-            border: `1px solid ${c.border}`, borderRadius: 8, padding: '3px 10px',
-            textTransform: 'uppercase', letterSpacing: '.06em',
-          }}>
-            {term.category}
-          </span>
-
-          <h1 style={{
-            fontSize: 28, fontWeight: 900, marginTop: 12, marginBottom: 0,
-            background: 'linear-gradient(135deg, #fff 60%, rgba(232,230,252,0.86))',
-            WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-            lineHeight: 1.2,
-          }}>{term.term}</h1>
+        {/* Definicja */}
+        <div className="mb-8">
+          <div className="font-body text-label-caps uppercase text-outline mb-3">Definicja</div>
+          <p className="font-body text-body-lg text-on-surface leading-relaxed">{term.definition}</p>
         </div>
 
-        <div style={{ padding: '20px 16px' }}>
-          {/* Definicja */}
-          <div style={{
-            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: 14, padding: '18px 20px', marginBottom: 16,
-          }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 10 }}>
-              Definicja
-            </div>
-            <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.88)', lineHeight: 1.7, margin: 0 }}>
-              {term.definition}
-            </p>
+        {/* Przykłady */}
+        {term.examples?.length > 0 && (
+          <div className="mb-8 border-l-2 border-primary-container/50 pl-5">
+            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Przykład</div>
+            {term.examples.map((ex, i) => (
+              <p key={i} className="font-body text-body-md text-on-surface-variant leading-relaxed">„{ex}"</p>
+            ))}
           </div>
+        )}
 
-          {/* Przykłady */}
-          {term.examples?.length > 0 && (
-            <div style={{
-              background: `linear-gradient(135deg, ${c.bg}, rgba(255,255,255,0.03))`,
-              border: `1px solid ${c.border}`,
-              borderRadius: 14, padding: '16px 18px', marginBottom: 16,
-            }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: c.color, marginBottom: 10 }}>
-                Przykład
-              </div>
-              {term.examples.map((ex, i) => (
-                <p key={i} style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.65, margin: 0, fontStyle: 'italic' }}>
-                  „{ex}"
-                </p>
+        {/* Powiązane terminy */}
+        {related.length > 0 && (
+          <div className="mt-12">
+            <div className="font-body text-label-caps uppercase text-outline mb-4">Powiązane terminy</div>
+            <div className="flex flex-col">
+              {related.map(r => (
+                <Link key={r.slug} href={`/slownik/${r.slug}`}>
+                  <div className="group py-4 border-b border-outline-variant/15 cursor-pointer">
+                    <div className="font-display italic font-medium text-body-lg text-on-surface group-hover:text-primary-container transition-colors">{r.term}</div>
+                    <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed">{r.definition.slice(0, 90)}…</div>
+                  </div>
+                </Link>
               ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Powiązane terminy */}
-          {related.length > 0 && (
-            <div style={{ marginTop: 24 }}>
-              <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: '.07em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 10 }}>
-                Powiązane terminy
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                {related.map(r => (
-                  <Link key={r.slug} href={`/slownik/${r.slug}`}>
-                    <div style={{
-                      background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-                      borderRadius: 10, padding: '11px 14px', cursor: 'pointer',
-                    }}>
-                      <div style={{ fontWeight: 700, fontSize: 13, color: '#fff', marginBottom: 3 }}>{r.term}</div>
-                      <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', lineHeight: 1.5 }}>
-                        {r.definition.slice(0, 90)}…
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* CTA do pełnego słownika */}
-          <Link href="/slownik">
-            <div style={{
-              marginTop: 24, padding: '14px 18px', borderRadius: 12,
-              background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)',
-              textAlign: 'center', cursor: 'pointer', fontSize: 14, color: 'rgba(232,230,252,0.86)',
-            }}>
-              Zobacz wszystkie {DICTIONARY_TERMS.length} terminów →
-            </div>
-          </Link>
-        </div>
-      </div>
-    </>
+        {/* CTA do pełnego słownika */}
+        <Link href="/slownik">
+          <div className="mt-12 p-4 border border-outline-variant/20 text-center font-body text-label-caps uppercase text-primary-container cursor-pointer hover:border-primary-container/40 transition-colors">
+            Zobacz wszystkie {DICTIONARY_TERMS.length} terminów →
+          </div>
+        </Link>
+      </main>
+    </div>
   )
 }

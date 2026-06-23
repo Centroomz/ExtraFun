@@ -3,13 +3,6 @@ import { Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { DICTIONARY_TERMS, getTermsByCategory } from '../lib/dictionary'
 
-const CATEGORY_COLORS = {
-  'CNM / Poliamoria':   { bg: 'rgba(233,193,118,0.12)',  color: '#e9c176',  border: 'rgba(233,193,118,0.25)' },
-  'Swinging / Lifestyle':{ bg: 'rgba(157,78,222,0.12)', color: '#e9c176',  border: 'rgba(157,78,222,0.25)' },
-  'BDSM / Kink':        { bg: 'rgba(157,78,221,0.12)', color: '#e9c176',  border: 'rgba(157,78,221,0.25)' },
-  'Ogólne':             { bg: 'rgba(0,255,150,0.12)',  color: '#00FF96',  border: 'rgba(0,255,150,0.25)' },
-}
-
 export function Slownik() {
   const [q, setQ] = useState('')
   const [activeCategory, setActiveCategory] = useState('all')
@@ -30,128 +23,93 @@ export function Slownik() {
   const grouped = {}
   for (const t of sortedFiltered) (grouped[sortAlpha ? t.term[0].toUpperCase() : t.category] ||= []).push(t)
 
+  const chip = (active) =>
+    `font-body text-label-caps uppercase px-4 py-2 border transition-colors ${
+      active ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'
+    }`
+
   return (
-    <>
+    <div className="bg-background min-h-screen text-on-surface">
       <Helmet>
         <title>Słownik CNM, Swinging i BDSM – ExtraFun</title>
         <meta name="description" content={`Słownik ${DICTIONARY_TERMS.length} terminów ze świata CNM, poliamorii, swingingu i BDSM. Polskie definicje, przykłady, bez tabu.`} />
         <link rel="canonical" href="https://extrafun.pl/slownik" />
       </Helmet>
 
-      <div className="page-inner">
-        <div className="page-header">
-          <h1>Słownik</h1>
-          <p style={{ color: 'rgba(232,230,252,0.8)', fontSize: 14, marginTop: 4 }}>
-            {DICTIONARY_TERMS.length} terminów — CNM, poliamoria, swinging, BDSM
-          </p>
-        </div>
+      <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
+        <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-2 leading-none">Słownik</h1>
+        <p className="font-body text-body-md text-on-surface-variant mb-10">
+          {DICTIONARY_TERMS.length} terminów — CNM, poliamoria, swinging, BDSM
+        </p>
 
         {/* Szukaj */}
-        <div style={{ padding: '0 16px 12px' }}>
-          <input
-            value={q}
-            onChange={e => setQ(e.target.value)}
-            placeholder="Szukaj terminu…"
-            style={{
-              width: '100%', boxSizing: 'border-box',
-              background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)',
-              borderRadius: 10, padding: '10px 14px', color: '#fff', fontSize: 14,
-              outline: 'none', fontFamily: 'inherit',
-            }}
-          />
-        </div>
+        <input
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          placeholder="Szukaj terminu…"
+          className="w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50 mb-6"
+        />
 
         {/* Filtry kategorii + sort */}
-        <div style={{ display: 'flex', gap: 8, padding: '0 16px 16px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <button onClick={() => setActiveCategory('all')} style={{
-            fontSize: 12, padding: '6px 13px', borderRadius: 20, border: 'none', cursor: 'pointer', fontWeight: 600,
-            background: activeCategory === 'all' ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.06)',
-            color: activeCategory === 'all' ? '#fff' : 'rgba(232,230,252,0.8)',
-          }}>Wszystkie ({DICTIONARY_TERMS.length})</button>
-          {categories.map(cat => {
-            const c = CATEGORY_COLORS[cat] || { bg: 'rgba(255,255,255,0.08)', color: '#fff', border: 'transparent' }
-            return (
-              <button key={cat} onClick={() => setActiveCategory(cat)} style={{
-                fontSize: 12, padding: '6px 13px', borderRadius: 20, border: `1px solid ${activeCategory === cat ? c.border : 'transparent'}`,
-                cursor: 'pointer', fontWeight: 600,
-                background: activeCategory === cat ? c.bg : 'rgba(255,255,255,0.06)',
-                color: activeCategory === cat ? c.color : 'rgba(232,230,252,0.8)',
-              }}>{cat} ({byCategory[cat].length})</button>
-            )
-          })}
-          {/* Sort toggle */}
-          <button onClick={() => setSortAlpha(v => !v)} style={{
-            fontSize: 12, padding: '6px 13px', borderRadius: 20, border: `1px solid ${sortAlpha ? 'rgba(255,255,255,0.3)' : 'transparent'}`,
-            cursor: 'pointer', fontWeight: 600, marginLeft: 'auto',
-            background: sortAlpha ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.06)',
-            color: sortAlpha ? '#fff' : 'rgba(255,255,255,0.4)',
-          }}>A–Z</button>
+        <div className="flex gap-3 flex-wrap items-center mb-10">
+          <button onClick={() => setActiveCategory('all')} className={chip(activeCategory === 'all')}>
+            Wszystkie ({DICTIONARY_TERMS.length})
+          </button>
+          {categories.map(cat => (
+            <button key={cat} onClick={() => setActiveCategory(cat)} className={chip(activeCategory === cat)}>
+              {cat} ({byCategory[cat].length})
+            </button>
+          ))}
+          <button onClick={() => setSortAlpha(v => !v)} className={`${chip(sortAlpha)} ml-auto`}>A–Z</button>
         </div>
 
         {/* Cross-link: gay.pl */}
-        <a href="https://gay.pl/slownik" target="_blank" rel="noopener noreferrer" style={{
-          display: 'block', margin: '0 16px 16px',
-          background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 14, padding: '14px 16px', textDecoration: 'none',
-        }}>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'rgba(232,230,252,0.72)', marginBottom: 4 }}>Też cię interesuje?</div>
-          <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Słownik LGBT+ →</div>
-          <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', marginTop: 2 }}>gay.pl/slownik — orientacje, tożsamości, subkultury</div>
+        <a
+          href="https://gay.pl/slownik"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block mb-12 p-5 border border-outline-variant/20 hover:border-primary-container/40 transition-colors no-underline"
+        >
+          <div className="font-body text-label-caps uppercase text-outline mb-1">Też cię interesuje?</div>
+          <div className="font-display italic font-medium text-headline-sm text-on-surface">Słownik LGBT+ →</div>
+          <div className="font-body text-body-md text-on-surface-variant mt-1">gay.pl/slownik — orientacje, tożsamości, subkultury</div>
         </a>
 
         {/* Lista terminów */}
-        <div style={{ padding: '0 16px 80px', display: 'flex', flexDirection: 'column', gap: 20 }}>
-          {sortedFiltered.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)', fontSize: 14 }}>
-              Brak wyników dla "{q}"
-            </div>
-          ) : q ? (
-            // Wyniki wyszukiwania — flat list
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {sortedFiltered.map(t => <TermRow key={t.slug} term={t} />)}
-            </div>
-          ) : (
-            // Pogrupowane po kategoriach lub literach
-            Object.entries(grouped).map(([group, terms]) => (
+        {sortedFiltered.length === 0 ? (
+          <div className="py-16 text-center font-body text-body-md text-on-surface-variant">Brak wyników dla „{q}"</div>
+        ) : q ? (
+          <div className="flex flex-col">
+            {sortedFiltered.map(t => <TermRow key={t.slug} term={t} />)}
+          </div>
+        ) : (
+          <div className="space-y-12">
+            {Object.entries(grouped).map(([group, terms]) => (
               <div key={group}>
-                <div style={{
-                  fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase',
-                  color: sortAlpha ? 'rgba(255,255,255,0.4)' : (CATEGORY_COLORS[group]?.color || 'rgba(255,255,255,0.4)'),
-                  marginBottom: 10, paddingBottom: 6, borderBottom: `1px solid ${sortAlpha ? 'rgba(255,255,255,0.08)' : (CATEGORY_COLORS[group]?.border || 'rgba(255,255,255,0.08)')}`,
-                }}>{group}</div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <h2 className="font-display italic font-medium text-headline-sm text-on-surface border-b border-outline-variant/20 pb-3 mb-4">{group}</h2>
+                <div className="flex flex-col">
                   {terms.map(t => <TermRow key={t.slug} term={t} />)}
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      </div>
-    </>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
   )
 }
 
 function TermRow({ term }) {
-  const c = CATEGORY_COLORS[term.category] || { bg: 'rgba(255,255,255,0.06)', color: 'rgba(232,230,252,0.8)', border: 'transparent' }
   return (
     <Link href={`/slownik/${term.slug}`}>
-      <div style={{
-        background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: 12, padding: '12px 14px', cursor: 'pointer',
-        transition: 'background 0.15s',
-      }}
-        onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.07)'}
-        onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
-          <div style={{ fontFamily: 'Playfair Display', fontWeight: 600, fontSize: 17, color: '#fff' }}>{term.term}</div>
-          <span style={{ fontSize: 10, background: c.bg, color: c.color, borderRadius: 6, padding: '2px 7px', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            {term.category}
-          </span>
+      <div className="group flex justify-between items-start gap-4 py-4 border-b border-outline-variant/15 cursor-pointer">
+        <div className="min-w-0">
+          <div className="font-display italic font-medium text-body-lg text-on-surface group-hover:text-primary-container transition-colors">{term.term}</div>
+          <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed">
+            {term.definition.slice(0, 120)}{term.definition.length > 120 ? '…' : ''}
+          </div>
         </div>
-        <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)', marginTop: 4, lineHeight: 1.5 }}>
-          {term.definition.slice(0, 120)}{term.definition.length > 120 ? '…' : ''}
-        </div>
+        <span className="font-body text-label-caps uppercase text-primary-container flex-shrink-0 whitespace-nowrap">{term.category}</span>
       </div>
     </Link>
   )
