@@ -17,6 +17,7 @@ import { Imprezy } from './pages/Imprezy'
 import { Slownik } from './pages/Slownik'
 import { SlownikTerm } from './pages/SlownikTerm'
 import { Plaze } from './pages/Plaze'
+import { Wiadomosci } from './pages/Wiadomosci'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
@@ -91,6 +92,7 @@ function DesktopNav({ user, profile, onSignOut }) {
     : location.startsWith('/plaze') ? 'plaze'
     : location.startsWith('/slownik') ? 'slownik'
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
+    : location.startsWith('/wiadomosci') ? 'wiadomosci'
     : location.startsWith('/admin') ? 'admin'
     : location.startsWith('/profil') ? 'profil'
     : 'magazyn'
@@ -113,6 +115,18 @@ function DesktopNav({ user, profile, onSignOut }) {
       </div>
 
       <div className="desktop-nav-footer">
+        {user && (
+          <Link href="/wiadomosci">
+            <button className={`desktop-nav-item ${active === 'wiadomosci' ? 'active' : ''}`}>
+              <span className="desktop-nav-item-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </span>
+              <span className="desktop-nav-item-label">Wiadomości</span>
+            </button>
+          </Link>
+        )}
         {isAdmin(user?.email) && (
           <Link href="/admin">
             <button className={`desktop-nav-item ${active === 'admin' ? 'active' : ''}`}>
@@ -295,6 +309,7 @@ function AppInner() {
             <Route path="/plaze" component={Plaze} />
             <Route path="/czat">{() => <Czat user={user} />}</Route>
             <Route path="/ogloszenia">{() => <Ogloszenia user={user} />}</Route>
+            <Route path="/wiadomosci">{() => <Wiadomosci user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/signup">{() => <SignupPage onSwitch={() => navigate('/login')} onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/profil">{() => user

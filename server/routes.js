@@ -121,13 +121,14 @@ export function registerRoutes(app) {
   // (type←category, city←location).
   app.get('/api/ads', async (_req, res) => {
     const { data, error } = await supabaseAdmin.from('ads')
-      .select('id, title, description, location, category, latitude, longitude, created_at')
+      .select('id, title, description, location, category, latitude, longitude, created_at, author_uuid')
       .eq('status', 'active').order('created_at', { ascending: false }).limit(100)
     if (error) return res.status(500).json({ message: error.message })
     res.json((data || []).map(a => ({
       id: a.id, title: a.title, description: a.description,
       city: a.location, type: a.category || 'all',
       latitude: a.latitude, longitude: a.longitude, created_at: a.created_at,
+      author_uuid: a.author_uuid || null,
     })))
   })
 
@@ -143,6 +144,55 @@ export function registerRoutes(app) {
     }).select('id').single()
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json(data)
+  })
+
+  // === PRIVATE MESSAGES (DM ogłoszeniodawca ↔ zainteresowany) ===
+  // Send a DM about an ad. Recipient = ad.author_uuid.
+  app.post('/api/messages', verifyJWT, async (req, res) => {
+    const { ad_id, content, recipient_id } = req.body || {}
+    if (!content?.trim()) return res.status(400).json({ message: 'Treść wymagana' })
+    if (!ad_id) return res.status(400).json({ message: 'ad_id wymagane' })
+    const { data: ad } = await supabaseAdmin.from('ads').select('id, title, author_uuid').eq('id', ad_id).single()
+    if (!ad || !ad.author_uuid) return res.status(404).json({ message: 'Ogłoszenie nie istnieje lub bez autora (demo)' })
+    // Initial contact → recipient = ad author. Reply in a thread → explicit recipient_id (the partner).
+    const recipient = recipient_id || ad.author_uuid
+    if (recipient === req.user.id) return res.status(400).json({ message: 'Nie możesz pisać do siebie' })
+    const meta = req.user.meta || {}
+    const senderName = meta.display_name || meta.full_name || meta.name || (req.user.email || '').split('@')[0] || 'Użytkownik'
+    const { error } = await supabaseAdmin.from('private_messages').insert({
+      ad_id: ad.id, ad_title: ad.title, content: content.trim(),
+      sender_id: req.user.id, sender_name: senderName,
+      recipient_id: recipient, recipient_name: '', is_read: false,
+    })
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json({ ok: true })
+  })
+
+  // My inbox: all DMs where I am sender or recipient (grouped client-side).
+  app.get('/api/messages', verifyJWT, async (req, res) => {
+    const me = req.user.id
+    const { data, error } = await supabaseAdmin.from('private_messages')
+      .select('id, ad_id, ad_title, content, sender_id, sender_name, recipient_id, recipient_name, is_read, created_at')
+      .or(`sender_id.eq.${me},recipient_id.eq.${me}`)
+      .order('created_at', { ascending: true })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  // Unread count (badge).
+  app.get('/api/messages/unread', verifyJWT, async (req, res) => {
+    const { count, error } = await supabaseAdmin.from('private_messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('recipient_id', req.user.id).eq('is_read', false)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ count: count || 0 })
+  })
+
+  // Mark all my incoming as read.
+  app.post('/api/messages/read', verifyJWT, async (req, res) => {
+    await supabaseAdmin.from('private_messages').update({ is_read: true })
+      .eq('recipient_id', req.user.id).eq('is_read', false)
+    res.json({ ok: true })
   })
 
   // === ADMIN ===

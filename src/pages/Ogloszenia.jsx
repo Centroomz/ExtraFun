@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'wouter'
+import { useLocation, Link } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
@@ -39,6 +39,24 @@ function typeLabel(id) {
 
 function AdDetail({ ad, onBack, user }) {
   const [, navigate] = useLocation()
+  const [compose, setCompose] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [sending, setSending] = useState(false)
+  const [sent, setSent] = useState(false)
+  const canMessage = !!ad.author_uuid
+
+  async function send() {
+    if (!msg.trim() || sending) return
+    setSending(true)
+    try {
+      await apiFetch('/api/messages', { method: 'POST', body: { ad_id: ad.id, content: msg.trim() } })
+      setSent(true); setMsg('')
+    } catch (e) { alert('Nie udało się wysłać: ' + (e.message || '')) }
+    setSending(false)
+  }
+
+  const inputCls = 'w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50'
+
   return (
     <div className="bg-background min-h-screen text-on-surface">
       <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
@@ -60,12 +78,43 @@ function AdDetail({ ad, onBack, user }) {
         <p className="font-body text-body-lg text-on-surface leading-relaxed mb-10">{ad.description}</p>
 
         <div className="flex items-center gap-6">
-          {user
-            ? <Button onClick={() => navigate('/czat')}>Napisz na czacie</Button>
-            : <Button onClick={() => navigate('/login')}>Zaloguj się, aby kontaktować</Button>}
+          {!user ? (
+            <Button onClick={() => navigate('/login')}>Zaloguj się, aby napisać</Button>
+          ) : canMessage ? (
+            <Button onClick={() => { setSent(false); setCompose(true) }}>Napisz wiadomość</Button>
+          ) : (
+            <span className="font-body text-body-md text-on-surface-variant">Ogłoszenie demonstracyjne — kontakt niedostępny</span>
+          )}
           <button className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zgłoś</button>
         </div>
       </main>
+
+      {compose && (
+        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+          <div className="absolute inset-0 bg-black/70" onClick={() => !sending && setCompose(false)} />
+          <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6">
+            <div className="font-display italic font-semibold text-headline-sm text-on-surface mb-1">Napisz wiadomość</div>
+            <div className="font-body text-body-md text-on-surface-variant mb-5">Do ogłoszeniodawcy · {ad.title}</div>
+            {sent ? (
+              <>
+                <p className="font-body text-body-md text-on-surface mb-6">Wysłano ✓ Odpowiedź zobaczysz w „Wiadomości".</p>
+                <Button onClick={() => { setCompose(false); navigate('/wiadomosci') }}>Przejdź do Wiadomości</Button>
+              </>
+            ) : (
+              <>
+                <textarea value={msg} onChange={e => setMsg(e.target.value)} placeholder="Twoja wiadomość…" className={`${inputCls} min-h-[120px] mb-4`} />
+                <div className="flex items-center gap-6">
+                  <button onClick={send} disabled={!msg.trim() || sending}
+                    className="bg-primary-container text-[#1a1400] px-10 py-4 font-body text-label-caps uppercase font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
+                    {sending ? 'Wysyłam…' : 'Wyślij'}
+                  </button>
+                  <button onClick={() => setCompose(false)} className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Anuluj</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -132,7 +181,14 @@ export function Ogloszenia({ user }) {
   return (
     <div className="bg-background min-h-screen text-on-surface">
       <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
-        <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-2 leading-none">Ogłoszenia</h1>
+        <div className="flex items-start justify-between gap-4 mb-2">
+          <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-none">Ogłoszenia</h1>
+          {user && (
+            <Link href="/wiadomosci">
+              <span className="font-body text-label-caps uppercase text-primary-container hover:opacity-80 cursor-pointer whitespace-nowrap mt-2 inline-block">Wiadomości →</span>
+            </Link>
+          )}
+        </div>
         <p className="font-body text-body-md text-on-surface-variant mb-8">Szukam · wydarzenia · sprzedaż — od społeczności</p>
 
         {/* Location bar */}
