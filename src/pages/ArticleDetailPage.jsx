@@ -99,11 +99,11 @@ const CTA_DEFAULT = { icon: '📖', title: 'Słownik CNM', sub: 'Poznaj język n
 function CtaBox({ categorySlug }) {
   const cta = CTA_MAP[categorySlug] || CTA_DEFAULT
   return (
-    <Link href={cta.href} className="ef-art-cta">
-      <span className="ef-art-cta-icon">{cta.icon}</span>
-      <div className="ef-art-cta-body">
-        <span className="ef-art-cta-title">{cta.title}</span>
-        <span className="ef-art-cta-sub">{cta.sub}</span>
+    <Link href={cta.href} className="group flex items-center gap-4 mt-12 p-6 border border-outline-variant/20 hover:border-primary-container/40 transition-colors no-underline">
+      <span className="text-3xl">{cta.icon}</span>
+      <div className="min-w-0">
+        <span className="block font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">{cta.title}</span>
+        <span className="block font-body text-body-md text-on-surface-variant mt-1">{cta.sub}</span>
       </div>
     </Link>
   )
@@ -162,23 +162,25 @@ export function ArticleDetailPage() {
 
   if (loading) {
     return (
-      <div className="mag-root" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 300 }}>
-        <div className="spinner" />
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <div className="font-body text-body-md text-on-surface-variant">Ładowanie…</div>
       </div>
     )
   }
 
   if (!article) {
     return (
-      <div className="mag-root" style={{ padding: '60px 24px', textAlign: 'center' }}>
+      <div className="bg-background min-h-screen text-on-surface">
         <Helmet>
           <title>Artykuł nie znaleziony | ExtraFun</title>
           <meta name="robots" content="noindex" />
         </Helmet>
-        <p style={{ color: 'var(--text-dim)', marginBottom: 16 }}>Nie znaleziono artykułu.</p>
-        <Link href="/magazyn">
-          <button className="btn-ghost">← Wróć do Magazynu</button>
-        </Link>
+        <main className="max-w-2xl mx-auto px-6 md:px-16 py-24 text-center">
+          <p className="font-display italic text-headline-sm text-on-surface mb-6">Nie znaleziono artykułu.</p>
+          <Link href="/magazyn">
+            <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer">← Wróć do Magazynu</span>
+          </Link>
+        </main>
       </div>
     )
   }
@@ -188,7 +190,7 @@ export function ArticleDetailPage() {
   const ogImage = article.cover_image || `${BASE_URL}/og-default.jpg`
 
   return (
-    <div className="mag-root">
+    <div className="bg-background min-h-screen text-on-surface">
       <Helmet>
         <title>{article.seoTitle ? `${article.seoTitle} | ExtraFun` : `${article.title} | ExtraFun`}</title>
         <meta name="description" content={article.seoDescription || article.description} />
@@ -208,50 +210,50 @@ export function ArticleDetailPage() {
       </Helmet>
 
       {/* Back bar */}
-      <div className="mag-article-bar">
+      <div className="max-w-2xl mx-auto px-6 md:px-16 pt-8">
         <Link href="/magazyn">
-          <button className="mag-back-btn">← Powrót</button>
+          <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer hover:opacity-80">← Powrót</span>
         </Link>
       </div>
 
       {/* Hero image */}
       {article.cover_image && (
-        <div className="ef-art-hero">
-          <img src={article.cover_image} alt={article.title} />
+        <div className="max-w-4xl mx-auto px-6 md:px-16 mt-6">
+          <img src={article.cover_image} alt={article.title} className="w-full h-auto max-h-[60vh] object-cover" />
         </div>
       )}
 
       {/* Article */}
-      <article className={`ef-art-wrap${article.cover_image ? ' ef-art-wrap--overlap' : ''}`}>
-        <div className="ef-art-meta-top">
-          <span className="ef-art-chip">{article.category}</span>
-          <span className="ef-art-dot" />
-          <span>{article.reading_time} MIN CZYTANIA</span>
+      <article className="max-w-2xl mx-auto px-6 md:px-16 pt-10 pb-24">
+        <div className="flex items-center gap-3 font-body text-label-caps uppercase text-primary-container mb-5">
+          <span>{article.category}</span>
+          <span className="text-outline">·</span>
+          <span className="text-outline">{article.reading_time} min czytania</span>
         </div>
 
-        <h1 className="ef-art-title">{article.title}</h1>
+        <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-tight mb-6">{article.title}</h1>
 
-        <div className="ef-art-author">
-          <div className="ef-art-author-av">
+        <div className="flex items-center gap-3 mb-10 pb-8 border-b border-outline-variant/20">
+          <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
             </svg>
           </div>
           <div>
-            <p className="ef-art-author-name">{article.author}</p>
+            <p className="font-body text-body-md text-on-surface">{article.author}</p>
             {article.date && (
-              <p className="ef-art-author-date">
-                {new Date(article.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase()}
+              <p className="font-body text-label-caps uppercase text-outline">
+                {new Date(article.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             )}
           </div>
         </div>
 
         {related[0] && (
-          <Link href={`/magazyn/${related[0].slug}`} className="ef-art-teaser">
-            <span className="ef-art-teaser-label">Czytaj też</span>
-            <span className="ef-art-teaser-title">{related[0].title}</span>
-            <span className="ef-art-teaser-arrow">→</span>
+          <Link href={`/magazyn/${related[0].slug}`} className="group flex items-baseline gap-3 mb-10 p-4 border border-outline-variant/20 hover:border-primary-container/40 transition-colors no-underline">
+            <span className="font-body text-label-caps uppercase text-primary-container flex-shrink-0">Czytaj też</span>
+            <span className="font-body text-body-md text-on-surface flex-1">{related[0].title}</span>
+            <span className="text-primary-container">→</span>
           </Link>
         )}
 
@@ -267,25 +269,23 @@ export function ArticleDetailPage() {
         })()}
 
         {article.tags?.length > 0 && (
-          <div className="ef-art-tags">
+          <div className="flex flex-wrap gap-2 mt-10">
             {article.tags.map((t, i) => (
-              <span key={i} className="ef-art-tag">{t}</span>
+              <span key={i} className="font-body text-label-caps uppercase text-outline border border-outline-variant/30 px-3 py-1">{t}</span>
             ))}
           </div>
         )}
 
         {related.length > 0 && (
-          <section className="ef-art-related">
-            <h2 className="ef-art-related-head">Czytaj dalej</h2>
-            <div className="ef-art-related-grid">
+          <section className="mt-16">
+            <h2 className="font-display italic font-medium text-headline-md text-on-surface border-b border-outline-variant/20 pb-4 mb-8">Czytaj dalej</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {related.map(r => (
-                <Link key={r.slug} href={`/magazyn/${r.slug}`} className="ef-art-related-card">
-                  {r.cover_image && <img src={r.cover_image} alt="" loading="lazy" />}
-                  <div className="ef-art-related-body">
-                    <span className="ef-art-related-cat">{r.category}</span>
-                    <h3 className="ef-art-related-title">{r.title}</h3>
-                    <span className="ef-art-related-meta">{r.reading_time} min</span>
-                  </div>
+                <Link key={r.slug} href={`/magazyn/${r.slug}`} className="group no-underline">
+                  {r.cover_image && <img src={r.cover_image} alt="" loading="lazy" className="w-full h-44 object-cover mb-3" />}
+                  <span className="block font-body text-label-caps uppercase text-primary-container">{r.category}</span>
+                  <h3 className="font-display italic font-medium text-body-lg text-on-surface mt-1 group-hover:text-primary-container transition-colors">{r.title}</h3>
+                  <span className="block font-body text-label-caps uppercase text-outline mt-1">{r.reading_time} min</span>
                 </Link>
               ))}
             </div>
