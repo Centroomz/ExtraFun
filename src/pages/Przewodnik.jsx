@@ -541,6 +541,7 @@ export function Przewodnik({ city: cityParam }) {
         /* ════════ HUB ════════ */
         <>
           <Hero
+            image="/editorial/hero-przewodnik.jpg"
             label="PRZEWODNIK"
             title="Scena lifestyle — blisko Ciebie"
             lead="Kluby, sauny i miejsca dla par i singli. Filtruj po mieście, typie i dniu."

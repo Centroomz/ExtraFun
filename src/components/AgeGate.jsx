@@ -3,7 +3,9 @@ import { Button } from './nocturne'
 export function AgeGate({ onConfirm }) {
   return (
     <div className="fixed inset-0 z-[100] bg-background text-on-surface flex items-center overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-8 md:px-16 py-16">
+      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/editorial/hero-agegate.jpg')" }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(18,20,20,.95) 35%, rgba(18,20,20,.55) 100%)' }} />
+      <div className="relative z-10 max-w-2xl mx-auto px-8 md:px-16 py-16">
         <div className="font-body text-label-caps uppercase text-primary-container mb-6">18+ · ExtraFun</div>
 
         <h2 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-none mb-8">
