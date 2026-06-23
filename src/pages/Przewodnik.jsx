@@ -266,7 +266,7 @@ function ArticleCard({ article, hero, onClick }) {
         <div className="font-display italic font-semibold text-headline-md text-on-surface leading-tight mb-3 group-hover:text-primary-container transition-colors">
           {article.title}
         </div>
-        <p className="font-body italic text-body-md text-on-surface-variant leading-relaxed">{article.lead}</p>
+        <p className="font-body text-body-md text-on-surface-variant leading-relaxed">{article.lead}</p>
         <div className="mt-6 font-body text-label-caps uppercase text-primary-container">Czytaj dalej →</div>
       </div>
     )
@@ -277,7 +277,7 @@ function ArticleCard({ article, hero, onClick }) {
       <div className="font-display italic font-medium text-body-lg text-on-surface leading-tight mb-2 group-hover:text-primary-container transition-colors">
         {article.title}
       </div>
-      <p className="font-body italic text-body-md text-on-surface-variant leading-relaxed">{article.lead.slice(0, 80)}…</p>
+      <p className="font-body text-body-md text-on-surface-variant leading-relaxed">{article.lead.slice(0, 80)}…</p>
     </div>
   )
 }
@@ -318,7 +318,7 @@ function VenueRow({ venue, onClick }) {
           <span>{venue.city}</span>
         </div>
         {venue.type === 'plaża' ? (
-          <div className="mt-2 font-body italic text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</div>
+          <div className="mt-2 font-body text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</div>
         ) : venue._special ? (
           <div className="mt-2 font-body text-body-md text-on-surface">
             <span className="text-primary-container font-semibold">★ {venue._special.event_name}</span>

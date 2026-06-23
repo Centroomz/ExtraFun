@@ -19,7 +19,7 @@ export function ArticleCard({ image, tag, title, lead, meta, onClick, variant = 
       </div>
       <div className="pt-5">
         <h3 className={`${titleSize[variant]} text-on-surface leading-tight mb-2`}>{title}</h3>
-        {lead && <p className="font-body italic text-body-md text-on-surface-variant leading-relaxed">{lead}</p>}
+        {lead && <p className="font-body text-body-md text-on-surface-variant leading-relaxed">{lead}</p>}
         {meta && <div className="font-body text-label-caps uppercase text-outline mt-3">{meta}</div>}
       </div>
     </article>
