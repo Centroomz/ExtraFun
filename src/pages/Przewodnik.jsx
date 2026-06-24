@@ -303,18 +303,18 @@ function VenueRow({ venue, onClick }) {
   const t = getTypeConfig(venue.type)
   return (
     <article onClick={onClick} className="group flex flex-col gap-5 cursor-pointer">
-      {/* Image tile — Stitch venue card: 4/5, grayscale→colour on hover, hairline border */}
-      <div className="relative aspect-[4/5] overflow-hidden border border-outline-variant/15 bg-surface-container">
+      {/* Logo-forward tile — colour logo, framed centre, gold hairline. Shorter
+          than a photo card (4/3) because the asset is a wordmark, not a photo. */}
+      <div className="relative aspect-[4/3] overflow-hidden border border-primary-container/20 bg-surface-container-low flex items-center justify-center transition-colors duration-500 group-hover:border-primary-container/50">
+        <div className="absolute inset-0" style={{ background: 'radial-gradient(120% 90% at 50% 0%, rgba(212,175,55,0.08), transparent 70%)' }} />
         {venue.logo_url ? (
           <img
             src={venue.logo_url}
             alt={venue.name}
-            className="absolute inset-0 w-full h-full object-contain p-10 grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+            className="relative max-w-[62%] max-h-[58%] object-contain transition-transform duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-surface-container-high to-surface-container-lowest flex items-center justify-center">
-            <span className="text-5xl opacity-30">{t.icon}</span>
-          </div>
+          <span className="relative text-5xl opacity-25">{t.icon}</span>
         )}
         {venue.distance != null && (
           <span className="absolute top-3 right-3 font-body text-label-caps uppercase text-primary-container bg-surface/70 backdrop-blur-sm px-2 py-1">
