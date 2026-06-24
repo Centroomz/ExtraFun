@@ -90,9 +90,9 @@ function AdDetail({ ad, onBack, user }) {
       </main>
 
       {compose && (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+        <div className="fixed inset-0 z-[1100] flex items-end md:items-center justify-center">
           <div className="absolute inset-0 bg-black/70" onClick={() => !sending && setCompose(false)} />
-          <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6">
+          <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 pb-[calc(var(--nav-height)_+_env(safe-area-inset-bottom)_+_1.5rem)] md:pb-6 max-h-[90vh] overflow-y-auto">
             <div className="font-display italic font-semibold text-headline-sm text-on-surface mb-1">Napisz wiadomość</div>
             <div className="font-body text-body-md text-on-surface-variant mb-5">Do ogłoszeniodawcy · {ad.title}</div>
             {sent ? (
@@ -257,9 +257,9 @@ export function Ogloszenia({ user }) {
 
       {/* New ad sheet */}
       {showNewAd && (
-        <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+        <div className="fixed inset-0 z-[1100] flex items-end md:items-center justify-center">
           <div className="absolute inset-0 bg-black/70" onClick={() => setShowNewAd(false)} />
-          <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 max-h-[90vh] overflow-y-auto">
+          <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 pb-[calc(var(--nav-height)_+_env(safe-area-inset-bottom)_+_1.5rem)] md:pb-6 max-h-[90vh] overflow-y-auto">
             <div className="font-display italic font-semibold text-headline-sm text-on-surface mb-6">Dodaj ogłoszenie</div>
 
             <label className="block font-body text-label-caps uppercase text-outline mb-1">Typ</label>
