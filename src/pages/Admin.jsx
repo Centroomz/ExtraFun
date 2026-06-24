@@ -52,7 +52,7 @@ const labelStyle = {
 }
 
 const btnPrimary = {
-  background: 'linear-gradient(135deg,#d4af37,#9D4EDE)',
+  background: 'linear-gradient(135deg,#f2ca50,#b8941f)',
   border: 'none', borderRadius: 10, color: '#fff', fontWeight: 700,
   fontSize: 14, padding: '10px 18px', cursor: 'pointer',
 }
@@ -783,7 +783,7 @@ export function Admin() {
   return (
     <div>
       <div className="page-header" style={{ paddingBottom: 0 }}>
-        <h1 style={{ background: 'linear-gradient(135deg,#d4af37,#9D4EDE)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <h1 style={{ background: 'linear-gradient(135deg,#f2ca50,#b8941f)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           ⚙️ Panel Admina
         </h1>
       </div>

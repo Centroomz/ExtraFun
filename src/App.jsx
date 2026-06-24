@@ -279,7 +279,7 @@ function AppInner() {
         <header className="mobile-topbar">
           <Link href="/magazyn" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <img src={extrafunLogo} alt="ExtraFun" style={{ width: 32, height: 32, borderRadius: 8 }} />
-            <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: -0.5, background: 'linear-gradient(90deg, var(--cyan), var(--purple))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ fontFamily: "'Bodoni Moda', Georgia, serif", fontSize: 22, fontWeight: 600, fontStyle: 'italic', letterSpacing: '-0.02em', color: 'var(--gold-bright)' }}>
               ExtraFun
             </span>
           </Link>
@@ -287,7 +287,7 @@ function AppInner() {
             <button
               className="mobile-profile-btn-inline"
               onClick={() => navigate('/admin')}
-              style={{ background: 'var(--purple)', color: '#fff', marginRight: 6 }}
+              style={{ background: 'var(--gold)', color: 'var(--onyx)', marginRight: 6 }}
             >
               A
             </button>
