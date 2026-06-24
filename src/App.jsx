@@ -73,6 +73,14 @@ const NAV_ITEMS = [
     )
   },
   {
+    id: 'czat', label: 'Czat', href: '/czat',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg>
+    )
+  },
+  {
     id: 'ogloszenia', label: 'Ogłoszenia', href: '/ogloszenia',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -90,6 +98,7 @@ function DesktopNav({ user, profile, onSignOut }) {
     : location.startsWith('/imprezy') ? 'imprezy'
     : location.startsWith('/miejsca') ? 'miejsca'
     : location.startsWith('/plaze') ? 'plaze'
+    : location.startsWith('/czat') ? 'czat'
     : location.startsWith('/slownik') ? 'slownik'
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
     : location.startsWith('/wiadomosci') ? 'wiadomosci'
@@ -335,12 +344,12 @@ function AppInner() {
           location === '/' || location.startsWith('/magazyn') ? 'magazyn'
           : location.startsWith('/imprezy') ? 'imprezy'
           : location.startsWith('/miejsca') ? 'przewodnik'
-          : location.startsWith('/plaze') ? 'plaze'
+          : location.startsWith('/czat') ? 'czat'
           : location.startsWith('/slownik') ? 'slownik'
           : location.startsWith('/ogloszenia') ? 'ogloszenia'
           : 'magazyn'
         } onNavigate={(id) => {
-          const map = { magazyn: '/magazyn', imprezy: '/imprezy', przewodnik: '/miejsca', plaze: '/plaze', slownik: '/slownik', ogloszenia: '/ogloszenia' }
+          const map = { magazyn: '/magazyn', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia' }
           navigate(map[id] || '/magazyn')
         }} />
 
