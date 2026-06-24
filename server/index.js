@@ -2,7 +2,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
-import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml } from './meta.js'
+import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendSitemap } from './meta.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -40,6 +40,10 @@ app.get('/slownik/:slug', (req, res) => sendDictTermHtml(req, res, DIST))
 // bare /miejsca list + city slugs (warszawa) fall through to the SPA.
 app.get('/miejsca/:slug', (req, res, next) =>
   /^\d+(-|$)/.test(req.params.slug) ? sendVenueHtml(req, res, DIST) : next())
+
+// Dynamic sitemap (built from the DB) — must precede static so it isn't
+// shadowed by any stale dist/sitemap.xml.
+app.get('/sitemap.xml', (req, res) => sendSitemap(req, res))
 
 app.use(express.static(DIST))
 app.use((_req, res) => res.sendFile(join(DIST, 'index.html')))

@@ -8,6 +8,79 @@ function esc(s = '') {
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
+// Mirror of the frontend slugify/venueSlug (src/pages/Przewodnik.jsx) so the
+// sitemap URLs match the canonical links the SPA emits — no duplicate-URL split.
+function slugify(s) {
+  return String(s).toLowerCase()
+    .replace(/ł/g, 'l')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+function venueSlug(v) {
+  return `${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`
+}
+
+const BASE = 'https://extrafun.pl'
+
+// Dynamic sitemap built from the live DB (articles + venues the site shows +
+// glossary terms) instead of a hand-maintained static file. This is what gets
+// the bulk of pages discovered by Google/AI crawlers.
+export async function sendSitemap(_req, res) {
+  const urls = []
+  const add = (loc, changefreq, priority, lastmod) =>
+    urls.push({ loc: BASE + loc, changefreq, priority, lastmod })
+
+  // Static section pages.
+  add('/magazyn', 'daily', '1.0')
+  add('/miejsca', 'weekly', '0.8')
+  add('/plaze', 'weekly', '0.6')
+  add('/imprezy', 'weekly', '0.7')
+  add('/slownik', 'weekly', '0.6')
+  add('/ogloszenia', 'daily', '0.6')
+  add('/czat', 'weekly', '0.4')
+
+  try {
+    const { data: articles } = await supabaseAdmin.from('articles')
+      .select('slug, updated_at, publish_date, created_at')
+      .eq('site', 'extrafun').eq('status', 'published')
+    for (const a of (articles || [])) {
+      if (!a.slug) continue
+      const lm = a.updated_at || a.publish_date || a.created_at
+      add(`/magazyn/${a.slug}`, 'monthly', '0.9', lm ? new Date(lm).toISOString().slice(0, 10) : undefined)
+    }
+  } catch { /* skip articles on error, still emit the rest */ }
+
+  try {
+    // Same filter as /api/places: swing-scene venues + beaches (what /miejsca lists).
+    const { data: venues } = await supabaseAdmin.from('venues')
+      .select('id, name, city')
+      .or('legacy_swing_id.not.is.null,swing_days.not.is.null,type.eq.plaża')
+    for (const v of (venues || [])) {
+      if (!v.id || !v.name) continue
+      add(`/miejsca/${venueSlug(v)}`, 'weekly', '0.7')
+    }
+  } catch { /* skip venues on error */ }
+
+  try {
+    for (const t of DICTIONARY_TERMS) {
+      if (t?.slug) add(`/slownik/${t.slug}`, 'monthly', '0.5')
+    }
+  } catch { /* skip terms on error */ }
+
+  const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(u => `  <url>
+    <loc>${esc(u.loc)}</loc>${u.lastmod ? `
+    <lastmod>${u.lastmod}</lastmod>` : ''}
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`
+  res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+  res.setHeader('Cache-Control', 'public, max-age=3600')
+  res.send(body)
+}
+
 // For /magazyn/:slug, inject the article's real title/description/OG into
 // index.html before sending, so crawlers get proper metadata despite the SPA.
 export async function sendArticleHtml(req, res, dist) {
