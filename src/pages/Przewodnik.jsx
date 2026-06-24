@@ -9,8 +9,8 @@ import { Hero, SectionHeader, Button } from '../components/nocturne'
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
   club:      { label: 'Klub',    color: '#d4af37', bg: 'rgba(233,193,118,0.12)',   icon: '🎭' },
-  sauna:     { label: 'Sauna',   color: '#d4af37', bg: 'rgba(157,78,221,0.12)', icon: '♨️' },
-  bar:       { label: 'Bar',     color: '#d4af37', bg: 'rgba(157,78,222,0.12)',   icon: '🍸' },
+  sauna:     { label: 'Sauna',   color: '#d4af37', bg: 'rgba(212,175,55,0.12)', icon: '♨️' },
+  bar:       { label: 'Bar',     color: '#d4af37', bg: 'rgba(212,175,55,0.12)',   icon: '🍸' },
   dungeon:   { label: 'Dungeon', color: '#FF4500', bg: 'rgba(255,69,0,0.12)',    icon: '⛓️' },
   spa:       { label: 'Spa',     color: '#00FF96', bg: 'rgba(0,255,150,0.12)',   icon: '🛁' },
   party:     { label: 'Impreza', color: '#FFA500', bg: 'rgba(255,165,0,0.12)',   icon: '🎉' },
@@ -109,7 +109,7 @@ function ArticleReader({ article, onBack }) {
       <div style={{ padding: '0 0 80px' }}>
         {/* Header */}
         <div style={{
-          background: 'linear-gradient(135deg, rgba(157,78,221,0.3), rgba(233,193,118,0.15))',
+          background: 'linear-gradient(135deg, rgba(212,175,55,0.28), rgba(233,193,118,0.10))',
           borderBottom: '1px solid rgba(255,255,255,0.06)',
           padding: '28px 20px 24px',
           marginBottom: 0,
@@ -302,33 +302,47 @@ function venueSlug(v) {
 function VenueRow({ venue, onClick }) {
   const t = getTypeConfig(venue.type)
   return (
-    <div onClick={onClick} className="group flex gap-4 py-5 border-b border-outline-variant/15 cursor-pointer">
-      <div className="w-16 h-16 flex-shrink-0 overflow-hidden bg-surface-container flex items-center justify-center">
-        {venue.logo_url
-          ? <img src={venue.logo_url} alt={venue.name} className="w-full h-full object-contain p-1.5" />
-          : <span className="text-2xl">{t.icon}</span>}
+    <article onClick={onClick} className="group flex flex-col gap-5 cursor-pointer">
+      {/* Image tile — Stitch venue card: 4/5, grayscale→colour on hover, hairline border */}
+      <div className="relative aspect-[4/5] overflow-hidden border border-outline-variant/15 bg-surface-container">
+        {venue.logo_url ? (
+          <img
+            src={venue.logo_url}
+            alt={venue.name}
+            className="absolute inset-0 w-full h-full object-contain p-10 grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
+          />
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-br from-surface-container-high to-surface-container-lowest flex items-center justify-center">
+            <span className="text-5xl opacity-30">{t.icon}</span>
+          </div>
+        )}
+        {venue.distance != null && (
+          <span className="absolute top-3 right-3 font-body text-label-caps uppercase text-primary-container bg-surface/70 backdrop-blur-sm px-2 py-1">
+            {formatDistance(venue.distance)}
+          </span>
+        )}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between gap-2">
-          <div className="font-display italic font-medium text-body-lg text-on-surface group-hover:text-primary-container transition-colors truncate">{venue.name}</div>
-          {venue.distance != null && <span className="font-body text-label-caps uppercase text-outline flex-shrink-0">{formatDistance(venue.distance)}</span>}
-        </div>
-        <div className="flex items-center gap-3 mt-1 font-body text-label-caps uppercase text-on-surface-variant">
-          <span className="text-primary-container">{t.label}</span>
-          <span>{venue.city}</span>
+      {/* Info — left gold rule, district label, Bodoni name, arrow */}
+      <div className="flex flex-col gap-3 border-l border-primary-container/25 pl-5">
+        <div className="flex justify-between items-start gap-3">
+          <div className="min-w-0">
+            <span className="font-body text-label-caps uppercase text-primary-container/70 block mb-1">{t.label} · {venue.city}</span>
+            <h4 className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors leading-tight">{venue.name}</h4>
+          </div>
+          <span className="text-primary-container/40 group-hover:text-primary-container transition-colors text-xl leading-none flex-shrink-0" aria-hidden="true">↗</span>
         </div>
         {venue.type === 'plaża' ? (
-          <div className="mt-2 font-body text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</div>
+          <div className="font-body text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</div>
         ) : venue._special ? (
-          <div className="mt-2 font-body text-body-md text-on-surface">
+          <div className="font-body text-body-md text-on-surface">
             <span className="text-primary-container font-semibold">★ {venue._special.event_name}</span>
             {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
             {venue._special.price && <> · {venue._special.price}</>}
           </div>
         ) : venue._eventClub ? (
-          <div className="mt-2 font-body text-body-md text-primary-container">Otwarte — sprawdź imprezę na stronie</div>
+          <div className="font-body text-body-md text-primary-container">Otwarte — sprawdź imprezę na stronie</div>
         ) : (venue._dayEvents && venue._dayEvents.length > 0) ? (
-          <div className="mt-2 space-y-1">
+          <div className="space-y-1">
             {venue._dayEvents.map(e => (
               <div key={e.id} className="font-body text-body-md text-on-surface">
                 <span className="font-semibold">{e.event_name}</span>
@@ -338,10 +352,11 @@ function VenueRow({ venue, onClick }) {
             ))}
           </div>
         ) : (
-          <div className="mt-2 font-body text-body-md text-on-surface-variant/60">Dziś nieczynne</div>
+          <div className="font-body text-body-md text-on-surface-variant/60">Dziś nieczynne</div>
         )}
+        <span className="font-body text-label-caps uppercase text-primary-container border-b border-primary-container/20 pb-1 w-fit group-hover:tracking-widest transition-all mt-1">Zobacz lokal</span>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -532,7 +547,7 @@ export function Przewodnik({ city: cityParam }) {
           ) : cityVenues.length === 0 ? (
             <div className="py-24 text-center font-display italic text-headline-sm text-on-surface">Brak lokali</div>
           ) : (
-            <div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
               {cityVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
             </div>
           )}
@@ -574,7 +589,7 @@ export function Przewodnik({ city: cityParam }) {
                 {!location && !geoLoading && <Button onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</Button>}
               </div>
               {location && nearby.length > 0 && (
-                <div className="mt-4">
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
                   {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
                 </div>
               )}
