@@ -649,9 +649,16 @@ export function Przewodnik({ city: cityParam }) {
                 ) : hubVenues.length === 0 ? (
                   <div className="py-16 font-display italic text-headline-sm text-on-surface-variant">Dziś nic otwartego — zmień dzień lub miasto.</div>
                 ) : (
-                  <div className="flex flex-col">
-                    {hubVenues.map(v => <VenueRowCompact key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
-                  </div>
+                  <>
+                    {/* Mobile: big logo-forward cards */}
+                    <div className="flex flex-col gap-12 md:hidden">
+                      {hubVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
+                    </div>
+                    {/* Desktop: compact rows (narrow column) */}
+                    <div className="hidden md:flex md:flex-col">
+                      {hubVenues.map(v => <VenueRowCompact key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
+                    </div>
+                  </>
                 )}
               </div>
 
