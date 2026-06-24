@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
-import { Hero, SectionHeader, Button } from '../components/nocturne'
+import { Hero, Button } from '../components/nocturne'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
@@ -297,8 +297,56 @@ function venueSlug(v) {
   return `${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`
 }
 
-// One venue row (used in city listings + "blisko Ciebie"). `venue` carries the
-// attached day status (_special / _dayEvents / _eventClub).
+// The chosen day's status line (special / weekly events / event-club / closed).
+// Shared by the grid card (VenueRow) and the compact hub row (VenueRowCompact).
+function VenueStatus({ venue }) {
+  if (venue.type === 'plaża') return <span className="font-body text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</span>
+  if (venue._special) return (
+    <span className="font-body text-body-md text-on-surface">
+      <span className="text-primary-container font-semibold">★ {venue._special.event_name}</span>
+      {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
+      {venue._special.price && <> · {venue._special.price}</>}
+    </span>
+  )
+  if (venue._eventClub) return <span className="font-body text-body-md text-primary-container">Otwarte — sprawdź imprezę na stronie</span>
+  if (venue._dayEvents && venue._dayEvents.length > 0) return (
+    <span className="block space-y-1">
+      {venue._dayEvents.map(e => (
+        <span key={e.id} className="block font-body text-body-md text-on-surface">
+          <span className="font-semibold">{e.event_name}</span>
+          {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
+          {e.price && <> · {e.price}</>}
+        </span>
+      ))}
+    </span>
+  )
+  return <span className="font-body text-body-md text-on-surface-variant/60">Dziś nieczynne</span>
+}
+
+// Compact horizontal row — used in the hub club column (narrow). Logo thumb in
+// a gold frame + name + status. Big 4/3 cards (VenueRow) are for the city grids.
+function VenueRowCompact({ venue, onClick }) {
+  const t = getTypeConfig(venue.type)
+  return (
+    <article onClick={onClick} className="group flex gap-5 py-5 border-b border-outline-variant/15 cursor-pointer">
+      <div className="w-20 h-20 flex-shrink-0 border border-primary-container/20 bg-surface-container-low flex items-center justify-center overflow-hidden transition-colors group-hover:border-primary-container/50">
+        {venue.logo_url
+          ? <img src={venue.logo_url} alt={venue.name} className="max-w-[78%] max-h-[78%] object-contain" />
+          : <span className="text-2xl opacity-30">{t.icon}</span>}
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-baseline justify-between gap-3">
+          <h4 className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors truncate">{venue.name}</h4>
+          {venue.distance != null && <span className="font-body text-label-caps uppercase text-outline flex-shrink-0">{formatDistance(venue.distance)}</span>}
+        </div>
+        <div className="font-body text-label-caps uppercase text-primary-container/70 mt-1">{t.label} · {venue.city}</div>
+        <div className="mt-2"><VenueStatus venue={venue} /></div>
+      </div>
+    </article>
+  )
+}
+
+// Image-tile card (4/3, logo-forward) — used in the city grids.
 function VenueRow({ venue, onClick }) {
   const t = getTypeConfig(venue.type)
   return (
@@ -331,29 +379,7 @@ function VenueRow({ venue, onClick }) {
           </div>
           <span className="text-primary-container/40 group-hover:text-primary-container transition-colors text-xl leading-none flex-shrink-0" aria-hidden="true">↗</span>
         </div>
-        {venue.type === 'plaża' ? (
-          <div className="font-body text-body-md text-on-surface-variant">Plaża naturystyczna / FKK</div>
-        ) : venue._special ? (
-          <div className="font-body text-body-md text-on-surface">
-            <span className="text-primary-container font-semibold">★ {venue._special.event_name}</span>
-            {(venue._special.start_time || venue._special.end_time) && <> · {venue._special.start_time}{venue._special.end_time ? `–${venue._special.end_time}` : ''}</>}
-            {venue._special.price && <> · {venue._special.price}</>}
-          </div>
-        ) : venue._eventClub ? (
-          <div className="font-body text-body-md text-primary-container">Otwarte — sprawdź imprezę na stronie</div>
-        ) : (venue._dayEvents && venue._dayEvents.length > 0) ? (
-          <div className="space-y-1">
-            {venue._dayEvents.map(e => (
-              <div key={e.id} className="font-body text-body-md text-on-surface">
-                <span className="font-semibold">{e.event_name}</span>
-                {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
-                {e.price && <> · {e.price}</>}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="font-body text-body-md text-on-surface-variant/60">Dziś nieczynne</div>
-        )}
+        <VenueStatus venue={venue} />
         <span className="font-body text-label-caps uppercase text-primary-container border-b border-primary-container/20 pb-1 w-fit group-hover:tracking-widest transition-all mt-1">Zobacz lokal</span>
       </div>
     </article>
@@ -372,6 +398,7 @@ export function Przewodnik({ city: cityParam }) {
   const [radiusKm, setRadiusKm] = useState(Infinity) // GPS scope; Infinity = all, sorted by distance
   const [selectedVenue, setSelectedVenue] = useState(null)
   const [selectedArticle, setSelectedArticle] = useState(null)
+  const [hubScope, setHubScope] = useState(null)   // hub club column: 'nearby' | city name
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
   const geoApplied = useRef(false)
 
@@ -485,6 +512,23 @@ export function Przewodnik({ city: cityParam }) {
         .slice(0, 8)
     : []
 
+  // ─── Hub club column: city chooser + venues for chosen scope ───
+  // Cities sorted by venue count, Polish first. Used by the chooser buttons.
+  const chooserCities = [
+    ...Object.keys(cityCounts).filter(c => PL_CITY_SET.includes(c)).sort((a, b) => cityCounts[b] - cityCounts[a]),
+    ...foreignCities,
+  ]
+  // Default: GPS nearby if available, else the busiest city.
+  const effectiveScope = hubScope || (location ? 'nearby' : chooserCities[0])
+  const hubVenues = effectiveScope === 'nearby'
+    ? nearby
+    : venuesWithDist
+        .filter(v => v.city === effectiveScope)
+        .map(statusOf).filter(sceneOk).filter(isOpenToday)
+        .sort((a, b) => (location && a.distance != null && b.distance != null)
+          ? a.distance - b.distance
+          : String(a.name).localeCompare(String(b.name), 'pl'))
+
   // City page resolution
   const isPolska = cityParam === 'polska'
   const cityName = isPolska ? 'Polska' : (Object.keys(cityCounts).find(c => slugify(c) === cityParam) || cityParam)
@@ -562,66 +606,70 @@ export function Przewodnik({ city: cityParam }) {
             lead="Kluby, sauny i miejsca dla par i singli. Filtruj po mieście, typie i dniu."
           />
           <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-16">
 
-            {/* Polecane (guide articles) */}
-            <section className="mb-24">
-              <SectionHeader title="Polecane" />
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                <div className="md:col-span-8">
-                  <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
+              {/* LEFT — club column: city chooser + day tabs + list (narrow) */}
+              <div className="lg:col-span-7">
+                {/* City chooser — "Blisko Mnie" (GPS) + every city in the guide */}
+                <div className="flex flex-wrap items-center gap-2 mb-6">
+                  <button onClick={() => { if (!location) requestLocation(); setHubScope('nearby') }}
+                    className={`font-body text-label-caps uppercase px-3 py-2 border transition-colors ${effectiveScope === 'nearby' ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'}`}>
+                    Blisko Mnie
+                  </button>
+                  {chooserCities.map(c => (
+                    <button key={c} onClick={() => setHubScope(c)}
+                      className={`font-body text-label-caps uppercase px-3 py-2 border transition-colors ${effectiveScope === c ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'}`}>
+                      {c}
+                    </button>
+                  ))}
                 </div>
-                <div className="md:col-span-4 flex flex-col gap-8">
-                  {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
-                </div>
-              </div>
-            </section>
 
-            {/* Blisko Ciebie (GPS) */}
-            <section className="mb-24">
-              <SectionHeader title="Blisko Ciebie" />
-              <div className={`flex items-center gap-4 flex-wrap p-4 border ${location ? 'border-primary-container/40' : 'border-outline-variant/30'}`}>
-                <span className="flex-1 min-w-[150px] font-body text-body-md text-on-surface-variant">
-                  {geoLoading ? 'Szukam lokalizacji…' :
-                   location ? 'GPS aktywny — najbliższe otwarte dziś' :
-                   geoError ? geoError :
-                   'Włącz GPS — pokażę co jest blisko'}
-                </span>
-                {!location && !geoLoading && <Button onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</Button>}
-              </div>
-              {location && nearby.length > 0 && (
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-16">
-                  {nearby.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
+                {/* Day tabs */}
+                <div className="flex gap-4 mb-8">
+                  {[['Dziś', 0], ['Jutro', 1], ['Pojutrze', 2]].map(([label, off]) => (
+                    <button key={off} onClick={() => setDayOffset(off)}
+                      className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${dayOffset === off ? 'border-primary-container text-primary-container' : 'border-transparent text-on-surface-variant hover:text-on-surface'}`}>
+                      {label}
+                    </button>
+                  ))}
                 </div>
-              )}
-            </section>
 
-            {/* Kategorie — Plaże */}
-            <section className="mb-24">
-              <SectionHeader title="Kategorie" />
-              <div onClick={() => navigate('/plaze')}
-                className="group flex items-center gap-4 p-6 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">
-                <span className="text-3xl">🏖️</span>
-                <div className="min-w-0">
-                  <div className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">Plaże</div>
-                  <div className="font-body text-body-md text-on-surface-variant mt-1">Naturystyczne i FKK w Polsce i Europie</div>
-                </div>
-                <span className="ml-auto text-primary-container text-xl">→</span>
-              </div>
-            </section>
-
-            {/* Przeglądaj wg miasta */}
-            <section>
-              <SectionHeader title="Przeglądaj wg miasta" />
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[{ label: 'Polska', count: plCount, slug: 'polska' }, ...foreignCities.map(c => ({ label: c, count: cityCounts[c], slug: slugify(c) }))].map(cardItem => (
-                  <div key={cardItem.slug} onClick={() => navigate('/miejsca/' + cardItem.slug)}
-                    className="group p-5 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">
-                    <div className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">{cardItem.label}</div>
-                    <div className="font-body text-label-caps uppercase text-outline mt-2">{cardItem.count} {cardItem.count === 1 ? 'lokal' : 'lokali'}</div>
+                {/* Club list (or GPS prompt when "Blisko Mnie" chosen without location) */}
+                {effectiveScope === 'nearby' && !location ? (
+                  <div className="flex items-center gap-4 flex-wrap p-4 border border-outline-variant/30">
+                    <span className="flex-1 min-w-[150px] font-body text-body-md text-on-surface-variant">
+                      {geoLoading ? 'Szukam lokalizacji…' : geoError ? geoError : 'Pozwól na lokalizację — pokażę najbliższe otwarte.'}
+                    </span>
+                    {!geoLoading && <Button onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</Button>}
                   </div>
-                ))}
+                ) : loading ? (
+                  <div className="py-24 text-center font-body text-body-md text-on-surface-variant">Ładowanie…</div>
+                ) : hubVenues.length === 0 ? (
+                  <div className="py-16 font-display italic text-headline-sm text-on-surface-variant">Dziś nic otwartego — zmień dzień lub miasto.</div>
+                ) : (
+                  <div className="flex flex-col">
+                    {hubVenues.map(v => <VenueRowCompact key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
+                  </div>
+                )}
               </div>
-            </section>
+
+              {/* RIGHT — editorial: ranking on top, then city guides, then Plaże */}
+              <aside className="lg:col-span-5 flex flex-col gap-8">
+                <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
+                {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
+
+                <div onClick={() => navigate('/plaze')}
+                  className="group flex items-center gap-4 p-6 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">
+                  <span className="text-3xl">🏖️</span>
+                  <div className="min-w-0">
+                    <div className="font-display italic font-medium text-headline-sm text-on-surface group-hover:text-primary-container transition-colors">Plaże</div>
+                    <div className="font-body text-body-md text-on-surface-variant mt-1">Naturystyczne i FKK w Polsce i Europie</div>
+                  </div>
+                  <span className="ml-auto text-primary-container text-xl">→</span>
+                </div>
+              </aside>
+
+            </div>
           </main>
         </>
       )}
