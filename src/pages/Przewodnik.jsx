@@ -359,7 +359,7 @@ function VenueRow({ venue, onClick }) {
           <img
             src={venue.logo_url}
             alt={venue.name}
-            className="relative max-w-[62%] max-h-[58%] object-contain transition-transform duration-500 group-hover:scale-105"
+            className="relative max-w-[62%] max-h-[58%] object-contain grayscale opacity-90 transition-all duration-700 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
           />
         ) : (
           <span className="relative text-5xl opacity-25">{t.icon}</span>
