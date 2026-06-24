@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'wouter'
 import { apiFetch } from '../lib/api'
 
 // Shared live chat — same stream as bizarriusz.pl/czat (so the feed is alive).
@@ -50,6 +51,7 @@ export function Czat({ user }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
   const bottomRef = useRef(null)
 
   const load = () => apiFetch('/api/shoutbox').then(setMessages).catch(() => {})
@@ -67,12 +69,15 @@ export function Czat({ user }) {
   async function sendMessage() {
     const content = input.trim()
     if (!content || sending || !user) return
-    setInput('')
     setSending(true)
+    setError('')
     try {
       await apiFetch('/api/shoutbox', { method: 'POST', body: { content } })
+      setInput('')
       await load()
-    } catch { /* ignore */ }
+    } catch (e) {
+      setError(e?.message === '401' ? 'Sesja wygasła — zaloguj się ponownie.' : 'Nie udało się wysłać. Spróbuj ponownie.')
+    }
     setSending(false)
   }
 
@@ -92,7 +97,7 @@ export function Czat({ user }) {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', paddingTop: 12, paddingBottom: 80 }}>
+      <div className="czat-messages" style={{ flex: 1, overflowY: 'auto', paddingTop: 12, paddingBottom: 80 }}>
         {messages.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">💬</div>
@@ -108,15 +113,18 @@ export function Czat({ user }) {
       </div>
 
       {/* Input */}
-      <div style={{
+      <div className="czat-input-bar" style={{
         position: 'fixed', bottom: 0, left: 0, right: 0,
         padding: '12px 16px', paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
         background: 'rgba(10,10,30,0.95)', backdropFilter: 'blur(20px)',
         borderTop: '1px solid var(--glass-border)',
-        display: 'flex', gap: 10, maxWidth: 520, margin: '0 auto',
+        display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 520, margin: '0 auto',
       }}>
+        {error && (
+          <div style={{ color: '#ff8a8a', fontSize: 12, textAlign: 'center' }}>{error}</div>
+        )}
         {user ? (
-          <>
+          <div style={{ display: 'flex', gap: 10 }}>
             <input
               className="form-input"
               style={{ flex: 1, padding: '12px 16px' }}
@@ -131,11 +139,13 @@ export function Czat({ user }) {
               onClick={sendMessage}
               disabled={!input.trim() || sending}
             >→</button>
-          </>
-        ) : (
-          <div style={{ flex: 1, textAlign: 'center', color: 'var(--text-dim)', fontSize: 13, padding: '10px 0' }}>
-            Zaloguj się, aby pisać.
           </div>
+        ) : (
+          <Link href="/login">
+            <button className="btn-primary" style={{ width: '100%', padding: '12px 16px' }}>
+              Zaloguj się, aby pisać
+            </button>
+          </Link>
         )}
       </div>
     </div>

@@ -1093,6 +1093,17 @@ select.form-input option { background: #151538; }
 /* old fixed profile btn — keep hidden now handled inline */
 .mobile-profile-btn { display: none; }
 
+/* Chat input bar must sit above the bottom nav (z-index 1000) and clear it
+   on mobile, where the nav is visible (below 900px). */
+.czat-input-bar { z-index: 1001; }
+@media (max-width: 899px) {
+  .czat-input-bar {
+    bottom: calc(var(--nav-height) + env(safe-area-inset-bottom)) !important;
+    padding-bottom: 12px !important;
+  }
+  .czat-messages { padding-bottom: 150px !important; }
+}
+
 @media (min-width: 900px) {
   /* Root: row layout */
   .app-root { flex-direction: row; }
