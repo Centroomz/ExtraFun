@@ -606,22 +606,24 @@ export function Przewodnik({ city: cityParam }) {
             lead="Kluby, sauny i miejsca dla par i singli. Filtruj po mieście, typie i dniu."
           />
           <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-x-16 gap-y-16">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-x-10 gap-y-16">
 
               {/* LEFT — club column: city chooser + day tabs + list (narrow) */}
-              <div className="lg:col-span-7">
-                {/* City chooser — "Blisko Mnie" (GPS) + every city in the guide */}
-                <div className="flex flex-wrap items-center gap-2 mb-6">
-                  <button onClick={() => { if (!location) requestLocation(); setHubScope('nearby') }}
-                    className={`font-body text-label-caps uppercase px-3 py-2 border transition-colors ${effectiveScope === 'nearby' ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'}`}>
-                    Blisko Mnie
-                  </button>
-                  {chooserCities.map(c => (
-                    <button key={c} onClick={() => setHubScope(c)}
-                      className={`font-body text-label-caps uppercase px-3 py-2 border transition-colors ${effectiveScope === c ? 'border-primary-container text-primary-container' : 'border-outline-variant/30 text-on-surface-variant hover:text-on-surface'}`}>
-                      {c}
-                    </button>
-                  ))}
+              <div className="md:col-span-7">
+                {/* City chooser — compact dropdown (Blisko Mnie + every guide city) */}
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="font-body text-label-caps uppercase text-on-surface-variant">Pokaż</span>
+                  <div className="relative">
+                    <select
+                      value={effectiveScope || ''}
+                      onChange={(e) => { const v = e.target.value; if (v === 'nearby' && !location) requestLocation(); setHubScope(v) }}
+                      style={{ colorScheme: 'dark' }}
+                      className="appearance-none bg-transparent border-b border-primary-container/40 focus:border-primary-container outline-none font-display italic text-headline-sm text-on-surface pr-8 py-1 cursor-pointer">
+                      <option value="nearby">Blisko Mnie</option>
+                      {chooserCities.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                    <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-primary-container">▾</span>
+                  </div>
                 </div>
 
                 {/* Day tabs */}
@@ -654,7 +656,7 @@ export function Przewodnik({ city: cityParam }) {
               </div>
 
               {/* RIGHT — editorial: ranking on top, then city guides, then Plaże */}
-              <aside className="lg:col-span-5 flex flex-col gap-8">
+              <aside className="md:col-span-5 flex flex-col gap-8">
                 <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
                 {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
 
