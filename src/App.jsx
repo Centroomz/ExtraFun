@@ -6,6 +6,7 @@ import { AgeGate } from './components/AgeGate'
 import { BottomNav } from './components/BottomNav'
 import extrafunLogo from '/extrafun-logo.png'
 import { Magazyn } from './pages/Magazyn'
+import { Aktualnosci } from './pages/Aktualnosci'
 import { Przewodnik } from './pages/Przewodnik'
 import { Czat } from './pages/Czat'
 import { Ogloszenia } from './pages/Ogloszenia'
@@ -30,6 +31,15 @@ const NAV_ITEMS = [
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+      </svg>
+    )
+  },
+  {
+    id: 'aktualnosci', label: 'Aktualności', href: '/aktualnosci',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2" />
+        <path d="M18 14h-8M15 18h-5M10 6h8v4h-8z" />
       </svg>
     )
   },
@@ -95,6 +105,7 @@ function DesktopNav({ user, profile, onSignOut }) {
   const [location] = useLocation()
   const active = location === '/' ? 'magazyn'
     : location.startsWith('/magazyn') ? 'magazyn'
+    : location.startsWith('/aktualnosci') ? 'aktualnosci'
     : location.startsWith('/imprezy') ? 'imprezy'
     : location.startsWith('/miejsca') ? 'miejsca'
     : location.startsWith('/plaze') ? 'plaze'
@@ -309,6 +320,7 @@ function AppInner() {
           <Switch>
             <Route path="/" component={Magazyn} />
             <Route path="/magazyn" component={Magazyn} />
+            <Route path="/aktualnosci" component={Aktualnosci} />
             <Route path="/magazyn/:slug" component={ArticleDetailPage} />
             <Route path="/imprezy" component={Imprezy} />
             <Route path="/slownik/:slug">{(params) => <SlownikTerm slug={params.slug} />}</Route>
@@ -342,6 +354,7 @@ function AppInner() {
 
         <BottomNav active={
           location === '/' || location.startsWith('/magazyn') ? 'magazyn'
+          : location.startsWith('/aktualnosci') ? 'aktualnosci'
           : location.startsWith('/imprezy') ? 'imprezy'
           : location.startsWith('/miejsca') ? 'przewodnik'
           : location.startsWith('/czat') ? 'czat'
@@ -349,7 +362,7 @@ function AppInner() {
           : location.startsWith('/ogloszenia') ? 'ogloszenia'
           : 'magazyn'
         } onNavigate={(id) => {
-          const map = { magazyn: '/magazyn', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia' }
+          const map = { magazyn: '/magazyn', aktualnosci: '/aktualnosci', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia' }
           navigate(map[id] || '/magazyn')
         }} />
 

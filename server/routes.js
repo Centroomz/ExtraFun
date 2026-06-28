@@ -94,6 +94,55 @@ export function registerRoutes(app) {
     res.json(data)
   })
 
+  // === AKTUALNOŚCI (news) ===
+  // Items are ingested by the gay.pl server's news fetcher (single shared workflow)
+  // and tagged site='extrafun'. Here we only read the extrafun slice.
+  app.get('/api/news', async (_req, res) => {
+    const { data, error } = await supabaseAdmin.from('news_items')
+      .select('id, title, summary, url, source, image, published_at, lane, region, lang, pinned')
+      .eq('site', 'extrafun')
+      .order('pinned', { ascending: false })
+      .order('published_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(60)
+    if (error) return res.status(500).json({ message: error.message })
+    // Map snake_case → the camelCase the UI expects (publishedAt).
+    res.json((data || []).map(n => ({ ...n, publishedAt: n.published_at })))
+  })
+
+  app.patch('/api/admin/news/:id/pin', verifyJWT, isAdmin, async (req, res) => {
+    const id = parseInt(req.params.id, 10)
+    const { error } = await supabaseAdmin.from('news_items').update({ pinned: !!req.body?.pinned }).eq('id', id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
+  app.delete('/api/admin/news/:id', verifyJWT, isAdmin, async (req, res) => {
+    const id = parseInt(req.params.id, 10)
+    // Tombstone the URL so the fetcher won't re-add it next run (mirrors gay.pl).
+    const { data: row } = await supabaseAdmin.from('news_items').select('url').eq('id', id).maybeSingle()
+    if (row?.url) await supabaseAdmin.from('news_deleted').insert({ url: row.url }).then(() => {}, () => {})
+    const { error } = await supabaseAdmin.from('news_items').delete().eq('id', id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
+  // Translate proxy → bizarriusz (holds ANTHROPIC_API_KEY + shared translationsCache).
+  // Renders foreign (EN) news titles/leads in Polish.
+  app.post('/api/translate', async (req, res) => {
+    try {
+      const r = await fetch('https://bizarriusz.pl/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body || {}),
+      })
+      const data = await r.json().catch(() => ({}))
+      res.status(r.status).json(data)
+    } catch (err) {
+      res.status(502).json({ message: err.message })
+    }
+  })
+
   // === SHARED LIVE CHAT (same stream as bizarriusz.pl/czat) ===
   app.get('/api/shoutbox', async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 50, 100)
