@@ -328,6 +328,7 @@ function ArticlesTab() {
 function StatsTab() {
   const [rows, setRows] = useState(null)
   const [days, setDays] = useState(30)
+  const [metric, setMetric] = useState('sessions') // 'sessions' = Odwiedziny (domyślnie), 'views' = Odsłony
   const [loading, setLoading] = useState(true)
 
   useEffect(() => { load() }, [days])
@@ -346,14 +347,18 @@ function StatsTab() {
   const byDay = {}, byPath = {}, byRef = {}, byDev = {}
   for (const r of rows) {
     const d = (r.created_at || '').slice(0, 10)
-    // visits = distinct sessions per day (not raw page-view rows)
-    ;(byDay[d] = byDay[d] || new Set()).add(r.session_id)
-    byPath[r.path] = (byPath[r.path] || 0) + 1
+    const day = (byDay[d] = byDay[d] || { views: 0, sess: new Set() })
+    day.views++; if (r.session_id) day.sess.add(r.session_id)
+    const pp = (byPath[r.path] = byPath[r.path] || { views: 0, sess: new Set() })
+    pp.views++; if (r.session_id) pp.sess.add(r.session_id)
     byRef[r.referrer || 'direct'] = (byRef[r.referrer || 'direct'] || 0) + 1
     byDev[r.device || '?'] = (byDev[r.device || '?'] || 0) + 1
   }
-  const dailyAsc = Object.entries(byDay).map(([day, set]) => [day, set.size]).sort((a, b) => a[0].localeCompare(b[0]))
+  const metricOf = o => metric === 'views' ? o.views : o.sess.size // odsłony vs odwiedziny
+  const metricLabel = metric === 'views' ? 'Odsłony' : 'Odwiedziny'
+  const dailyAsc = Object.entries(byDay).map(([day, o]) => [day, metricOf(o)]).sort((a, b) => a[0].localeCompare(b[0]))
   const maxV = Math.max(1, ...dailyAsc.map(([, v]) => v))
+  const topPaths = Object.entries(byPath).map(([p, o]) => [p, metricOf(o), o.views, o.sess.size]).sort((a, b) => b[1] - a[1]).slice(0, 15)
   const top = (o, n = 15) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n)
 
   const card = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 16 }
@@ -369,15 +374,23 @@ function StatsTab() {
             {d} dni
           </button>
         ))}
+        <div style={{ flex: 1 }} />
+        {[['sessions', 'Odwiedziny'], ['views', 'Odsłony']].map(([m, label]) => (
+          <button key={m} onClick={() => setMetric(m)}
+            style={{ fontSize: 12, padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer', fontWeight: 700,
+              background: metric === m ? '#d4af37' : 'rgba(255,255,255,0.08)', color: metric === m ? '#0a0a1e' : 'rgba(232,230,252,0.86)' }}>
+            {label}
+          </button>
+        ))}
       </div>
 
       <div style={{ display: 'flex', gap: 10 }}>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalViews}</div></div>
-        <div style={{ ...card, flex: 1 }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalSessions}</div></div>
+        <div style={{ ...card, flex: 1, ...(metric === 'views' ? { outline: '2px solid #d4af37' } : {}) }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalViews}</div></div>
+        <div style={{ ...card, flex: 1, ...(metric === 'sessions' ? { outline: '2px solid #d4af37' } : {}) }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalSessions}</div></div>
       </div>
 
       <div style={card}>
-        <div style={head}>Odwiedziny dziennie</div>
+        <div style={head}>{metricLabel} dziennie</div>
         {dailyAsc.length === 0 ? <div style={{ color: 'rgba(232,230,252,0.72)', fontSize: 13 }}>Brak danych — zbieranie dopiero ruszyło.</div> : (
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 120 }}>
             {dailyAsc.map(([day, v]) => (
@@ -393,9 +406,9 @@ function StatsTab() {
 
       <div style={card}>
         <div style={head}>Najpopularniejsze strony</div>
-        {top(byPath).map(([p, v]) => (
+        {topPaths.map(([p, v, views, sess]) => (
           <div key={p} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0', borderBottom: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>
-            <span>{p}</span><span style={{ color: 'rgba(232,230,252,0.8)' }}>{v}</span>
+            <span>{p}</span><span style={{ color: 'rgba(232,230,252,0.8)' }}>{v} <span style={{ opacity: .6 }}>({metric === 'views' ? `${sess} sesji` : `${views} odsłon`})</span></span>
           </div>
         ))}
       </div>
