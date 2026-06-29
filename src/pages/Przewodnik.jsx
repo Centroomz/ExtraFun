@@ -416,8 +416,9 @@ export function Przewodnik({ city: cityParam }) {
   // the detail and returns to the list instead of leaving the page.
   useEffect(() => {
     if (selectedVenue == null && selectedArticle == null) return
+    window.scrollTo(0, 0) // detail opens via pushState (not a route change), so scroll to top manually
     window.history.pushState({ efDetail: true }, '')
-    const onPop = () => { setSelectedVenue(null); setSelectedArticle(null) }
+    const onPop = () => { setSelectedVenue(null); setSelectedArticle(null); window.scrollTo(0, 0) }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [selectedVenue, selectedArticle])
