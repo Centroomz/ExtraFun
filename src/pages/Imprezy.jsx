@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
+import { Hero } from '../components/nocturne'
 
 const DAY_PL = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb']
 const MONTH_PL = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia']
@@ -104,10 +105,14 @@ export function Imprezy() {
         <link rel="canonical" href="https://extrafun.pl/imprezy" />
       </Helmet>
 
-      <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
-        <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-2 leading-none">Imprezy</h1>
-        <p className="font-body text-body-md text-on-surface-variant mb-10">Nadchodzące eventy — kluby i imprezy prywatne</p>
+      <Hero
+        image="/editorial/hero-imprezy.jpg"
+        label="IMPREZY"
+        title="Noc ma swój kalendarz"
+        lead="Nadchodzące eventy — kluby lifestyle i imprezy prywatne w całej Polsce."
+      />
 
+      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
         <div className="flex gap-3 mb-10">
           {[
             { id: 'all', label: 'Wszystkie' },

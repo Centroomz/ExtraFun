@@ -3,7 +3,7 @@ import { useLocation, Link } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
-import { Button } from '../components/nocturne'
+import { Button, Hero } from '../components/nocturne'
 
 const TYPES = [
   { id: 'looking', label: 'Szukam', emoji: '🔍' },
@@ -180,16 +180,21 @@ export function Ogloszenia({ user }) {
 
   return (
     <div className="bg-background min-h-screen text-on-surface">
-      <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
-        <div className="flex items-start justify-between gap-4 mb-2">
-          <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-none">Ogłoszenia</h1>
-          {user && (
+      <Hero
+        image="/editorial/hero-ogloszenia.jpg"
+        label="OD SPOŁECZNOŚCI"
+        title="Ogłoszenia"
+        lead="Szukam · wydarzenia · sprzedaż — wpisy od ludzi z naszej sceny."
+      />
+
+      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        {user && (
+          <div className="flex justify-end mb-6">
             <Link href="/wiadomosci">
-              <span className="font-body text-label-caps uppercase text-primary-container hover:opacity-80 cursor-pointer whitespace-nowrap mt-2 inline-block">Wiadomości →</span>
+              <span className="font-body text-label-caps uppercase text-primary-container hover:opacity-80 cursor-pointer whitespace-nowrap inline-block">Wiadomości →</span>
             </Link>
-          )}
-        </div>
-        <p className="font-body text-body-md text-on-surface-variant mb-8">Szukam · wydarzenia · sprzedaż — od społeczności</p>
+          </div>
+        )}
 
         {/* Location bar */}
         <div className={`flex items-center gap-4 flex-wrap p-4 border mb-8 ${location ? 'border-primary-container/40' : 'border-outline-variant/30'}`}>
