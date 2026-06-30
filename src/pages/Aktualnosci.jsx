@@ -144,7 +144,7 @@ export function Aktualnosci() {
       </Helmet>
 
       <Hero
-        image="/editorial/hero-magazyn.jpg"
+        image="/editorial/hero-aktualnosci.jpg"
         label="AKTUALNOŚCI"
         title="Świeże wiadomości"
         lead="Swing, poliamoria, CNM i fetysz — przegląd z zaufanych źródeł, codziennie odświeżany."
