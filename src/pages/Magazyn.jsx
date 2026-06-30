@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { getWordOfTheDay } from '../lib/dictionary'
 import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
-import { QUIZ_QUESTIONS, interpretQuizResult } from '../lib/quiz'
+import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE } from '../lib/quiz-plazowicz'
 import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { Hero, ArticleCard, SectionHeader, Button } from '../components/nocturne'
@@ -26,7 +26,7 @@ const SLUG_TO_DISPLAY = {
 /* ─── Quiz View (inline, no URL needed) ──────────────────────── */
 function QuizView({ onBack }) {
   const [current, setCurrent] = useState(0)
-  const [answers, setAnswers] = useState([])
+  const [scores, setScores] = useState([0, 0, 0, 0])
   const [selected, setSelected] = useState(null)
   const [done, setDone] = useState(false)
   const [result, setResult] = useState(null)
@@ -35,13 +35,16 @@ function QuizView({ onBack }) {
   const total = QUIZ_QUESTIONS.length
 
   const handleNext = () => {
-    const newAnswers = [...answers, selected]
+    const next = scores.map((s, i) => (i === selected ? s + 1 : s))
     if (current + 1 < total) {
-      setAnswers(newAnswers); setCurrent(current + 1); setSelected(null)
+      setScores(next); setCurrent(current + 1); setSelected(null)
     } else {
-      const totalPoints = newAnswers.reduce((s, p) => s + p, 0)
-      setResult(interpretQuizResult(totalPoints)); setDone(true)
+      setResult(interpretQuizResult(next)); setDone(true)
     }
+  }
+
+  const restart = () => {
+    setCurrent(0); setScores([0, 0, 0, 0]); setSelected(null); setDone(false); setResult(null)
   }
 
   return (
@@ -58,9 +61,9 @@ function QuizView({ onBack }) {
             <div className="quiz-question-num">Pytanie {current + 1} z {total}</div>
             <div className="quiz-question">{q.question}</div>
             <div className="quiz-answers">
-              {q.answers.map((a, i) => (
-                <button key={i} className={`quiz-answer ${selected === a.points ? 'selected' : ''}`}
-                  onClick={() => setSelected(a.points)}>{a.text}</button>
+              {q.options.map((opt, i) => (
+                <button key={i} className={`quiz-answer ${selected === i ? 'selected' : ''}`}
+                  onClick={() => setSelected(i)}>{opt}</button>
               ))}
             </div>
             {selected !== null && (
@@ -74,8 +77,11 @@ function QuizView({ onBack }) {
             <span className="quiz-result-emoji">{result.emoji}</span>
             <h2 className="quiz-result-title" style={{ color: result.color }}>{result.title}</h2>
             <p className="quiz-result-desc">{result.description}</p>
-            <p className="quiz-result-score">Wynik: {answers.reduce((s, p) => s + p, 0)}/{total * 3} pkt</p>
-            <button className="btn-primary" style={{ width: '100%' }} onClick={onBack}>Wróć do Magazynu</button>
+            <p className="quiz-result-desc" style={{ opacity: 0.85, fontStyle: 'italic', marginTop: 12 }}>
+              💡 {result.advice}
+            </p>
+            <button className="btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={onBack}>Wróć do Magazynu</button>
+            <button className="mag-back-btn" style={{ width: '100%', marginTop: 12 }} onClick={restart}>↺ Jeszcze raz</button>
           </div>
         )}
       </div>
@@ -204,9 +210,9 @@ export function Magazyn() {
           </div>
 
           <div className="md:col-span-4 border border-outline-variant/20 p-6">
-            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Quiz tygodnia</div>
-            <div className="font-display text-headline-sm text-on-surface mb-2">Czy CNM jest dla Ciebie?</div>
-            <p className="font-body text-body-md text-on-surface-variant mb-5">12 pytań które pomogą zrozumieć siebie.</p>
+            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Quiz miesiąca · Lipiec</div>
+            <div className="font-display text-headline-sm text-on-surface mb-2">{QUIZ_TITLE}</div>
+            <p className="font-body text-body-md text-on-surface-variant mb-5">Sezon na plaże bez tabu — 12 pytań, 4 typy.</p>
             <Button onClick={() => setShowQuiz(true)}>Zacznij</Button>
           </div>
 
