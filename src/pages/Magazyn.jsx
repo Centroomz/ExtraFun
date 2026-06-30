@@ -96,7 +96,7 @@ export function Magazyn() {
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const [showQuiz, setShowQuiz] = useState(false)
   const [dbArticles, setDbArticles] = useState(null)
-  const [quizDone] = useState(() => {
+  const [quizDone, setQuizDone] = useState(() => {
     try { return localStorage.getItem('ef_quiz_plazowicz_done') === '1' } catch { return false }
   })
 
@@ -132,7 +132,10 @@ export function Magazyn() {
   // banner, so it never swaps/flashes when DB articles load in).
   const ordered = [...filtered].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0))
 
-  if (showQuiz) return <QuizView onBack={() => setShowQuiz(false)} />
+  if (showQuiz) return <QuizView onBack={() => {
+    setShowQuiz(false)
+    try { setQuizDone(localStorage.getItem('ef_quiz_plazowicz_done') === '1') } catch {}
+  }} />
 
   return (
     <div className="bg-background min-h-screen text-on-surface">
