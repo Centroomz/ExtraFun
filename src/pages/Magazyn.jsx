@@ -39,6 +39,7 @@ function QuizView({ onBack }) {
     if (current + 1 < total) {
       setScores(next); setCurrent(current + 1); setSelected(null)
     } else {
+      try { localStorage.setItem('ef_quiz_plazowicz_done', '1') } catch {}
       setResult(interpretQuizResult(next)); setDone(true)
     }
   }
@@ -95,6 +96,9 @@ export function Magazyn() {
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const [showQuiz, setShowQuiz] = useState(false)
   const [dbArticles, setDbArticles] = useState(null)
+  const [quizDone] = useState(() => {
+    try { return localStorage.getItem('ef_quiz_plazowicz_done') === '1' } catch { return false }
+  })
 
   useEffect(() => {
     apiFetch('/api/articles')
@@ -153,6 +157,24 @@ export function Magazyn() {
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        {/* Quiz miesiąca — prominentny CTA na górze. Po rozwiązaniu znika stąd
+            i zostaje już tylko w bocznym pasku na dole. */}
+        {!quizDone && (
+          <button
+            onClick={() => setShowQuiz(true)}
+            className="group w-full text-left mb-16 p-6 md:p-8 border border-primary-container/40 hover:border-primary-container transition-colors flex flex-col md:flex-row md:items-center gap-4 md:gap-8"
+            style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.03))' }}
+          >
+            <div className="text-5xl md:text-6xl shrink-0">🏖️</div>
+            <div className="flex-1">
+              <div className="font-body text-label-caps uppercase text-primary-container mb-2">Quiz miesiąca · Lipiec</div>
+              <div className="font-display text-headline-sm md:text-headline-md text-on-surface mb-1">{QUIZ_TITLE}</div>
+              <p className="font-body text-body-md text-on-surface-variant">Sezon na plaże bez tabu — 12 pytań, 4 typy. Sprawdź, kim jesteś na piasku.</p>
+            </div>
+            <span className="font-body text-label-caps uppercase text-primary-container shrink-0 group-hover:translate-x-1 transition-transform">Zacznij →</span>
+          </button>
+        )}
+
         {/* Category filter */}
         <div className="flex flex-wrap gap-x-7 gap-y-3 mb-16">
           {CATEGORIES.map(cat => (
