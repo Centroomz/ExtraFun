@@ -151,12 +151,13 @@ export function Magazyn() {
         <meta property="og:site_name" content="ExtraFun" />
       </Helmet>
 
-      {/* Stable brand hero — never swaps on data load (no flash/cover) */}
+      {/* Monthly theme hero — nadtytuł = temat miesiąca (edytować co miesiąc).
+          Stały, nie swapuje się przy ładowaniu danych (bez flashu/covera). */}
       <Hero
-        image="/editorial/hero-magazyn.jpg"
-        label="MAGAZYN"
-        title="Lifestyle bez tabu"
-        lead="CNM, poliamoria, swing i fetysz — eksperckie teksty, przewodniki i społeczność dla dorosłych."
+        image="/editorial/hero-lipiec-plener.jpg"
+        label="LIPIEC · PLENER"
+        title="Plener. Plaże, nagość, natura."
+        lead="Numer lipcowy: plaże FKK, naturyzm, seks w plenerze i cienka granica między nagością a wstydem — teksty o życiu bez ubrań i bez miasta."
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
