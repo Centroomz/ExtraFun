@@ -265,8 +265,15 @@ function AppInner() {
       let ref = 'direct'
       try { if (document.referrer) ref = new URL(document.referrer).hostname.replace(/^www\./, '') } catch {}
       const device = window.matchMedia('(max-width: 768px)').matches ? 'mobile' : 'desktop'
+      // utm_source only appears in the URL on the landing pageview (SPA routing
+      // drops query params on later navigations) — capture once, keep for the session.
+      let utmSource = sessionStorage.getItem('ef_utm_source')
+      if (!utmSource) {
+        utmSource = new URLSearchParams(window.location.search).get('utm_source')
+        if (utmSource) { try { sessionStorage.setItem('ef_utm_source', utmSource) } catch {} }
+      }
       apiFetch('/api/track', { method: 'POST', body: {
-        path: location, referrer: ref, device, sessionId: sid,
+        path: location, referrer: ref, device, sessionId: sid, utmSource: utmSource || undefined,
       }}).catch(() => {})
     } catch {}
   }, [location])
