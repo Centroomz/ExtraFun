@@ -39,7 +39,7 @@ export function registerRoutes(app) {
       const sd = v.swing_days, gd = v.gay_days
       const allow = (dow) => !sd || sd.includes(dow)
       const label = (dow) => sd ? (gd && gd.includes(dow) ? 'Panie i Panowie' : 'Pary i single') : null
-      const key = v.legacy_swing_id || v.id   // events keyed in swingers-space id
+      const key = v.id   // events re-keyed to own venues.id (migration 2026-07-08); legacy_swing_id no longer used for lookup — avoids ID collision with gay.pl venues
       const events = (byVenue[key] || []).filter(e => allow(e.day_of_week)).map(e => ({ ...e, audience: label(e.day_of_week) }))
       // Alias venues columns back to the swingers shape the frontend expects.
       return { ...v, latitude: v.lat, longitude: v.lng, logo_url: v.cover_image, events, oneTime: otByVenue[key] || [] }
