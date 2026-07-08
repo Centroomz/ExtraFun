@@ -274,12 +274,16 @@ function AppInner() {
       // utm_source only appears in the URL on the landing pageview (SPA routing
       // drops query params on later navigations) — capture once, keep for the session.
       let utmSource = sessionStorage.getItem('ef_utm_source')
+      let utmMedium = sessionStorage.getItem('ef_utm_medium')
       if (!utmSource) {
-        utmSource = new URLSearchParams(window.location.search).get('utm_source')
+        const qs = new URLSearchParams(window.location.search)
+        utmSource = qs.get('utm_source')
+        utmMedium = qs.get('utm_medium')
         if (utmSource) { try { sessionStorage.setItem('ef_utm_source', utmSource) } catch {} }
+        if (utmMedium) { try { sessionStorage.setItem('ef_utm_medium', utmMedium) } catch {} }
       }
       apiFetch('/api/track', { method: 'POST', body: {
-        path: location, referrer: ref, device, sessionId: sid, utmSource: utmSource || undefined,
+        path: location, referrer: ref, device, sessionId: sid, utmSource: utmSource || undefined, utmMedium: utmMedium || undefined,
       }}).catch(() => {})
     } catch {}
   }, [location])

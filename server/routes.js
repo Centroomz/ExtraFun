@@ -48,13 +48,14 @@ export function registerRoutes(app) {
 
   // === ANALYTICS ===
   app.post('/api/track', async (req, res) => {
-    const { path, referrer, device, sessionId, utmSource } = req.body || {}
+    const { path, referrer, device, sessionId, utmSource, utmMedium } = req.body || {}
     if (!path) return res.status(400).json({ message: 'path required' })
     await supabaseAdmin.from('page_views').insert({
       site: 'extrafun', path: String(path).slice(0, 200),
       referrer: referrer ? String(referrer).slice(0, 100) : null,
       device: device || null, session_id: sessionId ? String(sessionId).slice(0, 40) : null,
       utm_source: utmSource ? String(utmSource).slice(0, 100) : null,
+      utm_medium: utmMedium ? String(utmMedium).slice(0, 100) : null,
     }).then(() => {}, () => {})
     res.json({ ok: true })
   })
