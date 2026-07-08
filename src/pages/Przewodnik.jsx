@@ -427,8 +427,8 @@ export function Przewodnik({ city: cityParam }) {
     try {
       const data = await apiFetch('/api/places')
       if (data && data.length > 0) {
-        // normalize to lat/lng for distance calc
-        setVenues(data.map(v => ({ ...v, lat: v.latitude, lng: v.longitude })))
+        // normalize to lat/lng for distance calc; drop gay beaches from the swing guide (they live on /plaze)
+        setVenues(data.filter(v => v.type !== 'plaża').map(v => ({ ...v, lat: v.latitude, lng: v.longitude })))
       }
     } catch {
       // silent fail
