@@ -250,8 +250,14 @@ function AppInner() {
     navigate('/magazyn')
   }
 
-  // Scroll to top on route change
-  useEffect(() => { window.scrollTo(0, 0) }, [location])
+  // Scroll to top on route change. On desktop (≥900px) the scroll container is
+  // `.page-content` (overflow-y:auto; height:100vh), not the window — so window.scrollTo
+  // is a no-op there and the old scroll position leaks into the next page (short pages
+  // clamp to their bottom). Reset both.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    document.querySelector('.page-content')?.scrollTo(0, 0)
+  }, [location])
 
   // First-party analytics: one page-view per route change (fire-and-forget).
   useEffect(() => {
