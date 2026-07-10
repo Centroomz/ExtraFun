@@ -150,12 +150,11 @@ function ArticleForm({ initial, onSave, onCancel, saving }) {
           <label style={{ ...btnGhost, padding: '8px 14px', cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0 }}>
             Wgraj plik
             <input type="file" accept="image/*" style={{ display: 'none' }}
-              onChange={e => {
+              onChange={async e => {
                 const file = e.target.files?.[0]
                 if (!file) return
-                const reader = new FileReader()
-                reader.onload = ev => set('cover_image', ev.target.result)
-                reader.readAsDataURL(file)
+                try { set('cover_image', await downscaleImage(file, 1600, 0.82)) }
+                catch { set('cover_image', '') }
                 e.target.value = ''
               }} />
           </label>
