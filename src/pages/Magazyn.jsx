@@ -21,6 +21,7 @@ const SLUG_TO_DISPLAY = {
   'tam-i-tam':      'Tam i Tam',
   'slownik':        'Słownik',
   'temat-miesiaca': 'Temat Miesiąca',
+  'felieton':       'Felieton',
 }
 
 /* ─── Quiz View (inline, no URL needed) ──────────────────────── */

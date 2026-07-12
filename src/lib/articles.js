@@ -237,7 +237,7 @@ Jeśli zazdrość paraliżuje twoje życie lub relacje, warto porozmawiać z ter
   },
 ]
 
-export const CATEGORIES = ["Wszystkie", "CNM 101", "Pierwszy Raz", "Bez Osądu", "Tam i Tam", "Słownik", "Temat Miesiąca"]
+export const CATEGORIES = ["Wszystkie", "CNM 101", "Pierwszy Raz", "Bez Osądu", "Tam i Tam", "Słownik", "Temat Miesiąca", "Felieton"]
 
 export function getArticlesByCategory(category) {
   if (category === "Wszystkie") return ARTICLES.filter(a => a.published)
