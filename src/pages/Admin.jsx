@@ -341,10 +341,16 @@ function StatsTab() {
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.8)' }}>Ładowanie…</div>
   if (!rows) return null
 
-  const totalViews = rows.length
-  const totalSessions = new Set(rows.map(r => r.session_id)).size
+  // Split real vs bot — bots are stored but excluded from the headline numbers so a
+  // crawler burst doesn't read as growth. Bot totals shown separately below.
+  const realRows = rows.filter(r => !r.is_bot)
+  const botRows = rows.filter(r => r.is_bot)
+  const totalViews = realRows.length
+  const totalSessions = new Set(realRows.map(r => r.session_id)).size
+  const totalBotViews = botRows.length
+  const totalBotSessions = new Set(botRows.map(r => r.session_id)).size
   const byDay = {}, byPath = {}, byRef = {}, byDev = {}
-  for (const r of rows) {
+  for (const r of realRows) {
     const d = (r.created_at || '').slice(0, 10)
     const day = (byDay[d] = byDay[d] || { views: 0, sess: new Set() })
     day.views++; if (r.session_id) day.sess.add(r.session_id)
@@ -387,6 +393,12 @@ function StatsTab() {
         <div style={{ ...card, flex: 1, ...(metric === 'views' ? { outline: '2px solid #d4af37' } : {}) }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODSŁONY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalViews}</div></div>
         <div style={{ ...card, flex: 1, ...(metric === 'sessions' ? { outline: '2px solid #d4af37' } : {}) }}><div style={{ fontSize: 11, color: 'rgba(232,230,252,0.8)' }}>ODWIEDZINY</div><div style={{ fontSize: 28, fontWeight: 900, color: '#d4af37' }}>{totalSessions}</div></div>
       </div>
+
+      {(totalBotViews > 0 || totalBotSessions > 0) && (
+        <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.6)' }}>
+          🤖 Boty odfiltrowane (nie liczone powyżej): {totalBotSessions} odwiedzin / {totalBotViews} odsłon
+        </div>
+      )}
 
       <div style={card}>
         <div style={head}>{metricLabel} dziennie</div>

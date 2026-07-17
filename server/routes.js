@@ -50,12 +50,20 @@ export function registerRoutes(app) {
   app.post('/api/track', async (req, res) => {
     const { path, referrer, device, sessionId, utmSource, utmMedium } = req.body || {}
     if (!path) return res.status(400).json({ message: 'path required' })
+    // Flag bots by user-agent — don't block, just mark, so dashboards split real vs
+    // bot (a headless-crawler burst like 2026-07-17 shouldn't read as growth). Empty
+    // UA = flagged; real browsers always send one.
+    const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|python-|urllib|curl\/|wget|scrapy|http-?client|go-http|java\/|node-fetch|axios\/|okhttp|bytespider|gptbot|claudebot|ccbot|perplexity|amazonbot|dataforseo|semrush|ahrefs|dotbot|mj12|petalbot|yandex|bingpreview|facebookexternalhit|meta-externalagent/i
+    const ua = String(req.headers['user-agent'] || '')
+    const isBot = ua === '' || BOT_UA.test(ua)
     await supabaseAdmin.from('page_views').insert({
       site: 'extrafun', path: String(path).slice(0, 200),
       referrer: referrer ? String(referrer).slice(0, 100) : null,
       device: device || null, session_id: sessionId ? String(sessionId).slice(0, 40) : null,
       utm_source: utmSource ? String(utmSource).slice(0, 100) : null,
       utm_medium: utmMedium ? String(utmMedium).slice(0, 100) : null,
+      user_agent: ua ? ua.slice(0, 300) : null,
+      is_bot: isBot,
     }).then(() => {}, () => {})
     res.json({ ok: true })
   })
@@ -306,7 +314,7 @@ export function registerRoutes(app) {
     const PAGE = 1000
     while (true) {
       const { data, error } = await supabaseAdmin.from('page_views')
-        .select('path, referrer, device, session_id, created_at')
+        .select('path, referrer, device, session_id, created_at, is_bot')
         .eq('site', 'extrafun').gte('created_at', since)
         .order('created_at', { ascending: false })
         .range(from, from + PAGE - 1)
