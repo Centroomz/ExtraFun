@@ -256,7 +256,7 @@ export function ArticleDetailPage() {
         <meta name="twitter:image" content={ogImage} />
       </Helmet>
 
-      <div className="lg:flex lg:gap-10 lg:pr-8">
+      <div className="lg:flex lg:gap-10 lg:justify-center max-w-[1040px] mx-auto">
       <div className="w-full min-w-0 flex-1">
       {/* Back bar */}
       <div className="max-w-2xl mx-auto px-6 md:px-16 pt-8">
