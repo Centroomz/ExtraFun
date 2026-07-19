@@ -109,16 +109,58 @@ function CtaBox({ categorySlug }) {
   )
 }
 
+// ── Desktop right rail (retention) ──────────────────────────────────────────
+// Fills the empty right gutter with internal links so a search/social visitor
+// has somewhere to go — most sessions are 1-hit. Hidden on mobile, where the top
+// "Czytaj też" teaser and bottom "Czytaj dalej" grid already cover onward reads.
+const mapRail = (a) => ({ slug: a.slug, title: a.title, cover_image: a.cover_image || null })
+
+function RailRow({ item }) {
+  return (
+    <Link href={`/magazyn/${item.slug}`} className="group flex gap-3 no-underline">
+      <div className="w-14 h-14 flex-shrink-0 overflow-hidden bg-surface-container">
+        {item.cover_image && <img src={item.cover_image} alt="" loading="lazy" className="w-full h-full object-cover" />}
+      </div>
+      <h4 className="font-body text-body-md text-on-surface leading-snug line-clamp-3 group-hover:text-primary-container transition-colors">{item.title}</h4>
+    </Link>
+  )
+}
+
+function RailSection({ title, items }) {
+  if (!items.length) return null
+  return (
+    <section>
+      <h3 className="font-body text-label-caps uppercase text-primary-container mb-4">{title}</h3>
+      <div className="space-y-4">{items.map(i => <RailRow key={i.slug} item={i} />)}</div>
+    </section>
+  )
+}
+
+function RightRail({ related, newest, popular }) {
+  if (!related.length && !newest.length && !popular.length) return null
+  return (
+    <aside className="hidden lg:block w-[300px] flex-shrink-0 pt-8">
+      <div className="sticky top-8 space-y-10">
+        <RailSection title="Powiązane" items={related} />
+        <RailSection title="Najnowsze" items={newest} />
+        <RailSection title="Najczęściej czytane" items={popular} />
+      </div>
+    </aside>
+  )
+}
+
 export function ArticleDetailPage() {
   const { slug } = useParams()
   const [article, setArticle] = useState(null)
   const [related, setRelated] = useState([])
+  const [allList, setAllList] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
       setLoading(true)
       setRelated([])
+      setAllList([])
       try {
         // 1. Try backend API (view increment happens server-side)
         const data = await apiFetch(`/api/articles/${slug}`)
@@ -140,8 +182,8 @@ export function ArticleDetailPage() {
         })
         // Onward reads (client-side, no backend change).
         apiFetch('/api/articles')
-          .then(list => setRelated(pickRelated(list, data, slug)))
-          .catch(() => setRelated([]))
+          .then(list => { setRelated(pickRelated(list, data, slug)); setAllList(list || []) })
+          .catch(() => { setRelated([]); setAllList([]) })
       } catch {
         // 2. Fallback to static articles
         const found = ARTICLES.find(a => a.slug === slug)
@@ -189,6 +231,11 @@ export function ArticleDetailPage() {
   const canonical = `${BASE_URL}/magazyn/${article.slug || slug}`
   const ogImage = article.cover_image || `${BASE_URL}/og-default.jpg`
 
+  // Right-rail sections derived from the full published list (fetched for related).
+  const notCurrent = a => a.slug && a.slug !== slug
+  const newest = allList.filter(notCurrent).slice(0, 5).map(mapRail)
+  const popular = [...allList].filter(notCurrent).sort((x, y) => (y.views || 0) - (x.views || 0)).slice(0, 5).map(mapRail)
+
   return (
     <div className="bg-background min-h-screen text-on-surface">
       <Helmet>
@@ -209,6 +256,8 @@ export function ArticleDetailPage() {
         <meta name="twitter:image" content={ogImage} />
       </Helmet>
 
+      <div className="lg:flex lg:gap-10 lg:justify-center max-w-6xl mx-auto">
+      <div className="w-full min-w-0 lg:max-w-2xl">
       {/* Back bar */}
       <div className="max-w-2xl mx-auto px-6 md:px-16 pt-8">
         <Link href="/magazyn">
@@ -294,6 +343,9 @@ export function ArticleDetailPage() {
 
         <CtaBox categorySlug={article.categorySlug} />
       </article>
+      </div>
+      <RightRail related={related.slice(0, 5)} newest={newest} popular={popular} />
+      </div>
     </div>
   )
 }
