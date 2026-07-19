@@ -256,10 +256,10 @@ export function ArticleDetailPage() {
         <meta name="twitter:image" content={ogImage} />
       </Helmet>
 
-      <div className="lg:flex lg:gap-10 lg:justify-center max-w-[1040px] mx-auto">
+      <div className="lg:flex lg:gap-10 lg:justify-center max-w-[1120px] mx-auto">
       <div className="w-full min-w-0 flex-1">
       {/* Back bar */}
-      <div className="max-w-2xl mx-auto px-6 md:px-16 pt-8">
+      <div className="max-w-3xl mx-auto px-6 md:px-16 pt-8">
         <Link href="/magazyn">
           <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer hover:opacity-80">← Powrót</span>
         </Link>
@@ -273,7 +273,7 @@ export function ArticleDetailPage() {
       )}
 
       {/* Article */}
-      <article className="max-w-2xl mx-auto px-6 md:px-16 pt-10 pb-24">
+      <article className="max-w-3xl mx-auto px-6 md:px-16 pt-10 pb-24">
         <div className="flex items-center gap-3 font-body text-label-caps uppercase text-primary-container mb-5">
           <span>{article.category}</span>
           <span className="text-outline">·</span>
