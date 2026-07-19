@@ -87,6 +87,9 @@ export function registerRoutes(app) {
     const { data, error } = await supabaseAdmin.from('articles')
       .select('id, title, slug, excerpt, content, category_slug, cover_image, featured, author, tags, publish_date, created_at')
       .eq('site', 'extrafun').eq('status', 'published')
+      // publish_date is the editorial date; created_at is bulk-import time
+      // (whole June batch shares one timestamp), so sort by publish_date first.
+      .order('publish_date', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false })
     if (error) return res.status(500).json({ message: error.message })
     res.json(data || [])
