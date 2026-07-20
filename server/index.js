@@ -2,7 +2,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
-import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendSitemap } from './meta.js'
+import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendSitemap, sendListPageHtml } from './meta.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -40,6 +40,29 @@ app.get('/slownik/:slug', (req, res) => sendDictTermHtml(req, res, DIST))
 // bare /miejsca list + city slugs (warszawa) fall through to the SPA.
 app.get('/miejsca/:slug', (req, res, next) =>
   /^\d+(-|$)/.test(req.params.slug) ? sendVenueHtml(req, res, DIST) : next())
+
+// Top-level list/hub pages — previously fell through to the SPA default
+// (homepage title + canonical="/"), so Google saw every one as a duplicate.
+app.get('/imprezy', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Imprezy lifestyle i swingers w Polsce | ExtraFun',
+  desc: 'Kalendarz imprez lifestyle, swingersów i CNM w Polsce — kluby, eventy tematyczne, spotkania par i singli.',
+}))
+app.get('/plaze', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Plaże naturystyczne i lifestyle w Polsce | ExtraFun',
+  desc: 'Przewodnik po plażach naturystycznych i przyjaznych lifestyle w Polsce — lokalizacje, opisy, dla kogo.',
+}))
+app.get('/slownik', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Słownik CNM, poliamorii i swingu | ExtraFun',
+  desc: 'Pojęcia CNM, poliamorii, swingu i BDSM wyjaśnione po polsku — słownik dla świadomych dorosłych.',
+}))
+app.get('/miejsca', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Kluby lifestyle i swingers w Polsce | ExtraFun',
+  desc: 'Katalog klubów lifestyle, swingers i miejsc CNM w Polsce — lokalizacje, opisy, godziny otwarcia.',
+}))
+app.get('/szukaj', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Szukaj | ExtraFun',
+  desc: 'Szukaj artykułów, miejsc i pojęć na ExtraFun — magazynie CNM, poliamorii i lifestyle.',
+}))
 
 // Dynamic sitemap (built from the DB) — must precede static so it isn't
 // shadowed by any stale dist/sitemap.xml.

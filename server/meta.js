@@ -144,6 +144,33 @@ export async function sendArticleHtml(req, res, dist) {
   }
 }
 
+// Top-level list/hub pages (/imprezy, /plaze, /slownik, /miejsca, /szukaj) had
+// NO dedicated handler — they fell through to the generic SPA index.html, which
+// carries the homepage's <title>/canonical baked in. Google saw every one of
+// them as "duplicate, canonical points elsewhere" and never indexed them
+// separately. Self-canonical + real title/desc per route fixes that.
+export function sendListPageHtml(req, res, dist, { title, desc }) {
+  const html = readFileSync(join(dist, 'index.html'), 'utf8')
+  try {
+    const url = `https://extrafun.pl${req.path}`
+    const tags = `<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}" />
+<link rel="canonical" href="${url}" />
+<meta property="og:title" content="${esc(title)}" />
+<meta property="og:description" content="${esc(desc)}" />
+<meta property="og:url" content="${url}" />`
+    const injected = html
+      .replace(/<title>[\s\S]*?<\/title>/i, '')
+      .replace(/<link[^>]+rel="canonical"[^>]*>/i, '')
+      .replace(/<meta[^>]+name="description"[^>]*>/i, '')
+      .replace(/<meta[^>]+property="og:(?:title|description|url)"[^>]*>/gi, '')
+      .replace('</head>', `${tags}\n</head>`)
+    res.send(injected)
+  } catch {
+    res.send(html)
+  }
+}
+
 // For the homepage, inject Organization + WebSite JSON-LD so AI engines recognize
 // what ExtraFun IS as an entity (was zero structured data on the homepage).
 export function sendHomeHtml(_req, res, dist) {
