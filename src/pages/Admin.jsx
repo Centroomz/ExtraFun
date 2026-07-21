@@ -626,7 +626,7 @@ function EventsTab() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>{e.event_name}</div>
             <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.72)', marginTop: 3 }}>
-              {e.event_date} · {e.swingers_venues?.name || e.location_name || e.organizer || (e.is_external ? 'Zewnętrzna' : '—')}
+              {e.event_date} · {e.venue?.name || e.location_name || e.organizer || (e.is_external ? 'Zewnętrzna' : '—')}
               {e.start_time && ` · ${e.start_time.slice(0,5)}`}
             </div>
             {e.price && <div style={{ fontSize: 12, color: '#d4af37', marginTop: 2 }}>{e.price}</div>}
@@ -666,9 +666,41 @@ function downscaleImage(file, maxSize = 512, quality = 0.85) {
 }
 
 // ── VenuesTab (Przewodnik – lokale) ───────────────────────────────────────────
-const EMPTY_VENUE = { name: '', type: 'club', scene: 'swing', city: '', address: '', website: '', description: '', latitude: '', longitude: '', logo_url: '' }
+const EMPTY_VENUE = { name: '', type: 'club', scene: 'swing', city: '', address: '', website: '', description: '', latitude: '', longitude: '', logo_url: '', gay_days: [], swing_days: [] }
 const VENUE_TYPES = ['club', 'sauna', 'bar', 'resort', 'kino']
 const VENUE_SCENES = ['swing', 'lgbt', 'mixed']
+
+// Day-of-week labels, same idiom as gay.pl's OpenDaysPicker (getDay() ints,
+// 0=Nd..6=Sob, shown Pn..Nd). Used for the gay_days/swing_days audience
+// pickers below — NOT the same field as "open/closed" (there is no open_days
+// control in this admin yet); this only marks which days each audience is
+// present. NULL in the DB means "every day" and is shown here as all-checked
+// (behaviorally identical downstream — see /api/places' `allow`/`label`
+// helpers above); an explicit empty selection means "never" and is sent as
+// [], not collapsed back to null.
+const AUDIENCE_DAYS = [{ d: 1, l: 'Pn' }, { d: 2, l: 'Wt' }, { d: 3, l: 'Śr' }, { d: 4, l: 'Czw' }, { d: 5, l: 'Pt' }, { d: 6, l: 'Sb' }, { d: 0, l: 'Nd' }]
+// value: number[] | null|undefined (null/undefined rendered as "all checked").
+// Two accent variants so gay_days and swing_days read as distinct controls:
+// 'gold' (ExtraFun's own primary accent) for swing_days, 'lavender' (the
+// muted secondary text tone already used across this file) for gay_days.
+function AudienceDaysPicker({ value, onChange, variant }) {
+  const days = value == null ? AUDIENCE_DAYS.map(x => x.d) : value
+  const toggle = (d) => onChange(days.includes(d) ? days.filter(x => x !== d) : [...days, d])
+  const active = variant === 'gold'
+    ? { background: 'rgba(233,193,118,0.18)', border: '1px solid rgba(233,193,118,0.45)', color: '#d4af37' }
+    : { background: 'rgba(232,230,252,0.16)', border: '1px solid rgba(232,230,252,0.35)', color: '#fff' }
+  const inactive = { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', color: 'rgba(232,230,252,0.72)' }
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+      {AUDIENCE_DAYS.map(({ d, l }) => (
+        <button type="button" key={d} onClick={() => toggle(d)}
+          style={{ ...(days.includes(d) ? active : inactive), borderRadius: 8, padding: '6px 11px', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+          {l}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 function VenuesTab() {
   const [venues, setVenues] = useState([])
@@ -683,7 +715,16 @@ function VenuesTab() {
   async function load() { try { setVenues(await apiFetch('/api/admin/venues')) } catch { setVenues([]) } setLoading(false) }
 
   function openAdd() { setForm(EMPTY_VENUE); setMode('add'); setMsg('') }
-  function openEdit(v) { setForm({ ...EMPTY_VENUE, ...v, latitude: v.latitude ?? '', longitude: v.longitude ?? '', description: v.description ?? '', website: v.website ?? '', address: v.address ?? '', logo_url: v.logo_url ?? '' }); setMode(v); setMsg('') }
+  function openEdit(v) {
+    const allDays = AUDIENCE_DAYS.map(x => x.d)
+    setForm({
+      ...EMPTY_VENUE, ...v,
+      latitude: v.latitude ?? '', longitude: v.longitude ?? '', description: v.description ?? '', website: v.website ?? '', address: v.address ?? '', logo_url: v.logo_url ?? '',
+      // NULL ("every day") shown as all-checked; an explicit [] ("never") stays empty.
+      gay_days: v.gay_days ?? allDays, swing_days: v.swing_days ?? allDays,
+    })
+    setMode(v); setMsg('')
+  }
   const set = (k, val) => setForm(f => ({ ...f, [k]: val }))
 
   async function save() {
@@ -725,6 +766,15 @@ function VenuesTab() {
         </div>
         <label style={lbl}>Adres</label><input style={inp} value={form.address} onChange={e => set('address', e.target.value)} />
         <label style={lbl}>Strona WWW</label><input style={inp} value={form.website} onChange={e => set('website', e.target.value)} />
+        <div style={{ marginBottom: 8 }}>
+          <label style={lbl}>Dni — Panie i Panowie (swing)</label>
+          <AudienceDaysPicker value={form.swing_days} onChange={v => set('swing_days', v)} variant="gold" />
+        </div>
+        <div style={{ marginBottom: 8 }}>
+          <label style={lbl}>Dni — gay.pl (widoczność na gay.pl)</label>
+          <AudienceDaysPicker value={form.gay_days} onChange={v => set('gay_days', v)} variant="lavender" />
+          <p style={{ fontSize: 11, color: 'rgba(232,230,252,0.6)', marginTop: 4 }}>Uwaga: ten lokal jest współdzielony z gay.pl — odznaczenie wszystkich dni usuwa go z gay.pl.</p>
+        </div>
         <label style={lbl}>Opis</label><textarea style={{ ...inp, minHeight: 90, resize: 'vertical' }} value={form.description} onChange={e => set('description', e.target.value)} />
         <div style={{ display: 'flex', gap: 8 }}>
           <div style={{ flex: 1 }}><label style={lbl}>Lat</label><input style={inp} value={form.latitude} onChange={e => set('latitude', e.target.value)} /></div>

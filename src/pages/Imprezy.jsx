@@ -20,7 +20,7 @@ function groupByDate(events) {
 }
 
 function EventCard({ event }) {
-  const venue = event.swingers_venues
+  const venue = event.venue
   return (
     <div className="flex gap-4 py-5 border-b border-outline-variant/15">
       <div className="w-12 h-12 flex-shrink-0 overflow-hidden bg-surface-container flex items-center justify-center">

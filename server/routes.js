@@ -80,6 +80,22 @@ export function registerRoutes(app) {
     res.json({ ok: true })
   })
 
+  // === SELF-SERVICE: usuń własne konto (RODO, prawo do bycia zapomnianym) ===
+  // Kasuje dane usera na WSZYSTKICH 3 portalach (wspólna baza) przez RPC
+  // delete_user_account, potem sam auth user. Hard delete, nieodwracalne.
+  app.delete('/api/account', verifyJWT, async (req, res) => {
+    try {
+      const userId = req.user.id
+      const { error: rpcError } = await supabaseAdmin.rpc('delete_user_account', { p_user_id: userId })
+      if (rpcError) throw rpcError
+      const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+      if (authError) throw authError
+      res.json({ ok: true })
+    } catch (err) {
+      res.status(500).json({ message: err.message })
+    }
+  })
+
   // === ARTICLES (Magazyn) ===
 
   // Published extrafun articles — list for Magazyn
@@ -350,44 +366,68 @@ export function registerRoutes(app) {
   })
 
   // === ADMIN: VENUES (Przewodnik) ===
-  const VENUE_FIELDS = ['name', 'type', 'scene', 'city', 'address', 'website', 'description', 'logo_url', 'latitude', 'longitude']
+  // Reads/writes the merged `venues` table (same one /api/places reads — see the
+  // comment up there for the merge story). swingers_venues is legacy/frozen: kept
+  // in place for a human to drop later, but the admin no longer touches it.
+  const VENUE_FIELDS = ['name', 'type', 'scene', 'city', 'address', 'website', 'description', 'logo_url', 'latitude', 'longitude', 'gay_days', 'swing_days']
+  // Admin/frontend field name -> venues column name, only where they differ.
+  const VENUE_COLUMN = { logo_url: 'cover_image', latitude: 'lat', longitude: 'lng' }
+  // Alias venues columns back to the swingers shape the admin UI expects (same aliasing /api/places uses).
+  const toAdminVenue = (v) => ({ ...v, latitude: v.lat, longitude: v.lng, logo_url: v.cover_image })
 
   app.get('/api/admin/venues', verifyJWT, isAdmin, async (_req, res) => {
-    const { data, error } = await supabaseAdmin.from('swingers_venues')
-      .select('id, name, type, scene, city, address, website, description, logo_url, latitude, longitude')
+    const { data, error } = await supabaseAdmin.from('venues')
+      .select('id, name, type, scene, city, address, website, description, cover_image, lat, lng, gay_days, swing_days, legacy_swing_id')
+      .or('legacy_swing_id.not.is.null,swing_days.not.is.null,type.eq.plaża')
       .order('city', { ascending: true }).order('name', { ascending: true })
     if (error) return res.status(500).json({ message: error.message })
-    res.json(data || [])
+    res.json((data || []).map(toAdminVenue))
   })
 
   app.post('/api/admin/venues', verifyJWT, isAdmin, async (req, res) => {
     const b = req.body || {}
     if (!b.name || !b.city) return res.status(400).json({ message: 'name i city wymagane' })
-    const row = { type: 'club', scene: 'swing' }
-    for (const k of VENUE_FIELDS) if (k in b) row[k] = b[k] || null
-    const { data, error } = await supabaseAdmin.from('swingers_venues').insert(row).select().single()
+    // New rows are ExtraFun-only by default: is_active=false + gay_days=[] keep
+    // them out of gay.pl's directory (mirrors the convention already used for
+    // the merged swing rows — see /api/places above). swing_days=[] makes the
+    // row match the /api/places filter right away so it appears in the catalog
+    // as soon as it's saved (no fake schedule — recurring_events stay empty
+    // until the operator adds real ones).
+    const row = { type: 'club', scene: 'swing', is_active: false, gay_days: [], swing_days: [] }
+    for (const k of VENUE_FIELDS) if (k in b) row[VENUE_COLUMN[k] || k] = b[k] || null
+    const { data, error } = await supabaseAdmin.from('venues').insert(row).select().single()
     if (error) return res.status(500).json({ message: error.message })
-    res.json(data)
+    res.json(toAdminVenue(data))
   })
 
   app.put('/api/admin/venues/:id', verifyJWT, isAdmin, async (req, res) => {
     const b = req.body || {}
     const fields = {}
-    for (const k of VENUE_FIELDS) if (k in b) fields[k] = b[k] === '' ? null : b[k]
-    const { error } = await supabaseAdmin.from('swingers_venues').update(fields).eq('id', req.params.id)
+    for (const k of VENUE_FIELDS) if (k in b) fields[VENUE_COLUMN[k] || k] = b[k] === '' ? null : b[k]
+    const { error } = await supabaseAdmin.from('venues').update(fields).eq('id', req.params.id)
     if (error) return res.status(500).json({ message: error.message })
     res.json({ ok: true })
   })
 
   app.delete('/api/admin/venues/:id', verifyJWT, isAdmin, async (req, res) => {
-    await supabaseAdmin.from('recurring_events').delete().eq('venue_id', req.params.id)
-    await supabaseAdmin.from('one_time_events').delete().eq('venue_id', req.params.id)
-    const { error } = await supabaseAdmin.from('swingers_venues').delete().eq('id', req.params.id)
+    const id = req.params.id
+    // Guard: venues is shared with gay.pl now. A row with gay_days set is also a
+    // gay.pl venue (e.g. the native Bizarriusz/Heaven/Galla/Berlin duplicates) —
+    // never hard-delete those from the swing admin, just unlink the swing side.
+    const { data: existing } = await supabaseAdmin.from('venues').select('gay_days').eq('id', id).maybeSingle()
+    if (existing?.gay_days && existing.gay_days.length > 0) {
+      const { error } = await supabaseAdmin.from('venues').update({ swing_days: null, legacy_swing_id: null }).eq('id', id)
+      if (error) return res.status(500).json({ message: error.message })
+      return res.status(204).end()
+    }
+    await supabaseAdmin.from('recurring_events').delete().eq('venue_id', id)
+    await supabaseAdmin.from('one_time_events').delete().eq('venue_id', id)
+    const { error } = await supabaseAdmin.from('venues').delete().eq('id', id)
     if (error) return res.status(500).json({ message: error.message })
     res.status(204).end()
   })
 
-  // Logo upload: base64 dataURL → Supabase Storage (venue-logos) → set logo_url.
+  // Logo upload: base64 dataURL → Supabase Storage (venue-logos) → set cover_image.
   app.post('/api/admin/venues/:id/logo', verifyJWT, isAdmin, async (req, res) => {
     try {
       const { dataUrl } = req.body || {}
@@ -403,7 +443,7 @@ export function registerRoutes(app) {
       if (upErr) return res.status(500).json({ message: upErr.message })
       const { data: pub } = supabaseAdmin.storage.from(bucket).getPublicUrl(path)
       const url = pub.publicUrl
-      await supabaseAdmin.from('swingers_venues').update({ logo_url: url }).eq('id', req.params.id)
+      await supabaseAdmin.from('venues').update({ cover_image: url }).eq('id', req.params.id)
       res.json({ logo_url: url })
     } catch (e) {
       res.status(500).json({ message: e.message })
@@ -411,11 +451,38 @@ export function registerRoutes(app) {
   })
 
   // === VENUE EVENTS (imprezy klubowe + hotelowe) ===
+  // venue_events.venue_id still points at the OLD swingers_venues id-space — the
+  // DB foreign key (venue_events_venue_id_fkey) was never repointed to `venues`;
+  // that's a schema migration and out of scope for this code-only pass. Checked
+  // against live data: every event's venue_id already matches a venues.id 1:1
+  // except one legacy row that only matches venues.legacy_swing_id. Postgrest
+  // embedding needs an actual FK on the target table, which doesn't exist for
+  // venues here, so we resolve venue info with a second query instead of an
+  // embed — matching by id first, legacy_swing_id as fallback (id match always
+  // wins so the known id/legacy_swing_id collisions — e.g. gay.pl venues 2, 22,
+  // 24, 93, 99, 100 — resolve to the real venue, not a stale swing row).
+  async function attachVenueInfo(rows) {
+    const ids = [...new Set(rows.map(r => r.venue_id).filter((v) => v != null))]
+    if (!ids.length) return rows.map(r => ({ ...r, venue: null }))
+    const { data: vs } = await supabaseAdmin.from('venues')
+      .select('id, name, city, cover_image, legacy_swing_id')
+      .or(`id.in.(${ids.join(',')}),legacy_swing_id.in.(${ids.join(',')})`)
+    const byId = {}
+    for (const v of (vs || [])) {
+      byId[v.id] = v // exact id match always wins, even if set again below
+      if (v.legacy_swing_id != null && !(v.legacy_swing_id in byId)) byId[v.legacy_swing_id] = v
+    }
+    return rows.map(r => {
+      const v = r.venue_id != null ? byId[r.venue_id] : null
+      return { ...r, venue: v ? { id: v.id, name: v.name, city: v.city, logo_url: v.cover_image } : null }
+    })
+  }
+
   app.get('/api/events', async (req, res) => {
     const { from, to, venue_id } = req.query
     const today = new Date().toISOString().slice(0, 10)
     let q = supabaseAdmin.from('venue_events')
-      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external, swingers_venues(id, name, city, logo_url)')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external')
       .gte('event_date', from || today)
       .order('event_date', { ascending: true })
       .order('start_time', { ascending: true })
@@ -424,7 +491,7 @@ export function registerRoutes(app) {
     if (venue_id) q = q.eq('venue_id', venue_id)
     const { data, error } = await q
     if (error) return res.status(500).json({ message: error.message })
-    res.json(data || [])
+    res.json(await attachVenueInfo(data || []))
   })
 
   // === CALENDAR EVENTS ===
@@ -446,10 +513,10 @@ export function registerRoutes(app) {
   // === ADMIN: EVENTS ===
   app.get('/api/admin/events', verifyJWT, isAdmin, async (req, res) => {
     const { data, error } = await supabaseAdmin.from('venue_events')
-      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external, swingers_venues(id, name, city)')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external')
       .order('event_date', { ascending: false }).limit(200)
     if (error) return res.status(500).json({ message: error.message })
-    res.json(data || [])
+    res.json(await attachVenueInfo(data || []))
   })
 
   app.post('/api/admin/events', verifyJWT, isAdmin, async (req, res) => {
