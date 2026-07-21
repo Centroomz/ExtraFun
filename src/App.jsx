@@ -220,6 +220,22 @@ function ProfilePage({ user, profile, onSignOut }) {
         <button className="btn-ghost" style={{ width: '100%' }} onClick={onSignOut}>
           Wyloguj się
         </button>
+        <button
+          className="btn-ghost"
+          style={{ width: '100%', marginTop: 8, color: '#e5484d', borderColor: '#e5484d' }}
+          onClick={async () => {
+            if (!window.confirm('Na pewno chcesz usunąć konto? To nieodwracalne — kasuje profil, wiadomości, ulubione i ogłoszenia na wszystkich portalach (extrafun.pl, gay.pl, bizarriusz.pl).')) return
+            if (!window.confirm('Ostatnie potwierdzenie: usuwamy konto na stałe. Kontynuować?')) return
+            try {
+              await apiFetch('/api/account', { method: 'DELETE' })
+              await onSignOut()
+            } catch (e) {
+              alert('Nie udało się usunąć konta. Spróbuj ponownie lub napisz do nas.')
+            }
+          }}
+        >
+          Usuń konto na stałe
+        </button>
       </div>
     </div>
   )
