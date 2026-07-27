@@ -561,23 +561,45 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
   })
 
   // llms.txt — site summary for AI engines. Real route so the SPA fallback
-  // doesn't shadow it with index.html.
-  app.get('/llms.txt', (_req, res) => {
-    res.type('text/markdown').send(
+  // doesn't shadow it with index.html. Dynamic (30 min cache): the static
+  // version listed only fixed pages, so AI crawlers had no article/term links
+  // to follow past them. Mirrors the sitemap.xml data sources below.
+  let llmsTxtCache = null
+  const LLMS_TTL = 30 * 60 * 1000
+  app.get('/llms.txt', async (_req, res) => {
+    if (llmsTxtCache && Date.now() - llmsTxtCache.at < LLMS_TTL) {
+      res.type('text/markdown').send(llmsTxtCache.text)
+      return
+    }
+    let articleLines = ''
+    try {
+      const { data } = await supabaseAdmin.from('articles')
+        .select('title, slug').eq('site', 'extrafun').eq('status', 'published')
+        .order('publish_date', { ascending: false })
+      articleLines = (data || []).map(a => `- [${a.title}](https://extrafun.pl/magazyn/${a.slug})`).join('\n')
+    } catch { /* ship the rest even if this fails */ }
+    let termLines = ''
+    try {
+      const { DICTIONARY_TERMS: terms } = await import('../src/lib/dictionary.js')
+      termLines = terms.map(t => `- [${t.term}](https://extrafun.pl/slownik/${t.slug})`).join('\n')
+    } catch { /* dictionary optional */ }
+    const text =
 `# ExtraFun
 
 > ExtraFun — polski magazyn i społeczność CNM/lifestyle: konsensualna niemonogamia, poliamoria, swing, fetysz oraz katalog klubów lifestyle i miejsc w Polsce.
 
-## Magazyn
+## Sekcje
 - [Magazyn](https://extrafun.pl/magazyn): Artykuły o CNM, poliamorii, swingu, otwartych związkach, fetyszu i lifestyle.
-
-## Słownik CNM
 - [Słownik](https://extrafun.pl/slownik): Wyjaśnienia pojęć CNM, poliamorii, swingu i BDSM po polsku.
-
-## Miejsca i wydarzenia
 - [Miejsca](https://extrafun.pl/miejsca): Katalog klubów lifestyle, swingers i miejsc w Polsce.
 - [Imprezy](https://extrafun.pl/imprezy): Wydarzenia i imprezy lifestyle.
 - [Plaże](https://extrafun.pl/plaze): Plaże naturystyczne i przyjazne lifestyle.
+
+## Magazyn — artykuły
+${articleLines}
+
+## Słownik CNM — pojęcia
+${termLines}
 
 ## Key Facts
 - ExtraFun to polski portal lifestyle/CNM: magazyn + słownik + katalog miejsc.
@@ -586,7 +608,9 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
 
 ## Contact
 - Website: https://extrafun.pl
-`)
+`
+    llmsTxtCache = { at: Date.now(), text }
+    res.type('text/markdown').send(text)
   })
 
   app.get('/sitemap.xml', async (_req, res) => {
