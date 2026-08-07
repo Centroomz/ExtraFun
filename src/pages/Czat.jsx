@@ -66,6 +66,10 @@ export function Czat({ user }) {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Guests see 5 latest, logged-in 20 — same rule as bizarriusz.pl/czat.
+  // Server returns oldest-first, so the newest N are the LAST N.
+  const visible = messages.slice(-(user ? 20 : 5))
+
   async function sendMessage() {
     const content = input.trim()
     if (!content || sending || !user) return
@@ -98,14 +102,14 @@ export function Czat({ user }) {
 
       {/* Messages */}
       <div className="czat-messages" style={{ flex: 1, overflowY: 'auto', paddingTop: 12, paddingBottom: 80 }}>
-        {messages.length === 0 ? (
+        {visible.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">💬</div>
             <div className="empty-title">Cisza w eterze</div>
             <div className="empty-desc">Napisz pierwszy — czat jest wspólny dla całej społeczności.</div>
           </div>
         ) : (
-          messages.map(msg => (
+          visible.map(msg => (
             <MessageBubble key={msg.id} msg={msg} isMe={!!user && msg.user_id === user.id} />
           ))
         )}
