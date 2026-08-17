@@ -1,5 +1,6 @@
 import { supabaseAdmin } from './supabase.js'
-import { verifyJWT, isAdmin } from './auth.js'
+import { verifyJWT, isAdmin, isAdminEmail } from './auth.js'
+import { isFemaleNick, isTabooContent } from './chat-gender.js'
 
 export function registerRoutes(app) {
   app.get('/api/health', (_req, res) => res.json({ ok: true }))
@@ -173,10 +174,14 @@ export function registerRoutes(app) {
   })
 
   // === SHARED LIVE CHAT (same stream as bizarriusz.pl/czat) ===
+  // Poczekalnia: to TEN SAM stream co biz — musi stosować te same reguły. GET
+  // pokazuje TYLKO publiczne (held=false); wpisy w poczekalni (held=true) NIE
+  // wyciekają na ExtraFun. Moderacja (odsłona „Wpuść") dzieje się na biz.
   app.get('/api/shoutbox', async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 50, 100)
     const { data, error } = await supabaseAdmin.from('shoutbox_messages')
       .select('id, user_id, username, content, created_at').eq('source', 'bizarriusz')
+      .eq('held', false)
       .order('created_at', { ascending: false }).limit(limit)
     if (error) return res.status(500).json({ message: error.message })
     res.json((data || []).reverse())
@@ -187,8 +192,21 @@ export function registerRoutes(app) {
     if (!content || content.length > 500) return res.status(400).json({ message: 'Invalid content' })
     const meta = req.user.meta || {}
     const username = meta.display_name || meta.full_name || meta.name || meta.username || 'Gość'
+
+    // Poczekalnia (parytet z biz): admin bypass; treść-tabu chowa zawsze; poza
+    // tym przechodzi tylko damski nick lub autor na whiteliście (biz_chat_whitelist)
+    // — reszta (typowo panowie) → held, widoczna dopiero po „Wpuść" na biz.
+    const admin = isAdminEmail(req.user.email)
+    let whitelisted = false
+    if (!admin) {
+      const { data: wl } = await supabaseAdmin.from('biz_chat_whitelist')
+        .select('user_id').eq('user_id', req.user.id).limit(1)
+      whitelisted = !!(wl && wl.length)
+    }
+    const held = !admin && (isTabooContent(content) || !(isFemaleNick(username) || whitelisted))
+
     const { data, error } = await supabaseAdmin.from('shoutbox_messages')
-      .insert({ user_id: req.user.id, username, content, source: 'bizarriusz' })
+      .insert({ user_id: req.user.id, username, content, source: 'bizarriusz', held })
       .select('id, user_id, username, content, created_at').single()
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json(data)
