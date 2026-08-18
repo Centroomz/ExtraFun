@@ -469,16 +469,13 @@ export function registerRoutes(app) {
   })
 
   // === VENUE EVENTS (imprezy klubowe + hotelowe) ===
-  // venue_events.venue_id still points at the OLD swingers_venues id-space — the
-  // DB foreign key (venue_events_venue_id_fkey) was never repointed to `venues`;
-  // that's a schema migration and out of scope for this code-only pass. Checked
-  // against live data: every event's venue_id already matches a venues.id 1:1
-  // except one legacy row that only matches venues.legacy_swing_id. Postgrest
-  // embedding needs an actual FK on the target table, which doesn't exist for
-  // venues here, so we resolve venue info with a second query instead of an
-  // embed — matching by id first, legacy_swing_id as fallback (id match always
-  // wins so the known id/legacy_swing_id collisions — e.g. gay.pl venues 2, 22,
-  // 24, 93, 99, 100 — resolve to the real venue, not a stale swing row).
+  // 2026-08-18: merged into `one_time_events` (single dated-event table shared
+  // with gay.pl). venue_events dropped; swingers_venues dropped. venue_id now
+  // FK-> venues.id for all rows. Frontend still speaks `event_url`; the DB column
+  // is `external_link`, aliased both ways (select `event_url:external_link`; on
+  // write event_url -> external_link). External (hotel) events have venue_id NULL.
+  // attachVenueInfo resolves venue info by a second query (no FK embed): id match
+  // first, legacy_swing_id fallback kept as a harmless no-op for old rows.
   async function attachVenueInfo(rows) {
     const ids = [...new Set(rows.map(r => r.venue_id).filter((v) => v != null))]
     if (!ids.length) return rows.map(r => ({ ...r, venue: null }))
@@ -499,8 +496,8 @@ export function registerRoutes(app) {
   app.get('/api/events', async (req, res) => {
     const { from, to, venue_id } = req.query
     const today = new Date().toISOString().slice(0, 10)
-    let q = supabaseAdmin.from('venue_events')
-      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external')
+    let q = supabaseAdmin.from('one_time_events')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url:external_link, description, cover_image, is_external')
       .gte('event_date', from || today)
       .order('event_date', { ascending: true })
       .order('start_time', { ascending: true })
@@ -530,8 +527,8 @@ export function registerRoutes(app) {
 
   // === ADMIN: EVENTS ===
   app.get('/api/admin/events', verifyJWT, isAdmin, async (req, res) => {
-    const { data, error } = await supabaseAdmin.from('venue_events')
-      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external')
+    const { data, error } = await supabaseAdmin.from('one_time_events')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url:external_link, description, cover_image, is_external')
       .order('event_date', { ascending: false }).limit(200)
     if (error) return res.status(500).json({ message: error.message })
     res.json(await attachVenueInfo(data || []))
@@ -543,7 +540,8 @@ export function registerRoutes(app) {
     const EVENT_FIELDS = ['venue_id', 'event_date', 'event_name', 'start_time', 'end_time', 'price', 'location_name', 'location_address', 'organizer', 'event_url', 'description', 'cover_image', 'is_external']
     const row = {}
     for (const k of EVENT_FIELDS) if (k in b) row[k] = b[k] === '' ? null : b[k]
-    const { data, error } = await supabaseAdmin.from('venue_events').insert(row).select().single()
+    if ('event_url' in row) { row.external_link = row.event_url; delete row.event_url }
+    const { data, error } = await supabaseAdmin.from('one_time_events').insert(row).select().single()
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json(data)
   })
@@ -553,13 +551,14 @@ export function registerRoutes(app) {
     const EVENT_FIELDS = ['venue_id', 'event_date', 'event_name', 'start_time', 'end_time', 'price', 'location_name', 'location_address', 'organizer', 'event_url', 'description', 'cover_image', 'is_external']
     const fields = {}
     for (const k of EVENT_FIELDS) if (k in b) fields[k] = b[k] === '' ? null : b[k]
-    const { error } = await supabaseAdmin.from('venue_events').update(fields).eq('id', req.params.id)
+    if ('event_url' in fields) { fields.external_link = fields.event_url; delete fields.event_url }
+    const { error } = await supabaseAdmin.from('one_time_events').update(fields).eq('id', req.params.id)
     if (error) return res.status(500).json({ message: error.message })
     res.json({ ok: true })
   })
 
   app.delete('/api/admin/events/:id', verifyJWT, isAdmin, async (req, res) => {
-    const { error } = await supabaseAdmin.from('venue_events').delete().eq('id', req.params.id)
+    const { error } = await supabaseAdmin.from('one_time_events').delete().eq('id', req.params.id)
     if (error) return res.status(500).json({ message: error.message })
     res.status(204).end()
   })
