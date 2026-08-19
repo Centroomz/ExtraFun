@@ -1,4 +1,4 @@
-const CACHE_NAME = 'extrafun-v15';
+const CACHE_NAME = 'extrafun-v16';
 const STATIC_ASSETS = [
   '/',
   '/src/main.jsx',
