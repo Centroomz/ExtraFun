@@ -198,12 +198,17 @@ export function registerRoutes(app) {
     // — reszta (typowo panowie) → held, widoczna dopiero po „Wpuść" na biz.
     const admin = isAdminEmail(req.user.email)
     let whitelisted = false
+    let blacklisted = false
     if (!admin) {
       const { data: wl } = await supabaseAdmin.from('biz_chat_whitelist')
         .select('user_id').eq('user_id', req.user.id).limit(1)
       whitelisted = !!(wl && wl.length)
+      const { data: bl } = await supabaseAdmin.from('biz_chat_blacklist')
+        .select('user_id').eq('user_id', req.user.id).limit(1)
+      blacklisted = !!(bl && bl.length)
     }
-    const held = !admin && (isTabooContent(content) || !(isFemaleNick(username) || whitelisted))
+    // Blacklist wygrywa nad wszystkim (parytet z biz).
+    const held = !admin && (blacklisted || isTabooContent(content) || !(isFemaleNick(username) || whitelisted))
 
     const { data, error } = await supabaseAdmin.from('shoutbox_messages')
       .insert({ user_id: req.user.id, username, content, source: 'bizarriusz', held })
