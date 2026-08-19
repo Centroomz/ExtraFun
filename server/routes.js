@@ -1,6 +1,65 @@
 import { supabaseAdmin } from './supabase.js'
-import { verifyJWT, isAdmin, isAdminEmail } from './auth.js'
+import { verifyJWT, optionalAuth, isAdmin, isAdminEmail } from './auth.js'
 import { isFemaleNick, isTabooContent } from './chat-gender.js'
+
+// --- FINDER (member catalog) -------------------------------------------------
+// Profiles live in Supabase auth user_metadata (shared across portals). Project
+// ONLY safe public fields — never email. Excludes hidden_from_search (biz opt-out)
+// AND hidden_from_extrafun (this portal's opt-out). Gated OFF (count-only) until
+// the consent DM goes out — see the broadcast endpoint / Phase 3.
+const FINDER_LIVE = false; // flip to true after the heads-up broadcast
+let _finderCache = null;   // { at, profiles }
+const FINDER_TTL_MS = 60_000;
+
+async function loadVisibleProfiles() {
+  if (_finderCache && Date.now() - _finderCache.at < FINDER_TTL_MS) return _finderCache.profiles;
+  const rows = [];
+  for (let page = 1; page <= 50; page++) {
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
+    if (error) throw error;
+    for (const u of data.users) {
+      const m = u.user_metadata || {};
+      const name = String(m.full_name || m.name || m.display_name || '').trim();
+      if (!name) continue;                           // only filled profiles
+      if (m.hidden_from_search === true) continue;   // biz opt-out
+      if (m.hidden_from_extrafun === true) continue;  // extrafun opt-out
+      const lastSeen = u.last_sign_in_at || u.created_at || '';
+      rows.push({
+        id: u.id,
+        displayName: name.slice(0, 50),
+        age: m.age ? Number(m.age) : null,
+        lookingFor: m.looking_for ? String(m.looking_for).slice(0, 160) : null,
+        avatarUrl: m.avatar_url || null,
+        createdAt: u.created_at || '',
+        lastSeen,
+      });
+    }
+    if (data.users.length < 200) break;
+  }
+  rows.sort((a, b) => String(b.lastSeen).localeCompare(String(a.lastSeen)));
+  // Fallback avatar: newest gallery photo for anyone without an avatar.
+  const noAvatar = rows.filter(p => !p.avatarUrl).map(p => p.id);
+  if (noAvatar.length) {
+    const { data: g } = await supabaseAdmin.from('user_gallery')
+      .select('user_id, image_url, created_at').in('user_id', noAvatar)
+      .order('created_at', { ascending: false });
+    const first = new Map();
+    for (const row of (g || [])) if (!first.has(row.user_id)) first.set(row.user_id, row.image_url);
+    for (const p of rows) if (!p.avatarUrl && first.has(p.id)) p.avatarUrl = first.get(p.id);
+  }
+  _finderCache = { at: Date.now(), profiles: rows };
+  return rows;
+}
+
+// Bidirectional block set for a user.
+async function finderBlockedSet(me) {
+  const { data } = await supabaseAdmin.from('profile_blocks')
+    .select('blocker_id, blocked_id')
+    .or(`blocker_id.eq.${me},blocked_id.eq.${me}`);
+  const s = new Set();
+  for (const r of (data || [])) s.add(r.blocker_id === me ? r.blocked_id : r.blocker_id);
+  return s;
+}
 
 export function registerRoutes(app) {
   app.get('/api/health', (_req, res) => res.json({ ok: true }))
@@ -246,6 +305,106 @@ export function registerRoutes(app) {
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json(data)
   })
+
+  // === FINDER (member catalog) ===
+  app.get('/api/finder', optionalAuth, async (req, res) => {
+    try {
+      const all = await loadVisibleProfiles();
+      // Gated off, or a guest: count only. Rows stay server-side.
+      if (!FINDER_LIVE || !req.user) return res.json({ count: all.length, locked: true });
+      const me = req.user.id;
+      const blocks = await finderBlockedSet(me);
+      const q = String(req.query.q || '').trim().toLowerCase();
+      const mode = String(req.query.mode || 'all');
+      let items = all.filter(p => p.id !== me && !blocks.has(p.id));
+      if (mode === 'photos') items = items.filter(p => !!p.avatarUrl);
+      else if (mode === 'new') items = [...items].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+      else if (mode === 'active') {
+        const cutoff = new Date(Date.now() - 30 * 86400000).toISOString();
+        items = items.filter(p => p.lastSeen >= cutoff);
+      }
+      const minAge = parseInt(req.query.minAge, 10);
+      const maxAge = parseInt(req.query.maxAge, 10);
+      if (!Number.isNaN(minAge) || !Number.isNaN(maxAge)) {
+        const lo = Number.isNaN(minAge) ? 0 : minAge, hi = Number.isNaN(maxAge) ? 200 : maxAge;
+        items = items.filter(p => p.age != null && p.age >= lo && p.age <= hi);
+      }
+      if (q) items = items.filter(p => p.displayName.toLowerCase().includes(q) || (p.lookingFor || '').toLowerCase().includes(q));
+      res.json({ count: items.length, locked: false, items });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  // My extrafun visibility (per-portal opt-out). Flag lives in auth user_metadata.
+  app.get('/api/finder/me/visibility', verifyJWT, async (req, res) => {
+    res.json({ hiddenFromExtrafun: req.user.meta?.hidden_from_extrafun === true });
+  });
+
+  app.post('/api/finder/me/visibility', verifyJWT, async (req, res) => {
+    const hidden = !!req.body?.hidden;
+    const current = req.user.meta || {};
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(req.user.id, {
+      user_metadata: { ...current, hidden_from_extrafun: hidden },
+    });
+    if (error) return res.status(500).json({ message: error.message });
+    _finderCache = null; // bust cache so the change shows within a request
+    res.json({ hiddenFromExtrafun: hidden });
+  });
+
+  // Full public profile — lean (no biz groups / club check-in / biz ads).
+  app.get('/api/finder/:id', optionalAuth, async (req, res) => {
+    try {
+      if (!FINDER_LIVE || !req.user) return res.status(404).json({ message: 'Nie znaleziono' });
+      const id = String(req.params.id);
+      const { data, error } = await supabaseAdmin.auth.admin.getUserById(id);
+      if (error || !data.user) return res.status(404).json({ message: 'Nie znaleziono' });
+      const m = data.user.user_metadata || {};
+      const name = String(m.full_name || m.name || m.display_name || '').trim();
+      if (!name || m.hidden_from_search === true || m.hidden_from_extrafun === true)
+        return res.status(404).json({ message: 'Nie znaleziono' });
+
+      const me = req.user.id;
+      if (me !== id) {
+        const { data: blk } = await supabaseAdmin.from('profile_blocks').select('id').or(
+          `and(blocker_id.eq.${me},blocked_id.eq.${id}),and(blocker_id.eq.${id},blocked_id.eq.${me})`
+        ).limit(1);
+        if (blk && blk.length) return res.status(404).json({ message: 'Nie znaleziono' });
+      }
+
+      const { data: gallery } = await supabaseAdmin.from('user_gallery')
+        .select('image_url').eq('user_id', id).order('created_at', { ascending: false }).limit(30);
+      const { count: likeCount } = await supabaseAdmin.from('profile_likes')
+        .select('id', { count: 'exact', head: true }).eq('liked_id', id);
+      let likedByMe = false, likesMe = false;
+      if (me !== id) {
+        const { data: mine } = await supabaseAdmin.from('profile_likes').select('id')
+          .eq('liker_id', me).eq('liked_id', id).limit(1);
+        const { data: theirs } = await supabaseAdmin.from('profile_likes').select('id')
+          .eq('liker_id', id).eq('liked_id', me).limit(1);
+        likedByMe = !!(mine && mine.length);
+        likesMe = !!(theirs && theirs.length);
+      }
+      const prompts = Array.isArray(m.prompts)
+        ? m.prompts.filter(p => p && typeof p.q === 'string' && typeof p.a === 'string')
+            .slice(0, 5).map(p => ({ q: String(p.q).slice(0, 80), a: String(p.a).slice(0, 300) }))
+        : [];
+      res.json({
+        id,
+        displayName: name.slice(0, 50),
+        age: m.age ? Number(m.age) : null,
+        about: m.about ? String(m.about).slice(0, 600) : null,
+        lookingFor: m.looking_for ? String(m.looking_for).slice(0, 600) : null,
+        avatarUrl: m.avatar_url || (gallery && gallery[0]?.image_url) || null,
+        prompts,
+        likeCount: likeCount || 0,
+        likedByMe, likesMe, isMatch: likedByMe && likesMe,
+        gallery: (gallery || []).map(g => g.image_url),
+      });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
 
   // === PRIVATE MESSAGES (DM ogłoszeniodawca ↔ zainteresowany) ===
   // Send a DM about an ad. Recipient = ad.author_uuid.
