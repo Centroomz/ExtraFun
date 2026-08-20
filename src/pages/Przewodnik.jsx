@@ -565,7 +565,7 @@ export function Przewodnik({ city: cityParam }) {
       <Helmet>
         <title>Przewodnik po klubach lifestyle – swing, BDSM, fetysz | ExtraFun</title>
         <meta name="description" content="Mapa i lista klubów lifestyle, swing i BDSM w Polsce. Znajdź miejsce blisko siebie — filtruj po mieście, typie i dniu tygodnia." />
-        <link rel="canonical" href="https://extrafun.pl/miejsca" />
+        <link rel="canonical" href="https://www.extrafun.pl/miejsca" />
       </Helmet>
       {cityParam ? (
         /* ════════ CITY PAGE ════════ */

@@ -25,7 +25,7 @@ app.use((_req, res, next) => {
 app.use((req, res, next) => {
   const host = req.hostname || ''
   if (host.includes('extrafun.fun') || host.includes('extrafun.club')) {
-    return res.redirect(301, `https://extrafun.pl${req.originalUrl}`)
+    return res.redirect(301, `https://www.extrafun.pl${req.originalUrl}`)
   }
   next()
 })

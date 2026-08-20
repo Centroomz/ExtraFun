@@ -739,7 +739,7 @@ Disallow: /profil
 # AI usage preferences (IETF draft content-signals)
 Content-Signal: ai-train=yes, search=yes, ai-retrieval=yes
 
-Sitemap: https://extrafun.pl/sitemap.xml`)
+Sitemap: https://www.extrafun.pl/sitemap.xml`)
   })
 
   // llms.txt — site summary for AI engines. Real route so the SPA fallback
@@ -758,12 +758,12 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
       const { data } = await supabaseAdmin.from('articles')
         .select('title, slug').eq('site', 'extrafun').eq('status', 'published')
         .order('publish_date', { ascending: false })
-      articleLines = (data || []).map(a => `- [${a.title}](https://extrafun.pl/magazyn/${a.slug})`).join('\n')
+      articleLines = (data || []).map(a => `- [${a.title}](https://www.extrafun.pl/magazyn/${a.slug})`).join('\n')
     } catch { /* ship the rest even if this fails */ }
     let termLines = ''
     try {
       const { DICTIONARY_TERMS: terms } = await import('../src/lib/dictionary.js')
-      termLines = terms.map(t => `- [${t.term}](https://extrafun.pl/slownik/${t.slug})`).join('\n')
+      termLines = terms.map(t => `- [${t.term}](https://www.extrafun.pl/slownik/${t.slug})`).join('\n')
     } catch { /* dictionary optional */ }
     const text =
 `# ExtraFun
@@ -771,11 +771,11 @@ Sitemap: https://extrafun.pl/sitemap.xml`)
 > ExtraFun — polski magazyn i społeczność CNM/lifestyle: konsensualna niemonogamia, poliamoria, swing, fetysz oraz katalog klubów lifestyle i miejsc w Polsce.
 
 ## Sekcje
-- [Magazyn](https://extrafun.pl/magazyn): Artykuły o CNM, poliamorii, swingu, otwartych związkach, fetyszu i lifestyle.
-- [Słownik](https://extrafun.pl/slownik): Wyjaśnienia pojęć CNM, poliamorii, swingu i BDSM po polsku.
-- [Miejsca](https://extrafun.pl/miejsca): Katalog klubów lifestyle, swingers i miejsc w Polsce.
-- [Imprezy](https://extrafun.pl/imprezy): Wydarzenia i imprezy lifestyle.
-- [Plaże](https://extrafun.pl/plaze): Plaże naturystyczne i przyjazne lifestyle.
+- [Magazyn](https://www.extrafun.pl/magazyn): Artykuły o CNM, poliamorii, swingu, otwartych związkach, fetyszu i lifestyle.
+- [Słownik](https://www.extrafun.pl/slownik): Wyjaśnienia pojęć CNM, poliamorii, swingu i BDSM po polsku.
+- [Miejsca](https://www.extrafun.pl/miejsca): Katalog klubów lifestyle, swingers i miejsc w Polsce.
+- [Imprezy](https://www.extrafun.pl/imprezy): Wydarzenia i imprezy lifestyle.
+- [Plaże](https://www.extrafun.pl/plaze): Plaże naturystyczne i przyjazne lifestyle.
 
 ## Magazyn — artykuły
 ${articleLines}
@@ -789,7 +789,7 @@ ${termLines}
 - Język: polski.
 
 ## Contact
-- Website: https://extrafun.pl
+- Website: https://www.extrafun.pl
 `
     llmsTxtCache = { at: Date.now(), text }
     res.type('text/markdown').send(text)
@@ -799,22 +799,22 @@ ${termLines}
     const { data } = await supabaseAdmin.from('articles')
       .select('slug, publish_date').eq('site', 'extrafun').eq('status', 'published')
     const staticUrls = [
-      { loc: 'https://extrafun.pl/', priority: '1.0' },
-      { loc: 'https://extrafun.pl/magazyn', priority: '0.9' },
-      { loc: 'https://extrafun.pl/slownik', priority: '0.9' },
-      { loc: 'https://extrafun.pl/miejsca', priority: '0.7' },
-      { loc: 'https://extrafun.pl/imprezy', priority: '0.7' },
-      { loc: 'https://extrafun.pl/czat', priority: '0.5' },
-      { loc: 'https://extrafun.pl/ogloszenia', priority: '0.6' },
+      { loc: 'https://www.extrafun.pl/', priority: '1.0' },
+      { loc: 'https://www.extrafun.pl/magazyn', priority: '0.9' },
+      { loc: 'https://www.extrafun.pl/slownik', priority: '0.9' },
+      { loc: 'https://www.extrafun.pl/miejsca', priority: '0.7' },
+      { loc: 'https://www.extrafun.pl/imprezy', priority: '0.7' },
+      { loc: 'https://www.extrafun.pl/czat', priority: '0.5' },
+      { loc: 'https://www.extrafun.pl/ogloszenia', priority: '0.6' },
     ]
     const articleUrls = (data || []).map(a => ({
-      loc: `https://extrafun.pl/magazyn/${a.slug}`, priority: '0.8',
+      loc: `https://www.extrafun.pl/magazyn/${a.slug}`, priority: '0.8',
       lastmod: a.publish_date ? new Date(a.publish_date).toISOString().slice(0, 10) : undefined,
     }))
     let dictUrls = []
     try {
       const { DICTIONARY_TERMS: terms } = await import('../src/lib/dictionary.js')
-      dictUrls = terms.map(t => ({ loc: `https://extrafun.pl/slownik/${t.slug}`, priority: '0.7' }))
+      dictUrls = terms.map(t => ({ loc: `https://www.extrafun.pl/slownik/${t.slug}`, priority: '0.7' }))
     } catch {}
     // Per-venue pages (same set the catalog shows: swing/lifestyle rows).
     let venueUrls = []
@@ -826,7 +826,7 @@ ${termLines}
         .select('id, name, city')
         .or('legacy_swing_id.not.is.null,swing_days.not.is.null')
       venueUrls = (vs || []).map(v => ({
-        loc: `https://extrafun.pl/miejsca/${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`,
+        loc: `https://www.extrafun.pl/miejsca/${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`,
         priority: '0.6',
       }))
     } catch {}

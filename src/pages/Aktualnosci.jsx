@@ -4,7 +4,7 @@ import { apiFetch } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
 import { Hero } from '../components/nocturne'
 
-const BASE_URL = 'https://extrafun.pl'
+const BASE_URL = 'https://www.extrafun.pl'
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 
 const isForeign = (n) => n.region === 'International' || n.lang === 'en'

@@ -45,7 +45,7 @@ export function Slownik() {
       <Helmet>
         <title>Słownik CNM, Swinging i BDSM – ExtraFun</title>
         <meta name="description" content={`Słownik ${DICTIONARY_TERMS.length} terminów ze świata CNM, poliamorii, swingingu i BDSM. Polskie definicje, przykłady, bez tabu.`} />
-        <link rel="canonical" href="https://extrafun.pl/slownik" />
+        <link rel="canonical" href="https://www.extrafun.pl/slownik" />
       </Helmet>
 
       <Hero

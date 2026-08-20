@@ -102,7 +102,7 @@ export function Imprezy() {
       <Helmet>
         <title>Imprezy lifestyle – kluby i eventy | ExtraFun</title>
         <meta name="description" content="Nadchodzące imprezy w klubach lifestyle, swing i BDSM w Polsce. Sprawdź daty, miejsca i szczegóły eventów." />
-        <link rel="canonical" href="https://extrafun.pl/imprezy" />
+        <link rel="canonical" href="https://www.extrafun.pl/imprezy" />
       </Helmet>
 
       <Hero

@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
 
-const BASE_URL = 'https://extrafun.pl'
+const BASE_URL = 'https://www.extrafun.pl'
 
 const CATEGORY_COLORS = {
   'CNM 101':        { bg: 'rgba(233,193,118,0.12)',   color: '#d4af37', border: 'rgba(233,193,118,0.3)' },

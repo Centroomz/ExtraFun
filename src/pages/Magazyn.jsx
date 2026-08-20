@@ -8,7 +8,7 @@ import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { Hero, ArticleCard, SectionHeader, Button } from '../components/nocturne'
 
-const BASE_URL = 'https://extrafun.pl'
+const BASE_URL = 'https://www.extrafun.pl'
 
 function estimateReadingTime(content) {
   return Math.max(1, Math.ceil((content || '').split(/\s+/).length / 200))

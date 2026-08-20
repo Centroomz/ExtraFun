@@ -20,7 +20,7 @@ function venueSlug(v) {
   return `${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`
 }
 
-const BASE = 'https://extrafun.pl'
+const BASE = 'https://www.extrafun.pl'
 
 // Dynamic sitemap built from the live DB (articles + venues the site shows +
 // glossary terms) instead of a hand-maintained static file. This is what gets
@@ -93,8 +93,8 @@ export async function sendArticleHtml(req, res, dist) {
     if (!data) return res.send(html)
     const title = esc(data.seo_title || `${data.title} | ExtraFun`)
     const desc = esc(data.seo_description || data.excerpt || '')
-    const url = `https://extrafun.pl/magazyn/${data.slug}`
-    const img = data.cover_image ? esc(data.cover_image) : 'https://extrafun.pl/og-default.jpg'
+    const url = `https://www.extrafun.pl/magazyn/${data.slug}`
+    const img = data.cover_image ? esc(data.cover_image) : 'https://www.extrafun.pl/og-default.jpg'
     // Article JSON-LD — lets AI engines treat the page as a citable article with
     // author/dates/publisher, not just an OG preview.
     const published = data.publish_date || data.created_at
@@ -111,8 +111,8 @@ export async function sendArticleHtml(req, res, dist) {
       publisher: {
         '@type': 'Organization',
         name: 'ExtraFun',
-        url: 'https://extrafun.pl',
-        logo: { '@type': 'ImageObject', url: 'https://extrafun.pl/icon-192.png' },
+        url: 'https://www.extrafun.pl',
+        logo: { '@type': 'ImageObject', url: 'https://www.extrafun.pl/icon-192.png' },
       },
       mainEntityOfPage: url,
       // Full text in JSON-LD so AI crawlers (no JS) read the whole article
@@ -152,7 +152,7 @@ export async function sendArticleHtml(req, res, dist) {
 export function sendListPageHtml(req, res, dist, { title, desc }) {
   const html = readFileSync(join(dist, 'index.html'), 'utf8')
   try {
-    const url = `https://extrafun.pl${req.path}`
+    const url = `https://www.extrafun.pl${req.path}`
     const tags = `<title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}" />
 <link rel="canonical" href="${url}" />
@@ -181,10 +181,10 @@ export function sendHomeHtml(_req, res, dist) {
       '@graph': [
         {
           '@type': 'Organization',
-          '@id': 'https://extrafun.pl/#organization',
+          '@id': 'https://www.extrafun.pl/#organization',
           name: 'ExtraFun',
-          url: 'https://extrafun.pl',
-          logo: { '@type': 'ImageObject', url: 'https://extrafun.pl/icon-192.png' },
+          url: 'https://www.extrafun.pl',
+          logo: { '@type': 'ImageObject', url: 'https://www.extrafun.pl/icon-192.png' },
           description: 'ExtraFun — magazyn i społeczność CNM/lifestyle: konsensualna niemonogamia, poliamoria, swing, fetysz, plus katalog klubów lifestyle i miejsc w Polsce.',
           knowsAbout: [
             'konsensualna niemonogamia (CNM)', 'poliamoria', 'swing', 'otwarte związki',
@@ -193,11 +193,11 @@ export function sendHomeHtml(_req, res, dist) {
         },
         {
           '@type': 'WebSite',
-          '@id': 'https://extrafun.pl/#website',
+          '@id': 'https://www.extrafun.pl/#website',
           name: 'ExtraFun',
-          url: 'https://extrafun.pl',
+          url: 'https://www.extrafun.pl',
           inLanguage: 'pl-PL',
-          publisher: { '@id': 'https://extrafun.pl/#organization' },
+          publisher: { '@id': 'https://www.extrafun.pl/#organization' },
         },
       ],
     }).replace(/</g, '\\u003c')
@@ -221,8 +221,8 @@ export async function sendVenueHtml(req, res, dist) {
     if (!data) return res.send(html)
     const title = esc(`${data.name}${data.city ? ' – ' + data.city : ''} | ExtraFun`)
     const desc = esc((data.description || `${data.name} — klub lifestyle w ${data.city || 'Polsce'}.`).slice(0, 160))
-    const url = `https://extrafun.pl/miejsca/${req.params.slug}`
-    const img = data.cover_image ? esc(data.cover_image) : 'https://extrafun.pl/og-default.jpg'
+    const url = `https://www.extrafun.pl/miejsca/${req.params.slug}`
+    const img = data.cover_image ? esc(data.cover_image) : 'https://www.extrafun.pl/og-default.jpg'
     const ld = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
@@ -272,13 +272,13 @@ export function sendDictTermHtml(req, res, dist) {
     if (!term) return res.send(html)
     const title = esc(`${term.term} – co to znaczy? | Słownik ExtraFun`)
     const desc = esc(term.definition.slice(0, 155) + (term.definition.length > 155 ? '…' : ''))
-    const url = `https://extrafun.pl/slownik/${term.slug}`
+    const url = `https://www.extrafun.pl/slownik/${term.slug}`
     const ld = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'DefinedTerm',
       name: term.term,
       description: term.definition,
-      inDefinedTermSet: { '@type': 'DefinedTermSet', name: 'Słownik ExtraFun', url: 'https://extrafun.pl/slownik' },
+      inDefinedTermSet: { '@type': 'DefinedTermSet', name: 'Słownik ExtraFun', url: 'https://www.extrafun.pl/slownik' },
     }).replace(/</g, '\\u003c')
     const tags = `<title>${title}</title>
 <meta name="description" content="${desc}" />

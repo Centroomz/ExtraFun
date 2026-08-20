@@ -31,7 +31,7 @@ export function SlownikTerm({ slug }) {
       <Helmet>
         <title>{seoTitle}</title>
         <meta name="description" content={seoDesc} />
-        <link rel="canonical" href={`https://extrafun.pl/slownik/${term.slug}`} />
+        <link rel="canonical" href={`https://www.extrafun.pl/slownik/${term.slug}`} />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'DefinedTerm',
@@ -40,7 +40,7 @@ export function SlownikTerm({ slug }) {
           inDefinedTermSet: {
             '@type': 'DefinedTermSet',
             name: 'Słownik ExtraFun',
-            url: 'https://extrafun.pl/slownik',
+            url: 'https://www.extrafun.pl/slownik',
           },
         })}</script>
       </Helmet>
