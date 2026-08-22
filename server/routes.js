@@ -282,7 +282,13 @@ export function registerRoutes(app) {
   app.get('/api/ads', async (_req, res) => {
     const { data, error } = await supabaseAdmin.from('ads')
       .select('id, title, description, location, category, latitude, longitude, created_at, author_uuid')
-      .eq('status', 'active').order('created_at', { ascending: false }).limit(100)
+      .eq('status', 'active')
+      // bizarriusz.pl daje autorowi checkbox "pokaż też na extrafun.pl"
+      // (cross_post_extrafun, domyślnie true). Odznaczony → nie pokazuj tu.
+      // Inne źródła (gaypl/extrafun) nie mają tej kolumny ustawionej — przechodzą
+      // zawsze przez pierwszy człon OR.
+      .or('source.neq.bizarriusz,cross_post_extrafun.not.is.false')
+      .order('created_at', { ascending: false }).limit(100)
     if (error) return res.status(500).json({ message: error.message })
     res.json((data || []).map(a => ({
       id: a.id, title: a.title, description: a.description,
@@ -408,19 +414,32 @@ export function registerRoutes(app) {
 
   // === PRIVATE MESSAGES (DM ogłoszeniodawca ↔ zainteresowany) ===
   // Send a DM about an ad. Recipient = ad.author_uuid.
+  //
+  // ad_id był dotąd WYMAGANY na każdej wiadomości, także odpowiedzi w wątku —
+  // ale private_messages jest dzielone z bizarriusz.pl (i gay.pl), gdzie DM nie
+  // ma pojęcia ogłoszenia (ad_id=null). Odpowiedź na taki wątek (Wiadomosci.jsx
+  // wysyła `ad_id: current.ad_id`, czyli null) zawsze padała 400 "ad_id
+  // wymagane" — konwersacja między portalami była faktycznie jednokierunkowa.
+  // Teraz: ad_id trzeba PODAĆ tylko żeby napisać do autora ogłoszenia (skąd
+  // brać odbiorcę). Gdy recipient_id jest podany wprost (odpowiedź w wątku),
+  // ad_id jest opcjonalny.
   app.post('/api/messages', verifyJWT, async (req, res) => {
     const { ad_id, content, recipient_id } = req.body || {}
     if (!content?.trim()) return res.status(400).json({ message: 'Treść wymagana' })
-    if (!ad_id) return res.status(400).json({ message: 'ad_id wymagane' })
-    const { data: ad } = await supabaseAdmin.from('ads').select('id, title, author_uuid').eq('id', ad_id).single()
-    if (!ad || !ad.author_uuid) return res.status(404).json({ message: 'Ogłoszenie nie istnieje lub bez autora (demo)' })
-    // Initial contact → recipient = ad author. Reply in a thread → explicit recipient_id (the partner).
-    const recipient = recipient_id || ad.author_uuid
+    let recipient = recipient_id || null
+    let adTitle = null
+    if (ad_id) {
+      const { data: ad } = await supabaseAdmin.from('ads').select('id, title, author_uuid').eq('id', ad_id).single()
+      if (!ad) return res.status(404).json({ message: 'Ogłoszenie nie istnieje' })
+      adTitle = ad.title
+      recipient = recipient || ad.author_uuid
+    }
+    if (!recipient) return res.status(400).json({ message: 'Brak odbiorcy — podaj ad_id lub recipient_id' })
     if (recipient === req.user.id) return res.status(400).json({ message: 'Nie możesz pisać do siebie' })
     const meta = req.user.meta || {}
     const senderName = meta.display_name || meta.full_name || meta.name || (req.user.email || '').split('@')[0] || 'Użytkownik'
     const { error } = await supabaseAdmin.from('private_messages').insert({
-      ad_id: ad.id, ad_title: ad.title, content: content.trim(),
+      ad_id: ad_id || null, ad_title: adTitle, content: content.trim(),
       sender_id: req.user.id, sender_name: senderName,
       recipient_id: recipient, recipient_name: '', is_read: false,
     })
