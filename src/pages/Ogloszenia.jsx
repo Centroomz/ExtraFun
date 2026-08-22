@@ -37,13 +37,27 @@ function typeLabel(id) {
   return `${t.emoji} ${t.label}`
 }
 
-function AdDetail({ ad, onBack, user }) {
+function AdDetail({ ad, onBack, user, onDeleted }) {
   const [, navigate] = useLocation()
   const [compose, setCompose] = useState(false)
   const [msg, setMsg] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const canMessage = !!ad.author_uuid
+  const isOwner = !!(user && ad.author_uuid && user.id === ad.author_uuid)
+
+  async function del() {
+    if (deleting || !confirm('Usunąć to ogłoszenie?')) return
+    setDeleting(true)
+    try {
+      await apiFetch(`/api/ads/${ad.id}`, { method: 'DELETE' })
+      onDeleted?.()
+    } catch (e) {
+      alert('Nie udało się usunąć: ' + (e.message || ''))
+      setDeleting(false)
+    }
+  }
 
   async function send() {
     if (!msg.trim() || sending) return
@@ -78,14 +92,19 @@ function AdDetail({ ad, onBack, user }) {
         <p className="font-body text-body-lg text-on-surface leading-relaxed mb-10">{ad.description}</p>
 
         <div className="flex items-center gap-6">
-          {!user ? (
+          {isOwner ? (
+            <button onClick={del} disabled={deleting}
+              className="font-body text-label-caps uppercase text-red-400 hover:text-red-300 disabled:opacity-50">
+              {deleting ? 'Usuwam…' : 'Usuń ogłoszenie'}
+            </button>
+          ) : !user ? (
             <Button onClick={() => navigate('/login')}>Zaloguj się, aby napisać</Button>
           ) : canMessage ? (
             <Button onClick={() => { setSent(false); setCompose(true) }}>Napisz wiadomość</Button>
           ) : (
             <span className="font-body text-body-md text-on-surface-variant">Ogłoszenie demonstracyjne — kontakt niedostępny</span>
           )}
-          <button className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zgłoś</button>
+          {!isOwner && <button className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zgłoś</button>}
         </div>
       </main>
 
@@ -173,7 +192,8 @@ export function Ogloszenia({ user }) {
 
   if (selectedAd) {
     const ad = displayAds.find(a => a.id === selectedAd) || ads.find(a => a.id === selectedAd)
-    if (ad) return <AdDetail ad={ad} onBack={() => setSelectedAd(null)} user={user} />
+    if (ad) return <AdDetail ad={ad} onBack={() => setSelectedAd(null)} user={user}
+      onDeleted={() => { setSelectedAd(null); loadAds() }} />
   }
 
   const inputCls = 'w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50'

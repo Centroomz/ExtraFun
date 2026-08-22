@@ -312,6 +312,19 @@ export function registerRoutes(app) {
     res.status(201).json(data)
   })
 
+  // Self-service delete — autor kasuje własny anons. Dotąd istniał tylko
+  // DELETE /api/admin/ads/:id (admin-only); ten sam brak naprawiony na
+  // bizarriusz.pl i gay.pl.
+  app.delete('/api/ads/:id', verifyJWT, async (req, res) => {
+    const { data: ad, error: fetchErr } = await supabaseAdmin.from('ads')
+      .select('id, author_uuid').eq('id', req.params.id).single()
+    if (fetchErr || !ad) return res.status(404).json({ message: 'Nie znaleziono' })
+    if (ad.author_uuid !== req.user.id) return res.status(403).json({ message: 'Brak dostępu' })
+    const { error } = await supabaseAdmin.from('ads').delete().eq('id', req.params.id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
   // === FINDER (member catalog) ===
   app.get('/api/finder', optionalAuth, async (req, res) => {
     try {
