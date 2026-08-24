@@ -12,6 +12,8 @@ import { Czat } from './pages/Czat'
 import { Ogloszenia } from './pages/Ogloszenia'
 import { LoginPage } from './auth/LoginPage'
 import { SignupPage } from './auth/SignupPage'
+import { ForgotPasswordPage } from './auth/ForgotPasswordPage'
+import { ResetPasswordPage } from './auth/ResetPasswordPage'
 import { Admin } from './pages/Admin'
 import { ArticleDetailPage } from './pages/ArticleDetailPage'
 import { Imprezy } from './pages/Imprezy'
@@ -366,6 +368,8 @@ function AppInner() {
             <Route path="/wiadomosci">{() => <Wiadomosci user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/signup">{() => <SignupPage onSwitch={() => navigate('/login')} onSuccess={() => navigate('/magazyn')} />}</Route>
+            <Route path="/forgot-password" component={ForgotPasswordPage} />
+            <Route path="/reset-password">{() => <ResetPasswordPage onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/profil">{() => user
               ? <ProfilePage user={user} profile={profile} onSignOut={handleSignOut} />
               : (() => { navigate('/login'); return null })()

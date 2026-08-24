@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'wouter'
 import { useAuth } from '../hooks/useAuth'
 
 export function LoginPage({ onSwitch, onSuccess }) {
@@ -43,6 +44,9 @@ export function LoginPage({ onSwitch, onSuccess }) {
         </form>
         <div className="auth-switch">
           Nie masz konta? <a onClick={onSwitch}>Zarejestruj się</a>
+        </div>
+        <div className="auth-switch">
+          <Link href="/forgot-password">Zapomniałem hasła</Link>
         </div>
       </div>
     </div>
