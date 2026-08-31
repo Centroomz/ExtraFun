@@ -152,33 +152,46 @@ export function Magazyn() {
         <meta property="og:site_name" content="ExtraFun" />
       </Helmet>
 
+      {/* Quiz CTA — mobile only: prominentna karta nad hero */}
+      {!quizDone && (
+        <button
+          onClick={() => setShowQuiz(true)}
+          className="md:hidden group w-full text-left p-5 flex items-center gap-4"
+          style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04))' }}
+        >
+          <div className="text-4xl shrink-0">🌙</div>
+          <div className="flex-1 min-w-0">
+            <div className="font-body text-label-caps uppercase text-primary-container mb-1">Quiz miesiąca</div>
+            <div className="font-display text-headline-sm text-on-surface leading-tight">{QUIZ_TITLE}</div>
+          </div>
+          <span className="font-body text-label-caps uppercase text-primary-container shrink-0">Zacznij →</span>
+        </button>
+      )}
+
       {/* Monthly theme hero — nadtytuł = temat miesiąca (edytować co miesiąc).
-          Stały, nie swapuje się przy ładowaniu danych (bez flashu/covera). */}
+          Stały, nie swapuje się przy ładowaniu danych (bez flashu/covera).
+          Desktop: quiz CTA w aside po prawej. */}
       <Hero
         image="/editorial/hero-wrzesien-dogging.jpg"
         label="WRZESIEŃ · DOGGING"
         title="Las, Wisła, parking."
         lead="Wrzesień w rytmie doggingu: co mówi polskie prawo (i jak rzadko je egzekwuje), savoir-vivre plenerowej sceny i dlaczego część ludzi wybiera krzaki zamiast bezpiecznego klubu."
+        aside={!quizDone ? (
+          <button
+            onClick={() => setShowQuiz(true)}
+            className="group w-full text-left p-6 border border-white/15 hover:border-primary-container/60 transition-colors"
+            style={{ background: 'rgba(18,20,20,0.75)', backdropFilter: 'blur(8px)' }}
+          >
+            <div className="text-4xl mb-3">🌙</div>
+            <div className="font-body text-label-caps uppercase text-primary-container mb-2">Quiz miesiąca</div>
+            <div className="font-display text-headline-sm text-on-surface mb-2 leading-tight">{QUIZ_TITLE}</div>
+            <p className="font-body text-body-sm text-on-surface-variant mb-4">{QUIZ_INTRO}</p>
+            <span className="font-body text-label-caps uppercase text-primary-container group-hover:translate-x-1 transition-transform inline-block">Zacznij →</span>
+          </button>
+        ) : null}
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
-        {/* Quiz miesiąca — prominentny CTA na górze. Po rozwiązaniu znika stąd
-            i zostaje już tylko w bocznym pasku na dole. */}
-        {!quizDone && (
-          <button
-            onClick={() => setShowQuiz(true)}
-            className="group w-full text-left mb-16 p-6 md:p-8 border border-primary-container/40 hover:border-primary-container transition-colors flex flex-col md:flex-row md:items-center gap-4 md:gap-8"
-            style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.03))' }}
-          >
-            <div className="text-5xl md:text-6xl shrink-0">🌙</div>
-            <div className="flex-1">
-              <div className="font-body text-label-caps uppercase text-primary-container mb-2">Quiz miesiąca · Wrzesień</div>
-              <div className="font-display text-headline-sm md:text-headline-md text-on-surface mb-1">{QUIZ_TITLE}</div>
-              <p className="font-body text-body-md text-on-surface-variant">{QUIZ_INTRO}</p>
-            </div>
-            <span className="font-body text-label-caps uppercase text-primary-container shrink-0 group-hover:translate-x-1 transition-transform">Zacznij →</span>
-          </button>
-        )}
 
         {/* Category filter */}
         <div className="flex flex-wrap gap-x-7 gap-y-3 mb-16">
