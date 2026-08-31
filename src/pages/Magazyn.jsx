@@ -155,10 +155,10 @@ export function Magazyn() {
       {/* Monthly theme hero — nadtytuł = temat miesiąca (edytować co miesiąc).
           Stały, nie swapuje się przy ładowaniu danych (bez flashu/covera). */}
       <Hero
-        image="/editorial/hero-lipiec-plener.jpg"
-        label="LIPIEC · PLENER"
-        title="Plener. Plaże, nagość, natura."
-        lead="Numer lipcowy: plaże FKK, naturyzm, seks w plenerze i cienka granica między nagością a wstydem — teksty o życiu bez ubrań i bez miasta."
+        image="/editorial/hero-wrzesien-dogging.jpg"
+        label="WRZESIEŃ · DOGGING"
+        title="Las, Wisła, parking."
+        lead="Wrzesień w rytmie doggingu: co mówi polskie prawo (i jak rzadko je egzekwuje), savoir-vivre plenerowej sceny i dlaczego część ludzi wybiera krzaki zamiast bezpiecznego klubu."
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
