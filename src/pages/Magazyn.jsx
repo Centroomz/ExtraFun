@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { getWordOfTheDay } from '../lib/dictionary'
 import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
-import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE } from '../lib/quiz-plazowicz'
+import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
 import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { Hero, ArticleCard, SectionHeader, Button } from '../components/nocturne'
@@ -40,7 +40,7 @@ function QuizView({ onBack }) {
     if (current + 1 < total) {
       setScores(next); setCurrent(current + 1); setSelected(null)
     } else {
-      try { localStorage.setItem('ef_quiz_plazowicz_done', '1') } catch {}
+      try { localStorage.setItem('ef_quiz_dogging_done', '1') } catch {}
       setResult(interpretQuizResult(next)); setDone(true)
     }
   }
@@ -98,7 +98,7 @@ export function Magazyn() {
   const [showQuiz, setShowQuiz] = useState(false)
   const [dbArticles, setDbArticles] = useState(null)
   const [quizDone, setQuizDone] = useState(() => {
-    try { return localStorage.getItem('ef_quiz_plazowicz_done') === '1' } catch { return false }
+    try { return localStorage.getItem('ef_quiz_dogging_done') === '1' } catch { return false }
   })
 
   useEffect(() => {
@@ -135,7 +135,7 @@ export function Magazyn() {
 
   if (showQuiz) return <QuizView onBack={() => {
     setShowQuiz(false)
-    try { setQuizDone(localStorage.getItem('ef_quiz_plazowicz_done') === '1') } catch {}
+    try { setQuizDone(localStorage.getItem('ef_quiz_dogging_done') === '1') } catch {}
   }} />
 
   return (
@@ -170,11 +170,11 @@ export function Magazyn() {
             className="group w-full text-left mb-16 p-6 md:p-8 border border-primary-container/40 hover:border-primary-container transition-colors flex flex-col md:flex-row md:items-center gap-4 md:gap-8"
             style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.03))' }}
           >
-            <div className="text-5xl md:text-6xl shrink-0">🏖️</div>
+            <div className="text-5xl md:text-6xl shrink-0">🌙</div>
             <div className="flex-1">
-              <div className="font-body text-label-caps uppercase text-primary-container mb-2">Quiz miesiąca · Lipiec</div>
+              <div className="font-body text-label-caps uppercase text-primary-container mb-2">Quiz miesiąca · Wrzesień</div>
               <div className="font-display text-headline-sm md:text-headline-md text-on-surface mb-1">{QUIZ_TITLE}</div>
-              <p className="font-body text-body-md text-on-surface-variant">Sezon na plaże bez tabu — 12 pytań, 4 typy. Sprawdź, kim jesteś na piasku.</p>
+              <p className="font-body text-body-md text-on-surface-variant">{QUIZ_INTRO}</p>
             </div>
             <span className="font-body text-label-caps uppercase text-primary-container shrink-0 group-hover:translate-x-1 transition-transform">Zacznij →</span>
           </button>
@@ -237,9 +237,9 @@ export function Magazyn() {
           </div>
 
           <div className="md:col-span-4 border border-outline-variant/20 p-6">
-            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Quiz miesiąca · Lipiec</div>
+            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Quiz miesiąca · Wrzesień</div>
             <div className="font-display text-headline-sm text-on-surface mb-2">{QUIZ_TITLE}</div>
-            <p className="font-body text-body-md text-on-surface-variant mb-5">Sezon na plaże bez tabu — 12 pytań, 4 typy.</p>
+            <p className="font-body text-body-md text-on-surface-variant mb-5">12 pytań, 4 typy — sprawdź swój temperament.</p>
             <Button onClick={() => setShowQuiz(true)}>Zacznij</Button>
           </div>
 
