@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
 import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendSitemap, sendListPageHtml } from './meta.js'
+import { supabaseAdmin } from './supabase.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -71,4 +72,23 @@ app.get('/sitemap.xml', (req, res) => sendSitemap(req, res))
 app.use(express.static(DIST))
 app.use((_req, res) => res.sendFile(join(DIST, 'index.html')))
 
-app.listen(PORT, () => console.log(`ExtraFun server on ${PORT}`))
+app.listen(PORT, () => {
+  console.log(`ExtraFun server on ${PORT}`)
+
+  const publishScheduled = async () => {
+    try {
+      const { data, error } = await supabaseAdmin.from('articles')
+        .update({ status: 'published' })
+        .eq('status', 'scheduled')
+        .eq('site', 'extrafun')
+        .lte('publish_date', new Date().toISOString())
+        .select('id, title')
+      if (error) { console.error('[scheduler] publish error:', error.message); return }
+      if (data?.length) console.log(`[scheduler] Published ${data.length} scheduled article(s):`, data.map(a => a.title).join(', '))
+    } catch (err) {
+      console.error('[scheduler] publish error:', err.message)
+    }
+  }
+  publishScheduled()
+  setInterval(publishScheduled, 60 * 1000)
+})

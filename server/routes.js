@@ -490,7 +490,7 @@ export function registerRoutes(app) {
   // === ADMIN ===
   app.get('/api/admin/articles', verifyJWT, isAdmin, async (_req, res) => {
     const { data, error } = await supabaseAdmin.from('articles')
-      .select('id, title, slug, excerpt, category_slug, status, featured, cover_image, content, author, tags, views, created_at')
+      .select('id, title, slug, excerpt, category_slug, status, featured, cover_image, content, author, tags, views, publish_date, created_at')
       .eq('site', 'extrafun').order('created_at', { ascending: false })
     if (error) return res.status(500).json({ message: error.message })
     res.json(data || [])

@@ -29,6 +29,7 @@ const EMPTY_ARTICLE = {
   title: '', slug: '', excerpt: '', content: '',
   cover_image: '', category_slug: 'cnm-101',
   status: 'draft', featured: false, tags: '', author: 'Redakcja ExtraFun',
+  scheduled_at: '',
 }
 
 // ── Card style ────────────────────────────────────────────────────────────────
@@ -121,9 +122,19 @@ function ArticleForm({ initial, onSave, onCancel, saving }) {
             onChange={e => set('status', e.target.value)}>
             <option value="draft">Draft</option>
             <option value="published">Published</option>
+            <option value="scheduled">Zaplanowany</option>
           </select>
         </div>
       </div>
+
+      {form.status === 'scheduled' && (
+        <div>
+          <label style={labelStyle}>Data i godzina publikacji</label>
+          <input type="datetime-local" style={inputStyle} value={form.scheduled_at}
+            onChange={e => set('scheduled_at', e.target.value)} />
+          {form.scheduled_at && <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>Artykuł opublikuje się automatycznie: {new Date(form.scheduled_at).toLocaleString('pl-PL')}</p>}
+        </div>
+      )}
 
       <div>
         <label style={labelStyle}>Zajawka (excerpt)</label>
@@ -226,7 +237,9 @@ function ArticlesTab() {
       featured: form.featured,
       tags: form.tags ? form.tags.split(',').map(t => t.trim()).filter(Boolean) : [],
       site: 'extrafun',
-      publish_date: new Date().toISOString(),
+      publish_date: form.status === 'scheduled' && form.scheduled_at
+        ? new Date(form.scheduled_at).toISOString()
+        : new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
     try {
@@ -271,6 +284,9 @@ function ArticlesTab() {
     const initial = mode?.id ? {
       ...mode,
       tags: Array.isArray(mode.tags) ? mode.tags.join(', ') : (mode.tags || ''),
+      scheduled_at: mode.status === 'scheduled' && mode.publish_date
+        ? new Date(mode.publish_date).toISOString().slice(0, 16)
+        : '',
     } : null
     return (
       <div>
@@ -303,7 +319,8 @@ function ArticlesTab() {
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
                 <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#d4af37', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
-                <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#d4af37' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status}</span>
+                <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : a.status === 'scheduled' ? 'rgba(100,149,237,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#d4af37' : a.status === 'scheduled' ? '#6495ED' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status === 'scheduled' ? 'Zaplanowany' : a.status}</span>
+                {a.status === 'scheduled' && a.publish_date && <span style={{ fontSize: 10, color: 'rgba(232,230,252,0.5)' }}>{new Date(a.publish_date).toLocaleString('pl-PL')}</span>}
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
                 <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
