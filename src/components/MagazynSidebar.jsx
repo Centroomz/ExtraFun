@@ -112,22 +112,33 @@ function NearbyModule() {
 
   if (!venues || venues.length === 0) return null
 
+  // PL bounding box — default (no geolocation) shows Polish clubs, never a
+  // featured venue abroad (Amsterdam/Barcelona etc. also live in this table).
+  const inPoland = (v) => {
+    const la = Number(v.lat), ln = Number(v.lng)
+    return la >= 49 && la <= 55 && ln >= 14 && ln <= 24.3
+  }
   const withGps = venues.filter(v => v.lat && v.lng)
+  const plVenues = withGps.filter(inPoland)
+  const base = plVenues.length ? plVenues : withGps
   const list = location
     ? sortByDistance(withGps, location.lat, location.lng).slice(0, 4)
-    : [...venues].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)).slice(0, 4)
+    : [...base].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)).slice(0, 4)
 
   return (
     <div className={railBox}>
       <div className={railLabel}>Miejsca blisko</div>
       {!location && (
-        <button
-          onClick={requestLocation}
-          disabled={loading}
-          className="font-body text-body-sm text-on-surface-variant hover:text-primary-container mb-4 block disabled:opacity-50"
-        >
-          {loading ? 'Szukam pozycji…' : '📍 Pokaż najbliższe'}
-        </button>
+        <div className="mb-4">
+          <div className="font-body text-body-sm text-on-surface-variant mb-2">Popularne kluby w Polsce</div>
+          <button
+            onClick={requestLocation}
+            disabled={loading}
+            className="font-body text-body-sm text-primary-container hover:opacity-80 block disabled:opacity-50"
+          >
+            {loading ? 'Szukam pozycji…' : '📍 Pokaż najbliższe mnie'}
+          </button>
+        </div>
       )}
       {error && <p className="font-body text-body-sm text-on-surface-variant/70 mb-3">{error}</p>}
       <ul className="space-y-3">

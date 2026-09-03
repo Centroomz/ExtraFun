@@ -245,9 +245,7 @@ export function Magazyn() {
           </div>{/* /content col */}
 
           <aside className="mt-16 lg:mt-0 lg:col-span-4">
-            <div className="lg:sticky lg:top-24">
-              <MagazynSidebar onSelectCategory={setActiveCategory} />
-            </div>
+            <MagazynSidebar onSelectCategory={setActiveCategory} />
           </aside>
         </div>{/* /magazyn grid */}
 
