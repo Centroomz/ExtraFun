@@ -289,13 +289,23 @@ export function registerRoutes(app) {
       // Inne źródła (gaypl/extrafun) nie mają tej kolumny ustawionej — przechodzą
       // zawsze przez pierwszy człon OR.
       .or('source.neq.bizarriusz,cross_post_extrafun.not.is.false')
-      .order('created_at', { ascending: false }).limit(100)
+      .order('created_at', { ascending: false }).limit(300)
     if (error) return res.status(500).json({ message: error.message })
+    // Resolve author display names from auth.users (nick lives in user_metadata,
+    // not profiles). ad_author_names is a security-definer fn: service_role only,
+    // returns just the nick for the ids we pass — no emails leak.
+    const ids = [...new Set((data || []).map(a => a.author_uuid).filter(Boolean))]
+    const names = {}
+    if (ids.length) {
+      const { data: an } = await supabaseAdmin.rpc('ad_author_names', { ids })
+      for (const r of (an || [])) names[r.id] = r.display_name
+    }
     res.json((data || []).map(a => ({
       id: a.id, title: a.title, description: a.description,
-      city: a.location, type: a.category || 'all',
+      city: a.location, category: a.category || null, type: a.category || null,
       latitude: a.latitude, longitude: a.longitude, created_at: a.created_at,
       author_uuid: a.author_uuid || null,
+      author_name: a.author_uuid ? (names[a.author_uuid] || 'Użytkownik') : null,
     })))
   })
 

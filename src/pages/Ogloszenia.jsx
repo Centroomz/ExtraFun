@@ -1,41 +1,35 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useLocation, Link } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 import { Button, Hero } from '../components/nocturne'
 
-const TYPES = [
-  { id: 'looking', label: 'Szukam', emoji: '🔍' },
-  { id: 'event', label: 'Wydarzenie', emoji: '🎉' },
-  { id: 'sale', label: 'Sprzedaż', emoji: '🛍️' },
+// Real shared-pool categories (posting). Filters are derived from live data below.
+const POST_CATEGORIES = [
+  'Pan szuka Pani', 'Pani szuka Pana', 'Para', 'Pani', 'Pan', 'Bi', 'Trans/CD',
+  'Swing', 'BDSM/Fetysz', 'Cuckold', 'Na dziś', 'Znajomości', 'Związek', 'Inne',
 ]
+
+const CAT_EMOJI = {
+  'Pan szuka Pani': '🚹', 'Pani szuka Pana': '🚺', 'Para': '💑', 'Pani': '🌹',
+  'Pan': '🎩', 'Bi': '💫', 'Trans/CD': '⚧️', 'Swing': '🔥', 'BDSM/Fetysz': '⛓️',
+  'Cuckold': '👀', 'Na dziś': '⚡', 'Znajomości': '🤝', 'Związek': '❤️',
+  'Gej': '🏳️‍🌈', 'LGBT': '🏳️‍🌈', 'GB': '🔥', 'Shibari': '🪢', 'Gilf': '🌹', 'Połyk': '💋',
+}
+const catEmoji = (c) => CAT_EMOJI[c] || '📌'
+const GAY_CATS = ['Gej', 'LGBT']
 
 const DEMO_ADS = [
-  { id: '1', type: 'looking', title: 'Para bi poszukuje kobiety do tria', description: 'Jesteśmy otwartą parą (35/33) szukającą biseksualnej kobiety do spotkania. Cenimy komunikację i wzajemny szacunek.', city: 'Warszawa', latitude: 52.2297, longitude: 21.0122, created_at: new Date(Date.now() - 2*3600000).toISOString(), author_name: 'Para_WAW', author_emoji: '💑' },
-  { id: '2', type: 'event', title: 'Prywatna impreza swingerska – sobota 22:00', description: 'Zapraszamy na dyskretną imprezę w prywatnym domu. Miejsce dla 10-15 par. Dress code: elegancki. Weryfikacja telefoniczna.', city: 'Kraków', latitude: 50.0647, longitude: 19.9450, created_at: new Date(Date.now() - 5*3600000).toISOString(), author_name: 'Host_Krakow', author_emoji: '🥂' },
-  { id: '3', type: 'looking', title: 'Singl bi (28) szuka pary lub osoby do zabaw', description: 'Biseksualny mężczyzna, 28 lat, Wrocław. Szukam par lub singli do regularnych spotkań. Dyskretny, zadbany.', city: 'Wrocław', latitude: 51.1079, longitude: 17.0385, created_at: new Date(Date.now() - 8*3600000).toISOString(), author_name: 'Alex_WRO', author_emoji: '💫' },
-  { id: '4', type: 'event', title: 'Meetup poliamoryczny – kawa i rozmowa', description: 'Cykliczne spotkanie osób zainteresowanych poliamorią i CNM. Kawiarnia w centrum, ciepła atmosfera, bez presji.', city: 'Warszawa', latitude: 52.2318, longitude: 21.0127, created_at: new Date(Date.now() - 1*3600000).toISOString(), author_name: 'Poly_WAW', author_emoji: '☕' },
-  { id: '5', type: 'sale', title: 'Sprzedaję sprzęt BDSM – stan idealny', description: 'Zestaw: kajdanki ze stali, pejcz, kajdanki do łóżka, maska. Wszystko w bardzo dobrym stanie, używane rzadko. Odbiór Gdańsk lub wysyłka.', city: 'Gdańsk', latitude: 54.3520, longitude: 18.6466, created_at: new Date(Date.now() - 24*3600000).toISOString(), author_name: 'Seller_GD', author_emoji: '⚡' },
-  { id: '6', type: 'looking', title: 'Kobieta 40+ poszukuje Pana do relacji D/s', description: 'Dojrzała, niezależna kobieta szuka dominującego mężczyzny do regularnej relacji D/s. Cenię szczerość i doświadczenie.', city: 'Poznań', latitude: 52.4082, longitude: 16.9335, created_at: new Date(Date.now() - 3*3600000).toISOString(), author_name: 'Lady_P', author_emoji: '🌹' },
-]
-
-const DISTANCE_FILTERS = [
-  { id: 'all', label: 'Wszystkie' },
-  { id: '5', label: 'Do 5 km' },
-  { id: '25', label: 'Do 25 km' },
-  { id: '100', label: 'Do 100 km' },
+  { id: '1', category: 'Para', title: 'Para bi poszukuje kobiety do tria', description: 'Otwarta para (35/33) szuka biseksualnej kobiety. Cenimy komunikację i szacunek.', city: 'Warszawa', created_at: new Date(Date.now() - 2*3600000).toISOString(), author_name: 'Para_WAW' },
+  { id: '2', category: 'Swing', title: 'Prywatna impreza swingerska – sobota 22:00', description: 'Dyskretna impreza w prywatnym domu. 10-15 par. Dress code elegancki. Weryfikacja telefoniczna.', city: 'Kraków', created_at: new Date(Date.now() - 5*3600000).toISOString(), author_name: 'Host_Krakow' },
+  { id: '3', category: 'Bi', title: 'Singl bi (28) szuka pary lub osoby do zabaw', description: 'Biseksualny mężczyzna, 28, Wrocław. Pary lub single do regularnych spotkań.', city: 'Wrocław', created_at: new Date(Date.now() - 8*3600000).toISOString(), author_name: 'Alex_WRO' },
 ]
 
 const chip = (active) =>
-  `font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
+  `font-body text-label-caps uppercase pb-1 border-b-2 transition-colors whitespace-nowrap ${
     active ? 'border-primary-container text-primary-container' : 'border-transparent text-on-surface-variant hover:text-on-surface'
   }`
-
-function typeLabel(id) {
-  const t = TYPES.find(x => x.id === id) || TYPES[0]
-  return `${t.emoji} ${t.label}`
-}
 
 function AdDetail({ ad, onBack, user, onDeleted }) {
   const [, navigate] = useLocation()
@@ -77,19 +71,19 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
         <button onClick={onBack} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Ogłoszenia</button>
 
         <div className="flex items-center gap-4 mb-4 font-body text-label-caps uppercase">
-          <span className="text-primary-container">{typeLabel(ad.type)}</span>
+          <span className="text-primary-container">{catEmoji(ad.category)} {ad.category || 'Ogłoszenie'}</span>
           {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
         </div>
 
-        <h1 className="font-display italic font-semibold text-display-lg-mobile text-on-surface leading-tight mb-4">{ad.title}</h1>
+        <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-tight mb-4">{ad.title}</h1>
 
         <div className="flex flex-wrap gap-4 font-body text-body-md text-on-surface-variant mb-8">
-          <span>{ad.author_emoji} {ad.author_name}</span>
-          <span>{ad.city}</span>
+          <span>👤 {ad.author_name || 'Użytkownik'}</span>
+          {ad.city && <span>📍 {ad.city}</span>}
           <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
         </div>
 
-        <p className="font-body text-body-lg text-on-surface leading-relaxed mb-10">{ad.description}</p>
+        <p className="font-body text-body-lg text-on-surface leading-relaxed mb-10 whitespace-pre-line">{ad.description}</p>
 
         <div className="flex items-center gap-6">
           {isOwner ? (
@@ -112,7 +106,7 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
         <div className="fixed inset-0 z-[1100] flex items-end md:items-center justify-center">
           <div className="absolute inset-0 bg-black/70" onClick={() => !sending && setCompose(false)} />
           <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 pb-[calc(var(--nav-height)_+_env(safe-area-inset-bottom)_+_1.5rem)] md:pb-6 max-h-[90vh] overflow-y-auto">
-            <div className="font-display italic font-semibold text-headline-sm text-on-surface mb-1">Napisz wiadomość</div>
+            <div className="font-display font-semibold text-headline-sm text-on-surface mb-1">Napisz wiadomość</div>
             <div className="font-body text-body-md text-on-surface-variant mb-5">Do ogłoszeniodawcy · {ad.title}</div>
             {sent ? (
               <>
@@ -141,18 +135,15 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
 export function Ogloszenia({ user }) {
   const [ads, setAds] = useState([])
   const [loading, setLoading] = useState(true)
-  const [activeType, setActiveType] = useState('all')
-  const [distanceFilter, setDistanceFilter] = useState('all')
+  const [activeCategory, setActiveCategory] = useState('all')
+  const [search, setSearch] = useState('')
   const [selectedAd, setSelectedAd] = useState(null)
   const [showNewAd, setShowNewAd] = useState(false)
-  const [newAd, setNewAd] = useState({ type: 'looking', title: '', description: '', city: '' })
+  const [newAd, setNewAd] = useState({ type: 'Pan szuka Pani', title: '', description: '', city: '' })
   const [submitting, setSubmitting] = useState(false)
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
 
-  useEffect(() => {
-    loadAds()
-    requestLocation()
-  }, [])
+  useEffect(() => { loadAds() }, [])
 
   async function loadAds() {
     try {
@@ -173,7 +164,7 @@ export function Ogloszenia({ user }) {
         type: newAd.type, title: newAd.title, description: newAd.description, city: newAd.city,
         latitude: location?.lat || null, longitude: location?.lng || null,
       }})
-      setNewAd({ type: 'looking', title: '', description: '', city: '' })
+      setNewAd({ type: 'Pan szuka Pani', title: '', description: '', city: '' })
       setShowNewAd(false)
       loadAds()
     } catch (e) {
@@ -183,12 +174,18 @@ export function Ogloszenia({ user }) {
     }
   }
 
+  // Category chips derived from live data — count per category, most common first.
+  const categories = useMemo(() => {
+    const counts = {}
+    for (const a of ads) { const c = a.category || 'Inne'; counts[c] = (counts[c] || 0) + 1 }
+    return Object.entries(counts).sort(([, a], [, b]) => b - a).map(([c, n]) => ({ c, n }))
+  }, [ads])
+
   let displayAds = location ? sortByDistance(ads, location.lat, location.lng) : ads
-  if (activeType !== 'all') displayAds = displayAds.filter(a => a.type === activeType)
-  if (distanceFilter !== 'all' && location) {
-    const maxKm = parseInt(distanceFilter)
-    displayAds = displayAds.filter(a => a.distance == null || a.distance <= maxKm)
-  }
+  if (activeCategory !== 'all') displayAds = displayAds.filter(a => (a.category || 'Inne') === activeCategory)
+  const q = search.trim().toLowerCase()
+  if (q) displayAds = displayAds.filter(a =>
+    (a.title || '').toLowerCase().includes(q) || (a.description || '').toLowerCase().includes(q) || (a.city || '').toLowerCase().includes(q))
 
   if (selectedAd) {
     const ad = displayAds.find(a => a.id === selectedAd) || ads.find(a => a.id === selectedAd)
@@ -197,6 +194,7 @@ export function Ogloszenia({ user }) {
   }
 
   const inputCls = 'w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50'
+  const showGayBanner = GAY_CATS.includes(activeCategory)
 
   return (
     <div className="bg-background min-h-screen text-on-surface">
@@ -204,43 +202,57 @@ export function Ogloszenia({ user }) {
         image="/editorial/hero-ogloszenia.jpg"
         label="OD SPOŁECZNOŚCI"
         title="Ogłoszenia"
-        lead="Szukam · wydarzenia · sprzedaż — wpisy od ludzi z naszej sceny."
+        lead="Anonse od ludzi z naszej sceny — pary, single, wydarzenia, fetysz."
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
         {user && (
-          <div className="flex justify-end mb-6">
+          <div className="flex justify-end mb-4">
             <Link href="/wiadomosci">
               <span className="font-body text-label-caps uppercase text-primary-container hover:opacity-80 cursor-pointer whitespace-nowrap inline-block">Wiadomości →</span>
             </Link>
           </div>
         )}
 
-        {/* Location bar */}
-        <div className={`flex items-center gap-4 flex-wrap p-4 border mb-8 ${location ? 'border-primary-container/40' : 'border-outline-variant/30'}`}>
-          <span className="flex-1 min-w-[150px] font-body text-body-md text-on-surface-variant">
-            {geoLoading ? 'Szukam lokalizacji…' :
-             location ? 'Lokalizacja aktywna — sortuję po odległości' :
-             'Włącz lokalizację, aby zobaczyć odległości'}
-          </span>
-          {!location && !geoLoading && <Button onClick={requestLocation}>{geoError ? 'Ponów' : 'Włącz GPS'}</Button>}
+        {/* Search */}
+        <div className="relative mb-6">
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Szukaj w ogłoszeniach — nick, miasto, treść…"
+            className={inputCls}
+          />
+          {search && (
+            <button onClick={() => setSearch('')} aria-label="Wyczyść"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface">✕</button>
+          )}
         </div>
 
-        {/* Type filter */}
-        <div className="flex flex-wrap gap-x-7 gap-y-3 mb-6">
-          <button className={chip(activeType === 'all')} onClick={() => setActiveType('all')}>Wszystkie</button>
-          {TYPES.map(t => (
-            <button key={t.id} className={chip(activeType === t.id)} onClick={() => setActiveType(t.id)}>{t.emoji} {t.label}</button>
+        {/* Category filter — real categories from the shared pool */}
+        <div className="flex flex-nowrap md:flex-wrap gap-x-6 gap-y-3 mb-8 overflow-x-auto pb-1 -mx-1 px-1">
+          <button className={chip(activeCategory === 'all')} onClick={() => setActiveCategory('all')}>Wszystkie</button>
+          {categories.map(({ c, n }) => (
+            <button key={c} className={chip(activeCategory === c)} onClick={() => setActiveCategory(c)}>
+              {catEmoji(c)} {c} <span className="opacity-50">{n}</span>
+            </button>
           ))}
         </div>
 
-        {/* Distance filter */}
-        {location && (
-          <div className="flex flex-wrap gap-x-7 gap-y-3 mb-10">
-            {DISTANCE_FILTERS.map(f => (
-              <button key={f.id} className={chip(distanceFilter === f.id)} onClick={() => setDistanceFilter(f.id)}>{f.label}</button>
-            ))}
-          </div>
+        {/* Cross-portal banner — gay/LGBT ads live mostly on gay.pl */}
+        {showGayBanner && (
+          <a href="https://www.gay.pl/ogloszenia?utm_source=extrafun&utm_medium=ads_banner" target="_blank" rel="noopener noreferrer"
+            className="group block mb-8 p-6 border border-primary-container/40 hover:border-primary-container transition-colors"
+            style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.03))' }}>
+            <div className="flex items-center gap-4">
+              <span className="text-4xl shrink-0">🏳️‍🌈</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-body text-label-caps uppercase text-primary-container mb-1">Ogłoszenia gej</div>
+                <div className="font-display text-headline-sm text-on-surface leading-tight">Więcej anonsów gej znajdziesz na gay.pl</div>
+                <div className="font-body text-body-md text-on-surface-variant mt-1">Pełny katalog ogłoszeń LGBT+ — pary, single, znajomości.</div>
+              </div>
+              <span className="font-body text-label-caps uppercase text-primary-container shrink-0 group-hover:translate-x-1 transition-transform">gay.pl →</span>
+            </div>
+          </a>
         )}
 
         {/* List */}
@@ -248,28 +260,43 @@ export function Ogloszenia({ user }) {
           <div className="py-24 text-center font-body text-body-md text-on-surface-variant">Ładowanie…</div>
         ) : displayAds.length === 0 ? (
           <div className="py-24 text-center">
-            <div className="font-display italic text-headline-sm text-on-surface mb-2">Brak ogłoszeń</div>
+            <div className="font-display text-headline-sm text-on-surface mb-2">Brak ogłoszeń</div>
             <div className="font-body text-body-md text-on-surface-variant">Nie znaleziono ogłoszeń spełniających kryteria.</div>
           </div>
         ) : (
           <div>
+            <div className="font-body text-label-caps uppercase text-outline mb-4">{displayAds.length} {displayAds.length === 1 ? 'ogłoszenie' : 'ogłoszeń'}</div>
             {displayAds.map(ad => (
               <div key={ad.id} onClick={() => setSelectedAd(ad.id)} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
                 <div className="flex items-center justify-between gap-3 mb-1.5 font-body text-label-caps uppercase">
-                  <span className="text-primary-container">{typeLabel(ad.type)}</span>
+                  <span className="text-primary-container">{catEmoji(ad.category)} {ad.category || 'Ogłoszenie'}</span>
                   {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
                 </div>
-                <div className="font-display italic font-medium text-body-lg text-on-surface leading-tight group-hover:text-primary-container transition-colors">{ad.title}</div>
+                <div className="font-body font-semibold text-body-lg text-on-surface leading-snug group-hover:text-primary-container transition-colors">{ad.title}</div>
                 <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed line-clamp-2">{ad.description}</div>
                 <div className="flex flex-wrap gap-4 mt-2 font-body text-label-caps uppercase text-outline">
-                  <span>{ad.author_emoji || '👤'} {ad.author_name || 'Użytkownik'}</span>
-                  <span>{ad.city}</span>
+                  <span>👤 {ad.author_name || 'Użytkownik'}</span>
+                  {ad.city && <span>📍 {ad.city}</span>}
                   <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
                 </div>
               </div>
             ))}
           </div>
         )}
+
+        {/* Location — optional, secondary (only 13/343 ads have coordinates) */}
+        <div className="mt-12 flex items-center gap-4 flex-wrap p-4 border border-outline-variant/20">
+          <span className="flex-1 min-w-[150px] font-body text-body-sm text-on-surface-variant">
+            {geoLoading ? 'Szukam lokalizacji…' :
+             location ? 'Lokalizacja aktywna — sortuję po odległości (jeśli podana)' :
+             'Sortuj po odległości (opcjonalnie)'}
+          </span>
+          {!location && !geoLoading && (
+            <button onClick={requestLocation} className="font-body text-label-caps uppercase text-primary-container hover:opacity-80">
+              {geoError ? 'Ponów' : '📍 Włącz GPS'}
+            </button>
+          )}
+        </div>
       </main>
 
       {/* FAB */}
@@ -285,11 +312,11 @@ export function Ogloszenia({ user }) {
         <div className="fixed inset-0 z-[1100] flex items-end md:items-center justify-center">
           <div className="absolute inset-0 bg-black/70" onClick={() => setShowNewAd(false)} />
           <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 pb-[calc(var(--nav-height)_+_env(safe-area-inset-bottom)_+_1.5rem)] md:pb-6 max-h-[90vh] overflow-y-auto">
-            <div className="font-display italic font-semibold text-headline-sm text-on-surface mb-6">Dodaj ogłoszenie</div>
+            <div className="font-display font-semibold text-headline-sm text-on-surface mb-6">Dodaj ogłoszenie</div>
 
-            <label className="block font-body text-label-caps uppercase text-outline mb-1">Typ</label>
+            <label className="block font-body text-label-caps uppercase text-outline mb-1">Kategoria</label>
             <select className={`${inputCls} mb-4`} value={newAd.type} onChange={e => setNewAd(prev => ({ ...prev, type: e.target.value }))}>
-              {TYPES.map(t => <option key={t.id} value={t.id}>{t.emoji} {t.label}</option>)}
+              {POST_CATEGORIES.map(c => <option key={c} value={c}>{catEmoji(c)} {c}</option>)}
             </select>
 
             <label className="block font-body text-label-caps uppercase text-outline mb-1">Tytuł</label>
