@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
-import { getWordOfTheDay } from '../lib/dictionary'
 import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
 import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { MagazynSidebar } from '../components/MagazynSidebar'
-import { Hero, ArticleCard, SectionHeader, Button } from '../components/nocturne'
+import { Hero, ArticleCard, SectionHeader } from '../components/nocturne'
 
 const BASE_URL = 'https://www.extrafun.pl'
 
@@ -124,7 +123,6 @@ export function Magazyn() {
   }, [])
 
   const allArticles = (dbArticles && dbArticles.length > 0) ? dbArticles : FALLBACK_ARTICLES
-  const word = getWordOfTheDay()
 
   const filtered = activeCategory === 'Wszystkie'
     ? allArticles
@@ -246,32 +244,16 @@ export function Magazyn() {
 
           </div>{/* /content col */}
 
-          <aside className="hidden lg:block lg:col-span-4">
-            <div className="sticky top-24">
+          <aside className="mt-16 lg:mt-0 lg:col-span-4">
+            <div className="lg:sticky lg:top-24">
               <MagazynSidebar onSelectCategory={setActiveCategory} />
             </div>
           </aside>
         </div>{/* /magazyn grid */}
 
-        {/* Secondary rail (mobile only) — słówko dnia · quiz · kalendarz */}
-        <section className="mt-32 grid grid-cols-1 md:grid-cols-12 gap-8 lg:hidden">
-          <div className="md:col-span-4 border border-outline-variant/20 p-6">
-            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Słówko dnia</div>
-            <div className="font-display text-headline-sm text-on-surface mb-2">{word.term}</div>
-            <p className="font-body text-body-md text-on-surface-variant">{word.definition}</p>
-            <Link href="/slownik" className="inline-block mt-4 font-body text-label-caps uppercase text-primary-container hover:opacity-80">Cały słownik →</Link>
-          </div>
-
-          <div className="md:col-span-4 border border-outline-variant/20 p-6">
-            <div className="font-body text-label-caps uppercase text-primary-container mb-3">Quiz miesiąca · Wrzesień</div>
-            <div className="font-display text-headline-sm text-on-surface mb-2">{QUIZ_TITLE}</div>
-            <p className="font-body text-body-md text-on-surface-variant mb-5">12 pytań, 4 typy — sprawdź swój temperament.</p>
-            <Button onClick={() => setShowQuiz(true)}>Zacznij</Button>
-          </div>
-
-          <div className="md:col-span-4">
-            <CalendarWidget />
-          </div>
+        {/* Kalendarz — pełna szerokość pod treścią (słówko/quiz są w sidebarze) */}
+        <section className="mt-24 max-w-lg">
+          <CalendarWidget />
         </section>
       </main>
     </div>
