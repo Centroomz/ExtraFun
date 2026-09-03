@@ -696,14 +696,25 @@ export function registerRoutes(app) {
   app.get('/api/events', async (req, res) => {
     const { from, to, venue_id } = req.query
     const today = new Date().toISOString().slice(0, 10)
-    let q = supabaseAdmin.from('venue_events')
-      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url, description, cover_image, is_external')
+    // ExtraFun is the swing/lifestyle site, but venue_events is shared with gay.pl.
+    // Without a scene filter /imprezy fills with gay venues abroad (Prague/Berlin/
+    // Bangkok). Restrict to swing/mixed venues, matching both venues.id and
+    // legacy_swing_id (venue_events.venue_id historically points at the swingers id-space).
+    const { data: swingVenues } = await supabaseAdmin.from('venues')
+      .select('id, legacy_swing_id').in('scene', ['swing', 'mixed'])
+    const allowIds = [...new Set((swingVenues || []).flatMap(v => [v.id, v.legacy_swing_id]).filter(x => x != null))]
+    if (!allowIds.length) return res.json([])
+    // Dated swing events live in one_time_events (venue_events is the gay.pl-shared
+    // table and holds no swing dates). Alias external_link -> event_url for the
+    // frontend's EventCard.
+    let q = supabaseAdmin.from('one_time_events')
+      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url:external_link, description, cover_image, is_external')
+      .in('venue_id', venue_id ? [Number(venue_id)] : allowIds)
       .gte('event_date', from || today)
       .order('event_date', { ascending: true })
       .order('start_time', { ascending: true })
-      .limit(100)
+      .limit(200)
     if (to) q = q.lte('event_date', to)
-    if (venue_id) q = q.eq('venue_id', venue_id)
     const { data, error } = await q
     if (error) return res.status(500).json({ message: error.message })
     res.json(await attachVenueInfo(data || []))
