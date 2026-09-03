@@ -266,6 +266,7 @@ export function Ogloszenia({ user }) {
         ) : (
           <div>
             <div className="font-body text-label-caps uppercase text-outline mb-4">{displayAds.length} {displayAds.length === 1 ? 'ogłoszenie' : 'ogłoszeń'}</div>
+            <div className="md:grid md:grid-cols-2 md:gap-x-10">
             {displayAds.map(ad => (
               <div key={ad.id} onClick={() => setSelectedAd(ad.id)} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
                 <div className="flex items-center justify-between gap-3 mb-1.5 font-body text-label-caps uppercase">
@@ -281,6 +282,7 @@ export function Ogloszenia({ user }) {
                 </div>
               </div>
             ))}
+            </div>
           </div>
         )}
 

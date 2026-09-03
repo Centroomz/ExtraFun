@@ -289,7 +289,7 @@ export function registerRoutes(app) {
       // Inne źródła (gaypl/extrafun) nie mają tej kolumny ustawionej — przechodzą
       // zawsze przez pierwszy człon OR.
       .or('source.neq.bizarriusz,cross_post_extrafun.not.is.false')
-      .order('created_at', { ascending: false }).limit(300)
+      .order('created_at', { ascending: false }).limit(2000)
     if (error) return res.status(500).json({ message: error.message })
     // Resolve author display names from auth.users (nick lives in user_metadata,
     // not profiles). ad_author_names is a security-definer fn: service_role only,
