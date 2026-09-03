@@ -97,8 +97,9 @@ export function registerRoutes(app) {
     // unset → behave as before (show all). getDay 0=Sun..6=Sat.
     res.json((venues || []).map(v => {
       const sd = v.swing_days, gd = v.gay_days
-      const allow = (dow) => !sd || sd.includes(dow)
-      const label = (dow) => sd ? (gd && gd.includes(dow) ? 'Panie i Panowie' : 'Pary i single') : null
+      const unset = !sd || sd.length === 0   // empty array [] = unset, same as NULL (else [].includes()=false hides every day — bug hit Bizarriusz v5)
+      const allow = (dow) => unset || sd.includes(dow)
+      const label = (dow) => unset ? null : (gd && gd.includes(dow) ? 'Panie i Panowie' : 'Pary i single')
       const key = v.id   // events re-keyed to own venues.id (migration 2026-07-08); legacy_swing_id no longer used for lookup — avoids ID collision with gay.pl venues
       const events = (byVenue[key] || []).filter(e => allow(e.day_of_week)).map(e => ({ ...e, audience: label(e.day_of_week) }))
       // Alias venues columns back to the swingers shape the frontend expects.

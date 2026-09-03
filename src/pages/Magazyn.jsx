@@ -6,6 +6,7 @@ import { ARTICLES as FALLBACK_ARTICLES, CATEGORIES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
 import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
+import { MagazynSidebar } from '../components/MagazynSidebar'
 import { Hero, ArticleCard, SectionHeader, Button } from '../components/nocturne'
 
 const BASE_URL = 'https://www.extrafun.pl'
@@ -193,6 +194,9 @@ export function Magazyn() {
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
 
+        <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
+          <div className="lg:col-span-8">
+
         {/* Category filter */}
         <div className="flex flex-wrap gap-x-7 gap-y-3 mb-16">
           {CATEGORIES.map(cat => (
@@ -240,8 +244,17 @@ export function Magazyn() {
           </div>
         )}
 
-        {/* Secondary rail — słówko dnia · quiz · kalendarz */}
-        <section className="mt-32 grid grid-cols-1 md:grid-cols-12 gap-8">
+          </div>{/* /content col */}
+
+          <aside className="hidden lg:block lg:col-span-4">
+            <div className="sticky top-24">
+              <MagazynSidebar onSelectCategory={setActiveCategory} />
+            </div>
+          </aside>
+        </div>{/* /magazyn grid */}
+
+        {/* Secondary rail (mobile only) — słówko dnia · quiz · kalendarz */}
+        <section className="mt-32 grid grid-cols-1 md:grid-cols-12 gap-8 lg:hidden">
           <div className="md:col-span-4 border border-outline-variant/20 p-6">
             <div className="font-body text-label-caps uppercase text-primary-container mb-3">Słówko dnia</div>
             <div className="font-display text-headline-sm text-on-surface mb-2">{word.term}</div>
