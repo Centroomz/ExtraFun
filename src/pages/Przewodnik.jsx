@@ -297,6 +297,15 @@ function venueSlug(v) {
   return `${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`
 }
 
+// On ExtraFun a venue counts as a swing venue only on its swing_days (when set).
+// swing_days null/[] = no restriction (swing every day). Mirrors the server's
+// allow() in /api/places so a mostly-gay venue (e.g. Sauna Heaven — swing only on
+// Tuesdays) is not shown as an open swing club the rest of the week.
+function swingDayOk(v, dow) {
+  const sd = v.swing_days
+  return !sd || sd.length === 0 || sd.includes(dow)
+}
+
 // The chosen day's status line (special / weekly events / event-club / closed).
 // Shared by the grid card (VenueRow) and the compact hub row (VenueRowCompact).
 function VenueStatus({ venue }) {
@@ -483,7 +492,7 @@ export function Przewodnik({ city: cityParam }) {
       const evs = v.events || []
       // A dated special on that exact date overrides the weekly schedule.
       const special = (v.oneTime || []).find(e => (e.event_date || '').slice(0, 10) === targetYmd)
-      return { ...v, _special: special, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 }
+      return { ...v, _special: special, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 && swingDayOk(v, targetDow) }
     })
     // Open that day: special OR weekly event OR event-club (no fixed schedule).
     .filter(v => v._special || v._dayEvents.length > 0 || v._eventClub)
@@ -494,7 +503,7 @@ export function Przewodnik({ city: cityParam }) {
   const statusOf = (v) => {
     const evs = v.events || []
     const special = (v.oneTime || []).find(e => (e.event_date || '').slice(0, 10) === targetYmd)
-    return { ...v, _special: special, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 }
+    return { ...v, _special: special, _dayEvents: evs.filter(e => e.day_of_week === targetDow), _eventClub: evs.length === 0 && swingDayOk(v, targetDow) }
   }
   const isOpenToday = (v) => v._special || (v._dayEvents && v._dayEvents.length > 0) || v._eventClub
 
