@@ -31,6 +31,16 @@ const chip = (active) =>
     active ? 'border-primary-container text-primary-container' : 'border-transparent text-on-surface-variant hover:text-on-surface'
   }`
 
+// Round author avatar with graceful fallback to an emoji when there's no photo
+// or it fails to load (~42% of authors have one).
+function Avatar({ src, size = 28 }) {
+  const [ok, setOk] = useState(!!src)
+  const style = { width: size, height: size }
+  return src && ok
+    ? <img src={src} alt="" onError={() => setOk(false)} className="rounded-full object-cover shrink-0" style={style} />
+    : <span className="rounded-full bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant" style={style}>👤</span>
+}
+
 function AdDetail({ ad, onBack, user, onDeleted }) {
   const [, navigate] = useLocation()
   const [compose, setCompose] = useState(false)
@@ -77,8 +87,25 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
 
         <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-tight mb-4">{ad.title}</h1>
 
+        {/* Author mini-profile (no public profile page exists — this is it) */}
+        <div className="flex items-center gap-4 mb-4 p-4 border border-outline-variant/20">
+          <Avatar src={ad.author_avatar} size={56} />
+          <div className="min-w-0">
+            <div className="font-body text-body-lg font-semibold text-on-surface">
+              {ad.author_name || 'Użytkownik'}{ad.author_age ? ` · ${ad.author_age} l.` : ''}
+            </div>
+            {ad.author_looking && (
+              <div className="font-body text-body-md text-on-surface-variant mt-0.5 line-clamp-2">
+                <span className="text-primary-container">Szuka:</span> {ad.author_looking}
+              </div>
+            )}
+          </div>
+        </div>
+        {ad.author_about && (
+          <p className="font-body text-body-md text-on-surface-variant mb-6 whitespace-pre-line">{ad.author_about}</p>
+        )}
+
         <div className="flex flex-wrap gap-4 font-body text-body-md text-on-surface-variant mb-8">
-          <span>👤 {ad.author_name || 'Użytkownik'}</span>
           {ad.city && <span>📍 {ad.city}</span>}
           <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
         </div>
@@ -275,8 +302,11 @@ export function Ogloszenia({ user }) {
                 </div>
                 <div className="font-body font-semibold text-body-lg text-on-surface leading-snug group-hover:text-primary-container transition-colors">{ad.title}</div>
                 <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed line-clamp-2">{ad.description}</div>
-                <div className="flex flex-wrap gap-4 mt-2 font-body text-label-caps uppercase text-outline">
-                  <span>👤 {ad.author_name || 'Użytkownik'}</span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2.5 font-body text-label-caps uppercase text-outline">
+                  <span className="flex items-center gap-2">
+                    <Avatar src={ad.author_avatar} size={22} />
+                    <span className="text-on-surface-variant">{ad.author_name || 'Użytkownik'}{ad.author_age ? ` · ${ad.author_age} l.` : ''}</span>
+                  </span>
                   {ad.city && <span>📍 {ad.city}</span>}
                   <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
                 </div>

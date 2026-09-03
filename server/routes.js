@@ -295,18 +295,25 @@ export function registerRoutes(app) {
     // not profiles). ad_author_names is a security-definer fn: service_role only,
     // returns just the nick for the ids we pass — no emails leak.
     const ids = [...new Set((data || []).map(a => a.author_uuid).filter(Boolean))]
-    const names = {}
+    const authors = {}
     if (ids.length) {
-      const { data: an } = await supabaseAdmin.rpc('ad_author_names', { ids })
-      for (const r of (an || [])) names[r.id] = r.display_name
+      const { data: an } = await supabaseAdmin.rpc('ad_authors', { ids })
+      for (const r of (an || [])) authors[r.id] = r
     }
-    res.json((data || []).map(a => ({
-      id: a.id, title: a.title, description: a.description,
-      city: a.location, category: a.category || null, type: a.category || null,
-      latitude: a.latitude, longitude: a.longitude, created_at: a.created_at,
-      author_uuid: a.author_uuid || null,
-      author_name: a.author_uuid ? (names[a.author_uuid] || 'Użytkownik') : null,
-    })))
+    res.json((data || []).map(a => {
+      const au = a.author_uuid ? authors[a.author_uuid] : null
+      return {
+        id: a.id, title: a.title, description: a.description,
+        city: a.location, category: a.category || null, type: a.category || null,
+        latitude: a.latitude, longitude: a.longitude, created_at: a.created_at,
+        author_uuid: a.author_uuid || null,
+        author_name: au?.display_name || (a.author_uuid ? 'Użytkownik' : null),
+        author_avatar: au?.avatar_url || null,
+        author_age: au?.age || null,
+        author_looking: au?.looking_for || null,
+        author_about: au?.about || null,
+      }
+    }))
   })
 
   app.post('/api/ads', verifyJWT, async (req, res) => {
