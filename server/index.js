@@ -77,11 +77,18 @@ app.listen(PORT, () => {
 
   const publishScheduled = async () => {
     try {
+      // publish_date is stored as a naive Europe/Warsaw wall-clock timestamp
+      // (that's what the admin picker and the "Zaplanowany HH:MM" label mean),
+      // so compare it against Warsaw-local now, NOT UTC. Using UTC made every
+      // scheduled article go live 2h (CEST) / 1h (CET) late.
+      const warsawNow = new Date()
+        .toLocaleString('sv-SE', { timeZone: 'Europe/Warsaw' })
+        .replace(' ', 'T')
       const { data, error } = await supabaseAdmin.from('articles')
         .update({ status: 'published' })
         .eq('status', 'scheduled')
         .eq('site', 'extrafun')
-        .lte('publish_date', new Date().toISOString())
+        .lte('publish_date', warsawNow)
         .select('id, title')
       if (error) { console.error('[scheduler] publish error:', error.message); return }
       if (data?.length) console.log(`[scheduler] Published ${data.length} scheduled article(s):`, data.map(a => a.title).join(', '))
