@@ -106,7 +106,9 @@ function NearbyModule() {
 
   useEffect(() => {
     apiFetch('/api/places')
-      .then(data => setVenues((data || []).filter(v => v.name)))
+      // ExtraFun "kluby": drop naturist beaches (own /plaze page) and gay-scene
+      // venues (gay.pl) — otherwise the 66 gay beaches bury the ~13 swing clubs.
+      .then(data => setVenues((data || []).filter(v => v.name && v.type !== 'plaża' && v.scene !== 'gay')))
       .catch(() => setVenues([]))
   }, [])
 
