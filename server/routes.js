@@ -522,7 +522,14 @@ export function registerRoutes(app) {
   })
 
   app.put('/api/admin/articles/:id', verifyJWT, isAdmin, async (req, res) => {
-    const { error } = await supabaseAdmin.from('articles').update(req.body).eq('id', req.params.id)
+    const body = { ...req.body }
+    // Editing an already-published article (new cover, typo fix, retag...) must
+    // NOT bump publish_date — the feed and the mobile/aside banners sort by it,
+    // so touching it shoves a months-old piece to the top like it's brand new.
+    // Only a genuine draft/scheduled → published transition should set it.
+    const { data: existing } = await supabaseAdmin.from('articles').select('status').eq('id', req.params.id).single()
+    if (existing && existing.status === 'published') delete body.publish_date
+    const { error } = await supabaseAdmin.from('articles').update(body).eq('id', req.params.id)
     if (error) return res.status(500).json({ message: error.message })
     res.json({ ok: true })
   })
