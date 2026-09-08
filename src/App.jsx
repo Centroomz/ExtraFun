@@ -325,7 +325,7 @@ function AppInner() {
         <header className="mobile-topbar">
           <Link href="/magazyn" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <img src={extrafunLogo} alt="ExtraFun" style={{ width: 32, height: 32, borderRadius: 8 }} />
-            <span style={{ fontFamily: "'Bodoni Moda', Georgia, serif", fontSize: 22, fontWeight: 600, fontStyle: 'italic', letterSpacing: '-0.02em', color: 'var(--gold-bright)' }}>
+            <span style={{ fontFamily: "'Playfair Display', 'Bodoni Moda', serif", fontSize: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--gold-bright)' }}>
               ExtraFun
             </span>
           </Link>
