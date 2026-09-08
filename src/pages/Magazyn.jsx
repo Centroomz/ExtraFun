@@ -22,6 +22,9 @@ const SLUG_TO_DISPLAY = {
   'slownik':        'Słownik',
   'temat-miesiaca': 'Temat Miesiąca',
   'felieton':       'Felieton',
+  'plazing':        'Plażing',
+  'dogging':        'Dogging',
+  'naga-sroda':     'Naga Środa',
 }
 
 /* ─── Quiz View (inline, no URL needed) ──────────────────────── */

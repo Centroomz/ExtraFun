@@ -13,6 +13,9 @@ const CATEGORY_COLORS = {
   'Tam i Tam':      { bg: 'rgba(255,165,0,0.12)',   color: '#FFA500', border: 'rgba(255,165,0,0.3)' },
   'Słownik':        { bg: 'rgba(0,255,150,0.12)',   color: '#00FF96', border: 'rgba(0,255,150,0.3)' },
   'Temat Miesiąca': { bg: 'rgba(255,200,0,0.12)',   color: '#FFC800', border: 'rgba(255,200,0,0.3)' },
+  'Plażing':        { bg: 'rgba(255,160,0,0.12)',   color: '#FFA000', border: 'rgba(255,160,0,0.3)' },
+  'Dogging':        { bg: 'rgba(229,57,53,0.12)',   color: '#E53935', border: 'rgba(229,57,53,0.3)' },
+  'Naga Środa':     { bg: 'rgba(20,241,217,0.12)',  color: '#14F1D9', border: 'rgba(20,241,217,0.3)' },
 }
 
 const SLUG_TO_DISPLAY = {
@@ -22,6 +25,9 @@ const SLUG_TO_DISPLAY = {
   'tam-i-tam':      'Tam i Tam',
   'slownik':        'Słownik',
   'temat-miesiaca': 'Temat Miesiąca',
+  'plazing':        'Plażing',
+  'dogging':        'Dogging',
+  'naga-sroda':     'Naga Środa',
 }
 
 // Inline parser: supports **bold** and [label](url) in any nesting order.
