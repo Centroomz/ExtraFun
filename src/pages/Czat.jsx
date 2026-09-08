@@ -14,14 +14,14 @@ function MessageBubble({ msg, isMe }) {
       padding: '0 16px',
     }}>
       {!isMe && (
-        <div style={{
+        <div className="text-[16px]" style={{
           width: 32, height: 32, borderRadius: '50%',
           background: 'linear-gradient(135deg, rgba(233,193,118,0.3), rgba(157,78,221,0.3))',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 16, marginRight: 8, flexShrink: 0, alignSelf: 'flex-end',
+          marginRight: 8, flexShrink: 0, alignSelf: 'flex-end',
         }}>👤</div>
       )}
-      <div style={{
+      <div className="text-body-md" style={{
         maxWidth: '72%',
         padding: '10px 14px',
         borderRadius: isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
@@ -30,16 +30,15 @@ function MessageBubble({ msg, isMe }) {
           : 'rgba(255,255,255,0.08)',
         border: isMe ? 'none' : '1px solid rgba(255,255,255,0.12)',
         color: 'white',
-        fontSize: 14,
         lineHeight: 1.5,
       }}>
         {!isMe && (
-          <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--cyan)', marginBottom: 2 }}>
+          <div className="text-body-md font-bold" style={{ color: 'var(--cyan)', marginBottom: 2 }}>
             {msg.username || 'Gość'}
           </div>
         )}
         {msg.content}
-        <div style={{ fontSize: 10, color: isMe ? 'rgba(232,230,252,0.86)' : 'var(--text-dim)', marginTop: 4 }}>
+        <div className="text-body-md" style={{ color: isMe ? 'rgba(232,230,252,0.86)' : 'var(--text-dim)', marginTop: 4 }}>
           {new Date(msg.created_at).toLocaleTimeString('pl', { hour: '2-digit', minute: '2-digit' })}
         </div>
       </div>
@@ -89,13 +88,13 @@ export function Czat({ user }) {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
       {/* Header */}
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{
+        <div className="text-[18px]" style={{
           width: 36, height: 36, borderRadius: '50%',
           background: 'linear-gradient(135deg, rgba(233,193,118,0.3), rgba(157,78,221,0.3))',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>💬</div>
         <div>
-          <div style={{ fontWeight: 700, fontSize: 15 }}>Czat na żywo</div>
+          <div className="text-body-md font-bold">Czat na żywo</div>
           <div className="xenia-badge">Wspólny pokój · online</div>
         </div>
       </div>
@@ -125,7 +124,7 @@ export function Czat({ user }) {
         display: 'flex', flexDirection: 'column', gap: 8, maxWidth: 520, margin: '0 auto',
       }}>
         {error && (
-          <div style={{ color: '#ff8a8a', fontSize: 12, textAlign: 'center' }}>{error}</div>
+          <div className="text-body-md" style={{ color: '#ff8a8a', textAlign: 'center' }}>{error}</div>
         )}
         {user ? (
           <div style={{ display: 'flex', gap: 10 }}>

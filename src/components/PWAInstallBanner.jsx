@@ -60,7 +60,7 @@ export function PWAInstallBanner() {
         maxWidth: 420,
         width: '100%',
       }}>
-        <div style={{
+        <div className="text-[20px]" style={{
           width: 40,
           height: 40,
           borderRadius: 12,
@@ -68,38 +68,36 @@ export function PWAInstallBanner() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: 20,
           flexShrink: 0,
         }}>
           📲
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#ffffff', lineHeight: 1.3 }}>
+          <p className="text-body-md font-bold" style={{ margin: 0, color: '#ffffff', lineHeight: 1.3 }}>
             Zainstaluj ExtraFun
           </p>
-          <p style={{ margin: '2px 0 0', fontSize: 11, color: 'var(--text-dim)' }}>
+          <p className="text-body-md" style={{ margin: '2px 0 0', color: 'var(--text-dim)' }}>
             Szybszy dostęp, działa offline
           </p>
         </div>
         <button
           onClick={handleInstall}
+          className="text-body-md font-bold"
           style={{
             padding: '8px 16px',
             borderRadius: 12,
             background: 'linear-gradient(135deg, var(--cyan), var(--purple))',
             color: '#ffffff',
             border: 'none',
-            fontSize: 12,
-            fontWeight: 700,
             cursor: 'pointer',
             flexShrink: 0,
-            letterSpacing: -0.2,
           }}
         >
           Instaluj
         </button>
         <button
           onClick={handleDismiss}
+          className="text-body-md"
           style={{
             width: 28,
             height: 28,
@@ -111,7 +109,6 @@ export function PWAInstallBanner() {
             justifyContent: 'center',
             cursor: 'pointer',
             color: 'var(--text-dim)',
-            fontSize: 16,
             flexShrink: 0,
           }}
         >

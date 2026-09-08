@@ -32,12 +32,12 @@ export function SignupPage({ onSwitch, onSuccess }) {
     return (
       <div className="auth-container">
         <div className="auth-card" style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 56, marginBottom: 16 }}>📧</div>
-          <h2 style={{ fontFamily: 'Playfair Display', fontSize: 24, fontWeight: 800, marginBottom: 12 }}>Prawie gotowe!</h2>
-          <p style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 14 }}>
+          <div className="text-[56px]" style={{ marginBottom: 16 }}>📧</div>
+          <h2 className="font-headline-sm text-headline-sm font-extrabold" style={{ marginBottom: 12 }}>Prawie gotowe!</h2>
+          <p className="text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 14 }}>
             Wysłaliśmy link potwierdzający na <strong>{email}</strong>. Kliknij w link, aby aktywować konto.
           </p>
-          <p style={{ fontSize: 13, color: '#d4af37', lineHeight: 1.6, marginBottom: 20, background: 'rgba(233,193,118,0.08)', border: '1px solid rgba(233,193,118,0.3)', borderRadius: 12, padding: '12px 14px' }}>
+          <p className="text-body-md" style={{ color: '#d4af37', lineHeight: 1.6, marginBottom: 20, background: 'rgba(233,193,118,0.08)', border: '1px solid rgba(233,193,118,0.3)', borderRadius: 12, padding: '12px 14px' }}>
             ⚠️ Nie ma maila w ciągu minuty? Zajrzyj do folderu <strong>SPAM / Oferty</strong> i oznacz wiadomość jako „nie spam".
           </p>
           <button className="btn-ghost" style={{ width: '100%' }} onClick={onSwitch}>Wróć do logowania</button>

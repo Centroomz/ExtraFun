@@ -208,16 +208,16 @@ function ProfilePage({ user, profile, onSignOut }) {
               {profile?.verified && <span className="verified-badge">✓</span>}
             </div>
             <div className="profile-username">@{profile?.username || '---'}</div>
-            <div style={{ fontSize: 12, color: 'var(--text-dim)', marginTop: 4 }}>{user?.email}</div>
+            <div className="text-body-md" style={{ color: 'var(--text-dim)', marginTop: 4 }}>{user?.email}</div>
           </div>
         </div>
         {profile?.bio && (
           <div className="glass-card" style={{ padding: 16, margin: '0 0 16px' }}>
-            <p style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.7 }}>{profile.bio}</p>
+            <p className="text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.7 }}>{profile.bio}</p>
           </div>
         )}
         {profile?.city && (
-          <div style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 16 }}>📍 {profile.city}</div>
+          <div className="text-body-md" style={{ color: 'var(--text-dim)', marginBottom: 16 }}>📍 {profile.city}</div>
         )}
         <button className="btn-ghost" style={{ width: '100%' }} onClick={onSignOut}>
           Wyloguj się
@@ -325,7 +325,7 @@ function AppInner() {
         <header className="mobile-topbar">
           <Link href="/magazyn" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
             <img src={extrafunLogo} alt="ExtraFun" style={{ width: 32, height: 32, borderRadius: 8 }} />
-            <span style={{ fontFamily: "'Playfair Display', 'Bodoni Moda', serif", fontSize: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--gold-bright)' }}>
+            <span style={{ fontFamily: "'Bodoni Moda', serif", fontSize: 20, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--gold-bright)' }}>
               ExtraFun
             </span>
           </Link>
@@ -383,7 +383,7 @@ function AppInner() {
 
           {/* Sister site — inside content column so it doesn't become a flex
               row sibling stealing ~155px of page width on desktop */}
-          <div style={{ textAlign: 'center', padding: '8px 16px 20px', color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>
+          <div className="text-body-md" style={{ textAlign: 'center', padding: '8px 16px 20px', color: 'rgba(255,255,255,0.2)' }}>
             Portal partnerski:{' '}
             <a href="https://gay.pl" target="_blank" rel="noopener noreferrer" style={{ color: 'rgba(232,230,252,0.72)', textDecoration: 'none' }}>gay.pl</a>
           </div>

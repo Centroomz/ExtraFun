@@ -102,9 +102,10 @@ function ArticleReader({ article, onBack }) {
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={onBack}
-          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 22, padding: 0 }}
+          className="text-[22px]"
+          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', padding: 0 }}
         >←</button>
-        <h1 style={{ fontSize: 16 }}>Artykuł</h1>
+        <h1 className="text-body-md">Artykuł</h1>
       </div>
       <div style={{ padding: '0 0 80px' }}>
         {/* Header */}
@@ -114,15 +115,15 @@ function ArticleReader({ article, onBack }) {
           padding: '28px 20px 24px',
           marginBottom: 0,
         }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>{article.emoji}</div>
-          <div style={{
-            display: 'inline-block', fontSize: 11, fontWeight: 700,
+          <div className="text-[40px]" style={{ marginBottom: 12 }}>{article.emoji}</div>
+          <div className="text-label-caps uppercase" style={{
+            display: 'inline-block',
             color: article.tagColor, background: `${article.tagColor}22`,
             border: `1px solid ${article.tagColor}44`,
-            borderRadius: 20, padding: '3px 10px', marginBottom: 12, textTransform: 'uppercase', letterSpacing: '.08em',
+            borderRadius: 20, padding: '3px 10px', marginBottom: 12,
           }}>{article.tag} · {article.readTime} czytania</div>
           <h2 className="font-display italic font-semibold text-headline-md text-on-surface" style={{ lineHeight: 1.2, marginBottom: 12 }}>{article.title}</h2>
-          <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.6 }}>{article.lead}</p>
+          <p className="text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.6 }}>{article.lead}</p>
         </div>
         {/* Body */}
         <div className="max-w-2xl" style={{ padding: '24px 20px' }}>
@@ -132,7 +133,7 @@ function ArticleReader({ article, onBack }) {
                 {block.h}
               </h3>
             ) : (
-              <p key={i} className="font-body" style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 16 }}>
+              <p key={i} className="font-body text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.75, marginBottom: 16 }}>
                 {block.p}
               </p>
             )
@@ -151,9 +152,10 @@ function VenueDetail({ venue, onBack }) {
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
         <button
           onClick={onBack}
-          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 22, padding: 0 }}
+          className="text-[22px]"
+          style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', padding: 0 }}
         >←</button>
-        <h1 style={{ fontSize: 16 }}>Szczegóły</h1>
+        <h1 className="text-body-md">Szczegóły</h1>
       </div>
       <div className="max-w-3xl mx-auto" style={{ padding: '0 0 80px' }}>
         <div style={{ padding: '20px 16px' }}>
@@ -161,7 +163,7 @@ function VenueDetail({ venue, onBack }) {
             <div style={{ width: 72, height: 72, flexShrink: 0, background: venue.logo_url ? '#000' : t.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
               {venue.logo_url
                 ? <img src={venue.logo_url} alt={venue.name} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 8, boxSizing: 'border-box' }} />
-                : <span style={{ fontSize: 34 }}>{t.icon}</span>}
+                : <span className="text-[34px]">{t.icon}</span>}
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <h2 className="font-display italic font-semibold text-headline-md text-on-surface">{venue.name}</h2>
@@ -174,10 +176,10 @@ function VenueDetail({ venue, onBack }) {
             <span className="venue-type-badge" style={{ background: t.bg, color: t.color }}>
               {t.icon} {t.label}
             </span>
-            <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>📍 {venue.city}</span>
+            <span className="text-body-md" style={{ color: 'var(--text-dim)' }}>📍 {venue.city}</span>
           </div>
           {venue.description && (
-            <p style={{ fontSize: 15, color: '#fff', lineHeight: 1.7, marginBottom: 20 }}>
+            <p className="text-body-md" style={{ color: '#fff', lineHeight: 1.7, marginBottom: 20 }}>
               {venue.description}
             </p>
           )}
@@ -199,23 +201,23 @@ function VenueDetail({ venue, onBack }) {
                   const isToday = off === 0
                   return (
                     <div key={off} style={{ marginBottom: 12, paddingLeft: isToday ? 10 : 0, borderLeft: isToday ? '3px solid #d4af37' : 'none' }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: isToday ? '#d4af37' : 'var(--text)', marginBottom: 4 }}>
+                      <div className="text-body-md font-extrabold" style={{ color: isToday ? '#d4af37' : 'var(--text)', marginBottom: 4 }}>
                         {label}{off > 1 ? '' : ` · ${DNI[dow]} ${d.getDate()} ${MIES[d.getMonth()]}`}
                       </div>
                       {special ? (
-                        <div style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55 }}>
+                        <div className="text-body-md" style={{ color: '#fff', lineHeight: 1.55 }}>
                           <strong style={{ color: '#FFC824' }}>⭐ {special.event_name}</strong>
                           {(special.start_time || special.end_time) && <> · {special.start_time}{special.end_time ? `–${special.end_time}` : ''}</>}
-                          {special.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{special.price}</span></>}
+                          {special.price && <><br /><span className="text-body-md font-semibold">{special.price}</span></>}
                         </div>
                       ) : evs.length === 0 ? (
-                        <div style={{ fontSize: 13, color: 'var(--text-dim)', opacity: .6 }}>Zamknięte</div>
+                        <div className="text-body-md" style={{ color: 'var(--text-dim)', opacity: .6 }}>Zamknięte</div>
                       ) : evs.map(e => (
-                        <div key={e.id} style={{ fontSize: 13.5, color: '#fff', lineHeight: 1.55, marginBottom: 3 }}>
+                        <div key={e.id} className="text-body-md" style={{ color: '#fff', lineHeight: 1.55, marginBottom: 3 }}>
                           <strong style={{ color: 'var(--text)' }}>{e.event_name}</strong>
-                          {e.audience && <span style={{ marginLeft: 6, fontSize: 11, fontWeight: 700, color: '#d4af37', background: 'rgba(233,193,118,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
+                          {e.audience && <span className="text-label-caps uppercase" style={{ marginLeft: 6, color: '#d4af37', background: 'rgba(233,193,118,.12)', padding: '1px 6px', borderRadius: 6 }}>{e.audience}</span>}
                           {(e.start_time || e.end_time) && <> · {e.start_time}{e.end_time ? `–${e.end_time}` : ''}</>}
-                          {e.price && <><br /><span style={{ fontSize: 13, fontWeight: 600 }}>{e.price}</span></>}
+                          {e.price && <><br /><span className="text-body-md font-semibold">{e.price}</span></>}
                         </div>
                       ))}
                     </div>
@@ -226,20 +228,20 @@ function VenueDetail({ venue, onBack }) {
           )}
           {(!venue.events || venue.events.length === 0) && (
             <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
-              <div style={{ fontSize: 14, color: 'var(--text-dim)', lineHeight: 1.6 }}>
+              <div className="text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.6 }}>
                 📅 Klub eventowy — terminy i ceny zmieniają się. Sprawdź aktualne imprezy {venue.website ? 'na stronie poniżej.' : 'u źródła.'}
               </div>
             </div>
           )}
           <div className="glass-card" style={{ padding: 16, marginBottom: 12 }}>
             <div style={{ display: 'flex', gap: 10, marginBottom: venue.website ? 10 : 0 }}>
-              <span style={{ fontSize: 16 }}>📍</span>
-              <span style={{ fontSize: 14, color: '#fff' }}>{venue.address}</span>
+              <span className="text-[16px]">📍</span>
+              <span className="text-body-md" style={{ color: '#fff' }}>{venue.address}</span>
             </div>
             {venue.website && (
               <div style={{ display: 'flex', gap: 10 }}>
-                <span style={{ fontSize: 16 }}>🌐</span>
-                <a href={venue.website} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: '#d4af37', wordBreak: 'break-all' }}>{venue.website}</a>
+                <span className="text-[16px]">🌐</span>
+                <a href={venue.website} target="_blank" rel="noopener noreferrer" className="text-body-md" style={{ color: '#d4af37', wordBreak: 'break-all' }}>{venue.website}</a>
               </div>
             )}
           </div>

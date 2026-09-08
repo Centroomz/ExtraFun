@@ -92,24 +92,24 @@ function ThreadView({ thread, onBack, user }) {
   return (
     <div>
       <div className="page-header" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', fontSize: 22, padding: 0 }}>←</button>
-        <h1 style={{ fontSize: 15, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Forum</h1>
+        <button onClick={onBack} className="text-[22px]" style={{ background: 'none', border: 'none', color: 'var(--text-dim)', cursor: 'pointer', padding: 0 }}>←</button>
+        <h1 className="text-body-md" style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>Forum</h1>
       </div>
       <div style={{ padding: 16 }}>
-        <span style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, fontSize: 10, fontWeight: 700, background: cat.bg, color: cat.color, marginBottom: 10 }}>
+        <span className="text-label-caps uppercase" style={{ display: 'inline-block', padding: '3px 10px', borderRadius: 20, background: cat.bg, color: cat.color, marginBottom: 10 }}>
           {cat.emoji} {cat.label}
         </span>
-        <h2 style={{ fontFamily: 'Playfair Display', fontSize: 22, fontWeight: 800, lineHeight: 1.3, marginBottom: 12 }}>{thread.title}</h2>
-        <div style={{ display: 'flex', gap: 12, fontSize: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
+        <h2 className="font-headline-sm text-headline-sm font-extrabold" style={{ lineHeight: 1.3, marginBottom: 12 }}>{thread.title}</h2>
+        <div className="text-body-md" style={{ display: 'flex', gap: 12, color: 'var(--text-dim)', marginBottom: 20 }}>
           <span>{thread.author_emoji} {thread.author_name}</span>
           <span>👍 {thread.upvotes}</span>
           <span>{formatTimeAgo(thread.created_at)}</span>
         </div>
         {thread.content && (
-          <p style={{ fontSize: 15, color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>{thread.content}</p>
+          <p className="text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.7, marginBottom: 20 }}>{thread.content}</p>
         )}
         <div style={{ borderTop: '1px solid var(--glass-border)', paddingTop: 16, marginBottom: 16 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-dim)' }}>
+          <span className="text-body-md font-bold" style={{ color: 'var(--text-dim)' }}>
             {replies.length} {replies.length === 1 ? 'odpowiedź' : 'odpowiedzi'}
           </span>
         </div>
@@ -123,11 +123,11 @@ function ThreadView({ thread, onBack, user }) {
         ) : (
           replies.map(reply => (
             <div key={reply.id} style={{ marginBottom: 12, padding: 14, background: 'var(--glass)', border: '1px solid var(--glass-border)', borderRadius: 14 }}>
-              <div style={{ display: 'flex', gap: 8, marginBottom: 6, fontSize: 12, color: 'var(--text-dim)' }}>
+              <div className="text-body-md" style={{ display: 'flex', gap: 8, marginBottom: 6, color: 'var(--text-dim)' }}>
                 <span>👤 Użytkownik</span>
                 <span>{formatTimeAgo(reply.created_at)}</span>
               </div>
-              <p style={{ fontSize: 14, lineHeight: 1.6 }}>{reply.content}</p>
+              <p className="text-body-md" style={{ lineHeight: 1.6 }}>{reply.content}</p>
             </div>
           ))
         )}
@@ -146,7 +146,7 @@ function ThreadView({ thread, onBack, user }) {
           </div>
         ) : (
           <div className="glass-card" style={{ padding: 16, textAlign: 'center', marginTop: 16 }}>
-            <p style={{ fontSize: 14, color: 'var(--text-dim)', marginBottom: 8 }}>Zaloguj się, aby odpowiadać</p>
+            <p className="text-body-md" style={{ color: 'var(--text-dim)', marginBottom: 8 }}>Zaloguj się, aby odpowiadać</p>
           </div>
         )}
       </div>
@@ -256,8 +256,9 @@ export function Forum({ user }) {
           <button
             key={opt.id}
             onClick={() => setSortBy(opt.id)}
+            className="text-body-md font-semibold"
             style={{
-              padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600,
+              padding: '6px 14px', borderRadius: 20,
               background: sortBy === opt.id ? 'rgba(233,193,118,0.12)' : 'transparent',
               border: sortBy === opt.id ? '1px solid rgba(233,193,118,0.4)' : '1px solid var(--glass-border)',
               color: sortBy === opt.id ? 'var(--cyan)' : 'var(--text-dim)',
@@ -278,14 +279,14 @@ export function Forum({ user }) {
             return (
               <div key={thread.id} className="forum-thread" onClick={() => setSelectedThread(thread)}>
                 {thread.sticky && (
-                  <div style={{ fontSize: 11, color: 'var(--cyan)', fontWeight: 700, marginBottom: 6 }}>📌 Przypięty</div>
+                  <div className="text-body-md font-bold" style={{ color: 'var(--cyan)', marginBottom: 6 }}>📌 Przypięty</div>
                 )}
                 <div className="forum-thread-header">
                   <span className="forum-category-badge" style={{ background: cat.bg, color: cat.color }}>
                     {cat.emoji} {cat.label}
                   </span>
                   {thread.city && (
-                    <span style={{ fontSize: 11, color: 'var(--text-dim)' }}>📍 {thread.city}</span>
+                    <span className="text-body-md" style={{ color: 'var(--text-dim)' }}>📍 {thread.city}</span>
                   )}
                 </div>
                 <div className="forum-thread-title">{thread.title}</div>

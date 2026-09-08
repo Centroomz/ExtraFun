@@ -35,10 +35,10 @@ export function CalendarWidget() {
 
   return (
     <div className="mag-sidebar-word" style={{ position: 'relative' }}>
-      <div style={{ fontSize: 22, fontWeight: 900, color: 'var(--cyan)', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 8 }}>
+      <div className="text-headline-sm font-black" style={{ color: 'var(--cyan)', letterSpacing: '-0.5px', lineHeight: 1.1, marginBottom: 8 }}>
         📅 {dateStr}
       </div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: '#e5e5e5', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: 6 }}>
+      <div className="text-label-caps uppercase" style={{ color: '#e5e5e5', marginBottom: 6 }}>
         {TYPE_ICON[ev.type]} {TYPE_LABEL[ev.type]}{ev.year ? <span style={{ color: 'var(--cyan)' }}> · {ev.year}</span> : ''}
       </div>
       <div className="mag-sidebar-word-term" style={{ marginBottom: 6 }}>{ev.name}</div>
@@ -47,12 +47,14 @@ export function CalendarWidget() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginTop: 12 }}>
           <button
             onClick={() => setIdx((idx - 1 + events.length) % events.length)}
-            style={{ background: 'rgba(233,193,118,0.15)', border: '2px solid rgba(233,193,118,0.6)', borderRadius: 8, padding: '6px 18px', color: '#d4af37', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
+            className="text-body-lg font-black"
+            style={{ background: 'rgba(233,193,118,0.15)', border: '2px solid rgba(233,193,118,0.6)', borderRadius: 8, padding: '6px 18px', color: '#d4af37', cursor: 'pointer', lineHeight: 1 }}
           >‹</button>
-          <span style={{ fontSize: 12, color: '#d4af37', fontWeight: 700 }}>{idx + 1} / {events.length}</span>
+          <span className="text-body-md font-bold" style={{ color: '#d4af37' }}>{idx + 1} / {events.length}</span>
           <button
             onClick={() => setIdx((idx + 1) % events.length)}
-            style={{ background: 'rgba(233,193,118,0.15)', border: '2px solid rgba(233,193,118,0.6)', borderRadius: 8, padding: '6px 18px', color: '#d4af37', cursor: 'pointer', fontSize: 20, fontWeight: 900, lineHeight: 1 }}
+            className="text-body-lg font-black"
+            style={{ background: 'rgba(233,193,118,0.15)', border: '2px solid rgba(233,193,118,0.6)', borderRadius: 8, padding: '6px 18px', color: '#d4af37', cursor: 'pointer', lineHeight: 1 }}
           >›</button>
         </div>
       )}
