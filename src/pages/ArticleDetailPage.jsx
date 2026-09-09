@@ -299,20 +299,20 @@ export function ArticleDetailPage() {
 
         <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-tight mb-6">{article.title}</h1>
 
-        <div className="flex items-center gap-3 mb-10 pb-8 border-b border-outline-variant/20">
-          <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0 overflow-hidden">
+        <div className="flex items-center gap-4 mb-10 pb-8 border-b border-outline-variant/20">
+          <div className="w-28 h-28 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0 overflow-hidden">
             {AUTHOR_AVATARS[article.author] ? (
               <img src={AUTHOR_AVATARS[article.author]} alt={article.author} className="w-full h-full object-cover" />
             ) : (
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
               </svg>
             )}
           </div>
           <div>
-            <p className="font-body text-body-md text-on-surface">{article.author}</p>
+            <p className="font-display italic font-semibold text-headline-md text-on-surface">{article.author}</p>
             {article.date && (
-              <p className="font-body text-label-caps uppercase text-outline">
+              <p className="font-body text-headline-sm text-outline">
                 {new Date(article.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}
               </p>
             )}
