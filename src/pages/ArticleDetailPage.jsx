@@ -18,6 +18,10 @@ const CATEGORY_COLORS = {
   'Naga Środa':     { bg: 'rgba(20,241,217,0.12)',  color: '#14F1D9', border: 'rgba(20,241,217,0.3)' },
 }
 
+const AUTHOR_AVATARS = {
+  'Pola': '/authors/pola.jpg',
+}
+
 const SLUG_TO_DISPLAY = {
   'cnm-101':        'CNM 101',
   'pierwszy-raz':   'Pierwszy Raz',
@@ -289,10 +293,14 @@ export function ArticleDetailPage() {
         <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-tight mb-6">{article.title}</h1>
 
         <div className="flex items-center gap-3 mb-10 pb-8 border-b border-outline-variant/20">
-          <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-            </svg>
+          <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant flex-shrink-0 overflow-hidden">
+            {AUTHOR_AVATARS[article.author] ? (
+              <img src={AUTHOR_AVATARS[article.author]} alt={article.author} className="w-full h-full object-cover" />
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+              </svg>
+            )}
           </div>
           <div>
             <p className="font-body text-body-md text-on-surface">{article.author}</p>
