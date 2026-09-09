@@ -3,6 +3,9 @@ import { useParams, Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
+import { useAuth } from '../hooks/useAuth'
+
+const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 
 const BASE_URL = 'https://www.extrafun.pl'
 
@@ -162,6 +165,8 @@ function RightRail({ related, newest, popular }) {
 
 export function ArticleDetailPage() {
   const { slug } = useParams()
+  const { user } = useAuth()
+  const isAdmin = ADMIN_EMAILS.includes(user?.email)
   const [article, setArticle] = useState(null)
   const [related, setRelated] = useState([])
   const [allList, setAllList] = useState([])
@@ -186,6 +191,7 @@ export function ArticleDetailPage() {
           cover_image: data.cover_image || null,
           author: data.author || 'Redakcja',
           date: data.publish_date || data.created_at || null,
+          views: data.views ?? 0,
           tags: Array.isArray(data.tags) ? data.tags : [],
           seoTitle: data.seo_title || data.title,
           seoDescription: data.seo_description || data.excerpt || '',
@@ -308,6 +314,11 @@ export function ArticleDetailPage() {
             {article.date && (
               <p className="font-body text-label-caps uppercase text-outline">
                 {new Date(article.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
+            )}
+            {isAdmin && (
+              <p className="font-body text-label-caps uppercase text-outline">
+                👁 {article.views} wyświetleń
               </p>
             )}
           </div>
