@@ -20,6 +20,7 @@ const CATEGORY_COLORS = {
 
 const AUTHOR_AVATARS = {
   'Pola': '/authors/pola.jpg',
+  'Krysia': '/authors/krysia.jpg',
 }
 
 const SLUG_TO_DISPLAY = {
