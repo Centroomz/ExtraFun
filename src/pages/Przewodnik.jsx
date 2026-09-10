@@ -412,6 +412,14 @@ export function Przewodnik({ city: cityParam }) {
   const [hubScope, setHubScope] = useState(null)   // hub club column: 'nearby' | city name
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
   const geoApplied = useRef(false)
+  // List scroll position captured when opening an article, restored on Back so the
+  // user lands back on the card they clicked. `.page-content` scrolls on desktop,
+  // the window on mobile — restore both.
+  const listScroll = useRef(null)
+  const setScroll = (pc, win) => {
+    document.querySelector('.page-content')?.scrollTo(0, pc)
+    window.scrollTo(0, win)
+  }
 
   useEffect(() => {
     loadVenues()
@@ -427,12 +435,21 @@ export function Przewodnik({ city: cityParam }) {
   // the detail and returns to the list instead of leaving the page.
   useEffect(() => {
     if (selectedVenue == null && selectedArticle == null) return
-    window.scrollTo(0, 0) // detail opens via pushState (not a route change), so scroll to top manually
+    setScroll(0, 0) // detail opens via pushState (not a route change), so scroll to top manually
     window.history.pushState({ efDetail: true }, '')
-    const onPop = () => { setSelectedVenue(null); setSelectedArticle(null); window.scrollTo(0, 0) }
+    const onPop = () => { setSelectedVenue(null); setSelectedArticle(null) }
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
   }, [selectedVenue, selectedArticle])
+
+  // Returning from an article detail: restore the list scroll after re-mount, so
+  // Back returns to the clicked card instead of the top of the list.
+  useEffect(() => {
+    if (selectedArticle != null || listScroll.current == null) return
+    const { pc, win } = listScroll.current
+    listScroll.current = null
+    requestAnimationFrame(() => setScroll(pc, win))
+  }, [selectedArticle])
 
   async function loadVenues() {
     try {
@@ -676,8 +693,8 @@ export function Przewodnik({ city: cityParam }) {
 
               {/* RIGHT — editorial: ranking on top, then city guides, then Plaże */}
               <aside className="md:col-span-5 flex flex-col gap-8">
-                <ArticleCard article={ARTICLES[0]} hero onClick={() => setSelectedArticle(ARTICLES[0])} />
-                {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => setSelectedArticle(a)} />)}
+                <ArticleCard article={ARTICLES[0]} hero onClick={() => { listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }; setSelectedArticle(ARTICLES[0]) }} />
+                {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => { listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }; setSelectedArticle(a) }} />)}
 
                 <div onClick={() => navigate('/plaze')}
                   className="group flex items-center gap-4 p-6 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">

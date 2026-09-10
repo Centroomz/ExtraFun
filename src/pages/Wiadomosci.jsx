@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { Button } from '../components/nocturne'
@@ -10,6 +10,12 @@ export function Wiadomosci({ user }) {
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
   const me = user?.id
+  // Inbox scroll position captured when opening a thread, restored on Back.
+  const listScroll = useRef(null)
+  const setScroll = (pc, win) => {
+    document.querySelector('.page-content')?.scrollTo(0, pc)
+    window.scrollTo(0, win)
+  }
 
   async function load() {
     try { setMsgs((await apiFetch('/api/messages')) || []) } catch { setMsgs([]) }
@@ -23,11 +29,19 @@ export function Wiadomosci({ user }) {
   // pattern in Przewodnik.jsx / Ogloszenia.jsx.
   useEffect(() => {
     if (active == null) return
-    window.scrollTo(0, 0)
+    setScroll(0, 0)
     window.history.pushState({ efThread: true }, '')
-    const onPop = () => { setActive(null); window.scrollTo(0, 0) }
+    const onPop = () => setActive(null)
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
+  }, [active])
+
+  // Returning from a thread: restore inbox scroll after re-mount.
+  useEffect(() => {
+    if (active != null || listScroll.current == null) return
+    const { pc, win } = listScroll.current
+    listScroll.current = null
+    requestAnimationFrame(() => setScroll(pc, win))
   }, [active])
 
   if (!user) {
@@ -114,7 +128,10 @@ export function Wiadomosci({ user }) {
                 {list.map(t => {
                   const last = t.items[t.items.length - 1]
                   return (
-                    <div key={t.key} onClick={() => setActive(t.key)} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
+                    <div key={t.key} onClick={() => {
+                      listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }
+                      setActive(t.key)
+                    }} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
                       <div className="flex items-center justify-between gap-3">
                         <div className="font-display italic font-medium text-body-lg text-on-surface group-hover:text-primary-container transition-colors">
                           {t.partnerName || 'Ogłoszeniodawca'}
