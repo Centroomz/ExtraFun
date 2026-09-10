@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useLocation, Link } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
@@ -181,19 +181,38 @@ export function Ogloszenia({ user }) {
   const [newAd, setNewAd] = useState({ type: 'Pan szuka Pani', title: '', description: '', city: '' })
   const [submitting, setSubmitting] = useState(false)
   const { location, error: geoError, loading: geoLoading, requestLocation } = useGeolocation()
+  // List scroll position captured when opening a detail, restored on Back so the
+  // user lands back on the ad they clicked — not the top or bottom of the list.
+  const listScroll = useRef(null)
 
   useEffect(() => { loadAds() }, [])
+
+  // Which element actually scrolls: `.page-content` on desktop (height:100vh,
+  // overflow:auto), the window on mobile. Restore both to be safe.
+  const setScroll = (pc, win) => {
+    document.querySelector('.page-content')?.scrollTo(0, pc)
+    window.scrollTo(0, win)
+  }
 
   // Open an ad detail = a history entry, so the hardware/gesture Back closes the
   // detail and returns to the list instead of leaving the page (→ home). Mirrors
   // the pattern in Przewodnik.jsx.
   useEffect(() => {
     if (selectedAd == null) return
-    window.scrollTo(0, 0) // detail opens via pushState (not a route change), so scroll to top manually
+    setScroll(0, 0) // detail opens via pushState (not a route change), so scroll to top manually
     window.history.pushState({ efDetail: true }, '')
-    const onPop = () => { setSelectedAd(null); window.scrollTo(0, 0) }
+    const onPop = () => setSelectedAd(null)
     window.addEventListener('popstate', onPop)
     return () => window.removeEventListener('popstate', onPop)
+  }, [selectedAd])
+
+  // Returning from a detail (selectedAd → null): restore the list scroll position
+  // after the list re-mounts, so Back returns to the clicked ad.
+  useEffect(() => {
+    if (selectedAd != null || listScroll.current == null) return
+    const { pc, win } = listScroll.current
+    listScroll.current = null
+    requestAnimationFrame(() => setScroll(pc, win))
   }, [selectedAd])
 
   // New-ad sheet = a history entry, so Back closes it instead of leaving the page.
@@ -328,7 +347,10 @@ export function Ogloszenia({ user }) {
             <div className="font-body text-label-caps uppercase text-outline mb-4">{displayAds.length} {displayAds.length === 1 ? 'ogłoszenie' : 'ogłoszeń'}</div>
             <div className="md:grid md:grid-cols-2 md:gap-x-10">
             {displayAds.map(ad => (
-              <div key={ad.id} onClick={() => setSelectedAd(ad.id)} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
+              <div key={ad.id} onClick={() => {
+                listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }
+                setSelectedAd(ad.id)
+              }} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
                 <div className="flex items-center justify-between gap-3 mb-1.5 font-body text-label-caps uppercase">
                   <span className="text-primary-container">{catEmoji(ad.category)} {ad.category || 'Ogłoszenie'}</span>
                   {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
