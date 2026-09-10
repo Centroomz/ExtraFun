@@ -18,6 +18,18 @@ export function Wiadomosci({ user }) {
   }
   useEffect(() => { if (user) load() }, [user])
 
+  // Open a thread = a history entry, so the hardware/gesture Back closes the
+  // thread and returns to the inbox instead of leaving the page. Mirrors the
+  // pattern in Przewodnik.jsx / Ogloszenia.jsx.
+  useEffect(() => {
+    if (active == null) return
+    window.scrollTo(0, 0)
+    window.history.pushState({ efThread: true }, '')
+    const onPop = () => { setActive(null); window.scrollTo(0, 0) }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [active])
+
   if (!user) {
     return (
       <div className="bg-background min-h-screen text-on-surface">
@@ -62,7 +74,7 @@ export function Wiadomosci({ user }) {
         {current ? (
           /* ── Thread view ── */
           <>
-            <button onClick={() => setActive(null)} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Wiadomości</button>
+            <button onClick={() => window.history.back()} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Wiadomości</button>
             <h1 className="font-display italic font-semibold text-headline-md text-on-surface mb-1">{current.partnerName || 'Ogłoszeniodawca'}</h1>
             <div className="font-body text-body-md text-on-surface-variant mb-8">{current.ad_title}</div>
 

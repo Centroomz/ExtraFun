@@ -1,0 +1,537 @@
+{
+  ".claude/launch.json": {
+    "mtime": 1783535985.3702037,
+    "ast_hash": "15d348504db08d570ca03d58862635b1",
+    "semantic_hash": "15d348504db08d570ca03d58862635b1"
+  },
+  ".claude/settings.json": {
+    "mtime": 1784800790.7459826,
+    "ast_hash": "860209df6868ad2a77451c931d409069",
+    "semantic_hash": ""
+  },
+  ".mcp.json": {
+    "mtime": 1776512123.15858,
+    "ast_hash": "15c8ebdf32915b701c96df614621b0fb",
+    "semantic_hash": "15c8ebdf32915b701c96df614621b0fb"
+  },
+  ".opencode.json": {
+    "mtime": 1776508334.844646,
+    "ast_hash": "8bd1994c037ddbf50d06f60cf3058c95",
+    "semantic_hash": "8bd1994c037ddbf50d06f60cf3058c95"
+  },
+  "migrations/increment_article_views.sql": {
+    "mtime": 1780223085.8123553,
+    "ast_hash": "830cd3d7994626faa365f10f5653b7ed",
+    "semantic_hash": "830cd3d7994626faa365f10f5653b7ed"
+  },
+  "package.json": {
+    "mtime": 1782206833.437234,
+    "ast_hash": "35272f7b14e9ac7813556994b43044ad",
+    "semantic_hash": "35272f7b14e9ac7813556994b43044ad"
+  },
+  "postcss.config.js": {
+    "mtime": 1782206861.0390594,
+    "ast_hash": "ef3ba2a81ba19f8ea5ddf625521e96f0",
+    "semantic_hash": "ef3ba2a81ba19f8ea5ddf625521e96f0"
+  },
+  "public/manifest.json": {
+    "mtime": 1778837668.6027522,
+    "ast_hash": "b93a47140f7f5c0f4f71a4e4bdf8138c",
+    "semantic_hash": "b93a47140f7f5c0f4f71a4e4bdf8138c"
+  },
+  "public/sw.js": {
+    "mtime": 1784493168.0359864,
+    "ast_hash": "278e976e9eb2359f3e1291c119183b62",
+    "semantic_hash": "278e976e9eb2359f3e1291c119183b62"
+  },
+  "railway.json": {
+    "mtime": 1780442217.6589162,
+    "ast_hash": "2d941cd666c0ea7addcbffd5a91800a3",
+    "semantic_hash": "2d941cd666c0ea7addcbffd5a91800a3"
+  },
+  "server/auth.js": {
+    "mtime": 1781530697.220129,
+    "ast_hash": "18199a5d150e6fe36875c6b3028a9d91",
+    "semantic_hash": "18199a5d150e6fe36875c6b3028a9d91"
+  },
+  "server/index.js": {
+    "mtime": 1784547045.947954,
+    "ast_hash": "00379cedc1cbc0c73e631f702e11bc0d",
+    "semantic_hash": "00379cedc1cbc0c73e631f702e11bc0d"
+  },
+  "server/meta.js": {
+    "mtime": 1784547008.9638755,
+    "ast_hash": "b4100763b0ef30059e73f7f0b47dc866",
+    "semantic_hash": "b4100763b0ef30059e73f7f0b47dc866"
+  },
+  "server/routes.js": {
+    "mtime": 1786985935.7037556,
+    "ast_hash": "5d7ef8ae7c62e1cc58f0735b973f891c",
+    "semantic_hash": ""
+  },
+  "server/supabase.js": {
+    "mtime": 1780440565.7159646,
+    "ast_hash": "70e542791b7fa505a28ec694a5c4958f",
+    "semantic_hash": "70e542791b7fa505a28ec694a5c4958f"
+  },
+  "src/App.jsx": {
+    "mtime": 1784670708.7178235,
+    "ast_hash": "5364b716ed8d2937b47eba96a38be0bc",
+    "semantic_hash": "5364b716ed8d2937b47eba96a38be0bc"
+  },
+  "src/auth/LoginPage.jsx": {
+    "mtime": 1775636379.829619,
+    "ast_hash": "ffbd8dd1d19e5280f2d812d9dbcbabd0",
+    "semantic_hash": "ffbd8dd1d19e5280f2d812d9dbcbabd0"
+  },
+  "src/auth/SignupPage.jsx": {
+    "mtime": 1782233074.428836,
+    "ast_hash": "13e1eebd8fb1ac068c783041368f0c4b",
+    "semantic_hash": "13e1eebd8fb1ac068c783041368f0c4b"
+  },
+  "src/components/AgeGate.jsx": {
+    "mtime": 1782242760.1530292,
+    "ast_hash": "16a21ce92ab0c7b31d5eea017623d2e2",
+    "semantic_hash": "16a21ce92ab0c7b31d5eea017623d2e2"
+  },
+  "src/components/BottomNav.jsx": {
+    "mtime": 1782661067.67789,
+    "ast_hash": "855e513a91ac0e9b96dc4e2b99b19e39",
+    "semantic_hash": "855e513a91ac0e9b96dc4e2b99b19e39"
+  },
+  "src/components/CalendarWidget.jsx": {
+    "mtime": 1782233074.51583,
+    "ast_hash": "f794fb65e195a73ff232a47c3e4011c6",
+    "semantic_hash": "f794fb65e195a73ff232a47c3e4011c6"
+  },
+  "src/components/PWAInstallBanner.jsx": {
+    "mtime": 1781709503.7612653,
+    "ast_hash": "bc96bf69135dc666bca1e83a35a2fea7",
+    "semantic_hash": "bc96bf69135dc666bca1e83a35a2fea7"
+  },
+  "src/components/nocturne/ArticleCard.jsx": {
+    "mtime": 1782208809.9814644,
+    "ast_hash": "a4df4371e918a5e05165d17ac435b010",
+    "semantic_hash": "a4df4371e918a5e05165d17ac435b010"
+  },
+  "src/components/nocturne/Button.jsx": {
+    "mtime": 1782207094.0594368,
+    "ast_hash": "0b08455977b3cc0ba4d0129b30ff53d8",
+    "semantic_hash": "0b08455977b3cc0ba4d0129b30ff53d8"
+  },
+  "src/components/nocturne/DiamondRating.jsx": {
+    "mtime": 1782207099.3057728,
+    "ast_hash": "0d03595ea2c7b2b0a779d08e89c8f4ad",
+    "semantic_hash": "0d03595ea2c7b2b0a779d08e89c8f4ad"
+  },
+  "src/components/nocturne/Hero.jsx": {
+    "mtime": 1782243035.7932084,
+    "ast_hash": "5a3285f7e9e8e454adc93c6dd97ad108",
+    "semantic_hash": "5a3285f7e9e8e454adc93c6dd97ad108"
+  },
+  "src/components/nocturne/SectionHeader.jsx": {
+    "mtime": 1782208190.444263,
+    "ast_hash": "3f7fbeae734f8b68d9b7a02237200ce7",
+    "semantic_hash": "3f7fbeae734f8b68d9b7a02237200ce7"
+  },
+  "src/components/nocturne/index.js": {
+    "mtime": 1782207112.53638,
+    "ast_hash": "fa19a6f57848336d97f073c9577e379e",
+    "semantic_hash": "fa19a6f57848336d97f073c9577e379e"
+  },
+  "src/hooks/useAuth.jsx": {
+    "mtime": 1780440983.6837013,
+    "ast_hash": "2a167b0e8c5fd3b6d0fbee85fe842ce3",
+    "semantic_hash": "2a167b0e8c5fd3b6d0fbee85fe842ce3"
+  },
+  "src/hooks/useGeolocation.js": {
+    "mtime": 1780789564.252273,
+    "ast_hash": "4979f4dc5629e16961592ca6c9fdeade",
+    "semantic_hash": "4979f4dc5629e16961592ca6c9fdeade"
+  },
+  "src/lib/api.js": {
+    "mtime": 1780440709.6927226,
+    "ast_hash": "bfda721b3181dcaf98ee850b5b9b7912",
+    "semantic_hash": "bfda721b3181dcaf98ee850b5b9b7912"
+  },
+  "src/lib/articles.js": {
+    "mtime": 1783848326.218235,
+    "ast_hash": "0d76c97aaa76451725098755d2f369c7",
+    "semantic_hash": "0d76c97aaa76451725098755d2f369c7"
+  },
+  "src/lib/dictionary.js": {
+    "mtime": 1781521353.2718053,
+    "ast_hash": "5ab501bd166d8369cc59b1ced3b92a8c",
+    "semantic_hash": "5ab501bd166d8369cc59b1ced3b92a8c"
+  },
+  "src/lib/geo.js": {
+    "mtime": 1780789552.4760811,
+    "ast_hash": "0ccb089c6719e476a223074d00f4ab46",
+    "semantic_hash": "0ccb089c6719e476a223074d00f4ab46"
+  },
+  "src/lib/quiz-plazowicz.js": {
+    "mtime": 1782830308.2852447,
+    "ast_hash": "4d90982674613a43cf87bd365bdba6ea",
+    "semantic_hash": "4d90982674613a43cf87bd365bdba6ea"
+  },
+  "src/lib/quiz.js": {
+    "mtime": 1775636364.248131,
+    "ast_hash": "fda0cfade2dd002d434460e1fec351f7",
+    "semantic_hash": "fda0cfade2dd002d434460e1fec351f7"
+  },
+  "src/lib/supabase.js": {
+    "mtime": 1780441554.7033482,
+    "ast_hash": "5b1b09e455b10a4ccc675d00b8c36edc",
+    "semantic_hash": "5b1b09e455b10a4ccc675d00b8c36edc"
+  },
+  "src/main.jsx": {
+    "mtime": 1778777028.4862516,
+    "ast_hash": "2b485d949654add7149947a7debe647b",
+    "semantic_hash": "2b485d949654add7149947a7debe647b"
+  },
+  "src/pages/Admin.jsx": {
+    "mtime": 1784673379.5461957,
+    "ast_hash": "ba31bdc995ac3f71883742f9c716ad53",
+    "semantic_hash": "ba31bdc995ac3f71883742f9c716ad53"
+  },
+  "src/pages/Aktualnosci.jsx": {
+    "mtime": 1782828705.3453827,
+    "ast_hash": "1b7ef0ab44187f369f15f66ccb44bf58",
+    "semantic_hash": "1b7ef0ab44187f369f15f66ccb44bf58"
+  },
+  "src/pages/ArticleDetailPage.jsx": {
+    "mtime": 1784493159.5830932,
+    "ast_hash": "969cf524095d8ad78de216aaa523d4e7",
+    "semantic_hash": "969cf524095d8ad78de216aaa523d4e7"
+  },
+  "src/pages/Czat.jsx": {
+    "mtime": 1786133567.4751544,
+    "ast_hash": "088520ac58f60b75bc18842500a56c5a",
+    "semantic_hash": ""
+  },
+  "src/pages/Forum.jsx": {
+    "mtime": 1782233074.8198316,
+    "ast_hash": "a8ffeafe5437f3928c14a61ba1b311e5",
+    "semantic_hash": "a8ffeafe5437f3928c14a61ba1b311e5"
+  },
+  "src/pages/Imprezy.jsx": {
+    "mtime": 1784668208.6631129,
+    "ast_hash": "af66df64f6f1ba853bcab9dab657f710",
+    "semantic_hash": "af66df64f6f1ba853bcab9dab657f710"
+  },
+  "src/pages/Magazyn.jsx": {
+    "mtime": 1783848334.7888913,
+    "ast_hash": "d205f0f11d722d19f16adadeac165de0",
+    "semantic_hash": "d205f0f11d722d19f16adadeac165de0"
+  },
+  "src/pages/Ogloszenia.jsx": {
+    "mtime": 1782827963.5497985,
+    "ast_hash": "195f3c22394ac4cc7f86ad4b413178bc",
+    "semantic_hash": "195f3c22394ac4cc7f86ad4b413178bc"
+  },
+  "src/pages/Plaze.jsx": {
+    "mtime": 1782828043.445456,
+    "ast_hash": "bb237cad2c35be86b4d2ba0448ab7e79",
+    "semantic_hash": "bb237cad2c35be86b4d2ba0448ab7e79"
+  },
+  "src/pages/Przewodnik.jsx": {
+    "mtime": 1783513098.6011374,
+    "ast_hash": "ce0f3f0e909a1a1d2e59513e185b3d5a",
+    "semantic_hash": "ce0f3f0e909a1a1d2e59513e185b3d5a"
+  },
+  "src/pages/Slownik.jsx": {
+    "mtime": 1782827934.3299398,
+    "ast_hash": "93d637265ca413de2b2fca18f51cdf99",
+    "semantic_hash": "93d637265ca413de2b2fca18f51cdf99"
+  },
+  "src/pages/SlownikTerm.jsx": {
+    "mtime": 1782209048.0889504,
+    "ast_hash": "441266884a56a98d9bd74cc41ebab03e",
+    "semantic_hash": "441266884a56a98d9bd74cc41ebab03e"
+  },
+  "src/pages/Wiadomosci.jsx": {
+    "mtime": 1782244795.352179,
+    "ast_hash": "ca8a7e492c1cd41cdbe735f3efbcc2d7",
+    "semantic_hash": "ca8a7e492c1cd41cdbe735f3efbcc2d7"
+  },
+  "supabase-schema.sql": {
+    "mtime": 1775636364.2561464,
+    "ast_hash": "5a19d7943166cc75399ad8617833e2e0",
+    "semantic_hash": "5a19d7943166cc75399ad8617833e2e0"
+  },
+  "tailwind.config.js": {
+    "mtime": 1782312740.8005083,
+    "ast_hash": "9736d7e28a5cc78d4d37a62f07e1ff3d",
+    "semantic_hash": "9736d7e28a5cc78d4d37a62f07e1ff3d"
+  },
+  "vite.config.js": {
+    "mtime": 1775636364.2571867,
+    "ast_hash": "3873e8d6382648ab43abb3663a501a61",
+    "semantic_hash": "3873e8d6382648ab43abb3663a501a61"
+  },
+  ".claude/commands/build-react.md": {
+    "mtime": 1778907215.9812653,
+    "ast_hash": "3be7b8b182ccd96e48989b4e57311193",
+    "semantic_hash": ""
+  },
+  ".claude/commands/commit.md": {
+    "mtime": 1778907215.8790226,
+    "ast_hash": "d2bc82a69648a9fad80622d04dba9146",
+    "semantic_hash": ""
+  },
+  ".claude/commands/context-prime.md": {
+    "mtime": 1778907216.0772667,
+    "ast_hash": "c6eed5817fb0c8a66f39e68cdb8be9f9",
+    "semantic_hash": ""
+  },
+  ".claude/commands/create-pr.md": {
+    "mtime": 1778907215.930091,
+    "ast_hash": "9d7370f84844dd5c3190163d9dd8c730",
+    "semantic_hash": ""
+  },
+  ".claude/commands/pr-review.md": {
+    "mtime": 1778907216.0292628,
+    "ast_hash": "c1ca32a65462d0bead836a2d1a084de1",
+    "semantic_hash": ""
+  },
+  ".claude/skills/debug-issue.md": {
+    "mtime": 1776508334.874025,
+    "ast_hash": "83266930cd7096aee27fd30edc55c85f",
+    "semantic_hash": ""
+  },
+  ".claude/skills/explore-codebase.md": {
+    "mtime": 1776508334.8730235,
+    "ast_hash": "b70f59c577a3ce3a3e72d8c61ce3469a",
+    "semantic_hash": ""
+  },
+  ".claude/skills/refactor-safely.md": {
+    "mtime": 1776508334.8750598,
+    "ast_hash": "de0e5b1c85bd387821268d0f9411a778",
+    "semantic_hash": ""
+  },
+  ".claude/skills/review-changes.md": {
+    "mtime": 1776508334.874025,
+    "ast_hash": "1ce0725b638aed739326a7687c7fffb0",
+    "semantic_hash": ""
+  },
+  ".kiro/steering/code-review-graph.md": {
+    "mtime": 1776508340.8724215,
+    "ast_hash": "f0c147986e95d13713104ff4dd18e655",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1776508340.8684182,
+    "ast_hash": "f0c147986e95d13713104ff4dd18e655",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1784800790.7376647,
+    "ast_hash": "8e77a6dd25fac51a33aa00e1e3a19a20",
+    "semantic_hash": ""
+  },
+  "GEMINI.md": {
+    "mtime": 1776508340.869417,
+    "ast_hash": "f0c147986e95d13713104ff4dd18e655",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-06-03-extrafun-backend.md": {
+    "mtime": 1780440492.9793878,
+    "ast_hash": "8b437e6500eb1fdf23161813197a5329",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-06-23-extrafun-nocturne-elegance.md": {
+    "mtime": 1782206377.240646,
+    "ast_hash": "55503c1270e41e6d1a5a405638e1fd6d",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-06-03-extrafun-backend-design.md": {
+    "mtime": 1780440163.664104,
+    "ast_hash": "2178f8d104a2ab9f8bc14c76e8e56e6f",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-06-23-extrafun-nocturne-elegance-design.md": {
+    "mtime": 1782206030.3553677,
+    "ast_hash": "4537eaac6cae25dd5835699f3f8372f8",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-07-08-extrafun-swing-calendar-design.md": {
+    "mtime": 1783511555.613747,
+    "ast_hash": "4a6cf42adb89d563e34a9e2bb55789ef",
+    "semantic_hash": ""
+  },
+  "index.html": {
+    "mtime": 1782313734.109799,
+    "ast_hash": "44e06234b524f158e52eb0472ac2d567",
+    "semantic_hash": ""
+  },
+  "public/robots.txt": {
+    "mtime": 1778777261.3275697,
+    "ast_hash": "a5d316bf7008f2f573bd40dff567b616",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-bez-osadu.jpg": {
+    "mtime": 1782829131.325338,
+    "ast_hash": "0908d2e195cd866803441af9b14fdaf0",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-cnm101-czym.jpg": {
+    "mtime": 1782829082.0516877,
+    "ast_hash": "e84a316d363b72ce96b41dba218e44e6",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-brak-mlodych.jpg": {
+    "mtime": 1782925069.614267,
+    "ast_hash": "738a084405723dc5623331403956b5a4",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-capdagde.jpg": {
+    "mtime": 1782924892.3367088,
+    "ast_hash": "f2f18b05bc0ec0c5d989c6ac6ae4cdf0",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-chalupy.jpg": {
+    "mtime": 1782924844.4796505,
+    "ast_hash": "5c2619e9be15d77637f99662400c668c",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-chorwacja.jpg": {
+    "mtime": 1782924941.1908724,
+    "ast_hash": "163e952703c1ceeae6af46a5db3c5ef6",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-dogging.jpg": {
+    "mtime": 1782925114.0684662,
+    "ast_hash": "7325f360046d47b0615849c7b77ffb30",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-ekshibicjonizm.jpg": {
+    "mtime": 1782925205.6076114,
+    "ast_hash": "9f2d12aaa7bc4684faf7affd3de8afa7",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-fkk-historia.jpg": {
+    "mtime": 1782925025.1337292,
+    "ast_hash": "96a94f69fbd2136723f69a370431588a",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-gavdos.jpg": {
+    "mtime": 1782924979.3581655,
+    "ast_hash": "dc41beb496ae7f1bca6cf5693a632362",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-kemping.jpg": {
+    "mtime": 1782925717.781798,
+    "ast_hash": "6c6ac4f06874ea72665eed3cbf5f40e3",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-para.jpg": {
+    "mtime": 1782925260.80407,
+    "ast_hash": "189d3e7125f296447fc7d85defbab4b2",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-pierwsza-wizyta.jpg": {
+    "mtime": 1782925666.1495614,
+    "ast_hash": "e6e4bae62b5d02c81a2a702ee4e01633",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-pierwszy-raz-lir.jpg": {
+    "mtime": 1782925440.3983319,
+    "ast_hash": "2dcece3dded64defa833644e0811af56",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-prawo.jpg": {
+    "mtime": 1782925159.3503597,
+    "ast_hash": "38832222986e911b55c8abd2202d151d",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-slonce-woda-las.jpg": {
+    "mtime": 1782925482.5076303,
+    "ast_hash": "6ec10e0a3b09994d6592d888c81d98ee",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-lipiec-social.jpg": {
+    "mtime": 1782925301.8130207,
+    "ast_hash": "5913b842509a1e42f134c12953cd1f6a",
+    "semantic_hash": ""
+  },
+  "public/editorial/cover-zazdrosc.jpg": {
+    "mtime": 1782829172.171044,
+    "ast_hash": "d6f565b6181d156fc15af32475a12c32",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-agegate.jpg": {
+    "mtime": 1782242710.6843731,
+    "ast_hash": "ec20af4fafb78498082f805674311da2",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-aktualnosci.jpg": {
+    "mtime": 1782828675.5207443,
+    "ast_hash": "ddab9592bda954d7d8e6da08d54de5c8",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-imprezy.jpg": {
+    "mtime": 1782827729.1962137,
+    "ast_hash": "b57df4211068f9dcc406ae18aa2e097a",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-lipiec-plener.jpg": {
+    "mtime": 1782925603.2105663,
+    "ast_hash": "3463137071e081e10dfc1899562582c5",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-magazyn.jpg": {
+    "mtime": 1782828607.1024253,
+    "ast_hash": "b9528749040646ce4251c0d30ebd85d7",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-ogloszenia.jpg": {
+    "mtime": 1782827887.904292,
+    "ast_hash": "f4e357418eb91acd6e71f080e6dd8cd3",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-plaze.jpg": {
+    "mtime": 1782827687.6312702,
+    "ast_hash": "2b0e3c2f47b5c880b9f9525747ea7cfe",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-przewodnik.jpg": {
+    "mtime": 1782242665.5751133,
+    "ast_hash": "a829630259c8d777fa5caa6787d8d4d3",
+    "semantic_hash": ""
+  },
+  "public/editorial/hero-slownik.jpg": {
+    "mtime": 1782827777.9306786,
+    "ast_hash": "ce68a576dad848604d23c406b74418a1",
+    "semantic_hash": ""
+  },
+  "public/editorial/veto-power.jpg": {
+    "mtime": 1782397153.487892,
+    "ast_hash": "6c9132776c97ea4a591da8fc9d3cf764",
+    "semantic_hash": ""
+  },
+  "public/extrafun-logo.png": {
+    "mtime": 1778836759.8460836,
+    "ast_hash": "e8ff58b608fa6ae4fedf9602d5d9a965",
+    "semantic_hash": ""
+  },
+  "public/favicon.png": {
+    "mtime": 1778836759.9906256,
+    "ast_hash": "289619d78c7311bb728d0e66d02c9ff7",
+    "semantic_hash": ""
+  },
+  "public/icon-192.png": {
+    "mtime": 1778836759.9756296,
+    "ast_hash": "6569807b167e1a0a32b9120e750a0532",
+    "semantic_hash": ""
+  },
+  "public/icon-512.png": {
+    "mtime": 1778836759.945626,
+    "ast_hash": "e8ff58b608fa6ae4fedf9602d5d9a965",
+    "semantic_hash": ""
+  },
+  "server/chat-gender.js": {
+    "mtime": 1786985890.4811895,
+    "ast_hash": "7617fdcbd8931eb480177813781d12d0",
+    "semantic_hash": ""
+  }
+}

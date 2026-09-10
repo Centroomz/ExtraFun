@@ -172,6 +172,18 @@ export function Ogloszenia({ user }) {
 
   useEffect(() => { loadAds() }, [])
 
+  // Open an ad detail = a history entry, so the hardware/gesture Back closes the
+  // detail and returns to the list instead of leaving the page (→ home). Mirrors
+  // the pattern in Przewodnik.jsx.
+  useEffect(() => {
+    if (selectedAd == null) return
+    window.scrollTo(0, 0) // detail opens via pushState (not a route change), so scroll to top manually
+    window.history.pushState({ efDetail: true }, '')
+    const onPop = () => { setSelectedAd(null); window.scrollTo(0, 0) }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [selectedAd])
+
   async function loadAds() {
     try {
       const data = await apiFetch('/api/ads')
@@ -216,8 +228,8 @@ export function Ogloszenia({ user }) {
 
   if (selectedAd) {
     const ad = displayAds.find(a => a.id === selectedAd) || ads.find(a => a.id === selectedAd)
-    if (ad) return <AdDetail ad={ad} onBack={() => setSelectedAd(null)} user={user}
-      onDeleted={() => { setSelectedAd(null); loadAds() }} />
+    if (ad) return <AdDetail ad={ad} onBack={() => window.history.back()} user={user}
+      onDeleted={() => { window.history.back(); loadAds() }} />
   }
 
   const inputCls = 'w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50'

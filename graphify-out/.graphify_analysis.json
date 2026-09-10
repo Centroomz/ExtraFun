@@ -1,0 +1,476 @@
+{
+  "communities": {
+    "0": [
+      "src_hooks_usegeolocation",
+      "src_hooks_usegeolocation_usegeolocation",
+      "src_lib_geo",
+      "src_lib_geo_calculatedistance",
+      "src_lib_geo_formatdistance",
+      "src_lib_geo_getuserlocation",
+      "src_lib_geo_sortbydistance",
+      "src_pages_ogloszenia",
+      "src_pages_ogloszenia_addetail",
+      "src_pages_ogloszenia_chip",
+      "src_pages_ogloszenia_demo_ads",
+      "src_pages_ogloszenia_distance_filters",
+      "src_pages_ogloszenia_ogloszenia",
+      "src_pages_ogloszenia_typelabel",
+      "src_pages_ogloszenia_types",
+      "src_pages_plaze",
+      "src_pages_plaze_beachcard",
+      "src_pages_plaze_chip",
+      "src_pages_plaze_city_to_country",
+      "src_pages_plaze_country_order",
+      "src_pages_plaze_district_to_country",
+      "src_pages_plaze_groupbycountry",
+      "src_pages_plaze_orderedcountries",
+      "src_pages_plaze_pl_cities",
+      "src_pages_plaze_plaze",
+      "src_pages_plaze_resolvecountry",
+      "src_pages_przewodnik",
+      "src_pages_przewodnik_articlecard",
+      "src_pages_przewodnik_articlereader",
+      "src_pages_przewodnik_articles",
+      "src_pages_przewodnik_gettypeconfig",
+      "src_pages_przewodnik_pl_city_set",
+      "src_pages_przewodnik_przewodnik",
+      "src_pages_przewodnik_slugify",
+      "src_pages_przewodnik_type_config",
+      "src_pages_przewodnik_venuedetail",
+      "src_pages_przewodnik_venuerow",
+      "src_pages_przewodnik_venuerowcompact",
+      "src_pages_przewodnik_venueslug",
+      "src_pages_przewodnik_venuestatus"
+    ],
+    "1": [
+      "src_app",
+      "src_app_admin_emails",
+      "src_app_app",
+      "src_app_appinner",
+      "src_app_desktopnav",
+      "src_app_isadmin",
+      "src_app_nav_items",
+      "src_auth_loginpage",
+      "src_auth_loginpage_loginpage",
+      "src_auth_signuppage",
+      "src_auth_signuppage_signuppage",
+      "src_components_agegate",
+      "src_components_agegate_agegate",
+      "src_components_bottomnav",
+      "src_components_bottomnav_bottomnav",
+      "src_components_bottomnav_nav_items",
+      "src_components_pwainstallbanner",
+      "src_components_pwainstallbanner_pwainstallbanner",
+      "src_hooks_useauth",
+      "src_hooks_useauth_authcontext",
+      "src_hooks_useauth_authprovider",
+      "src_hooks_useauth_useauth",
+      "src_lib_api",
+      "src_lib_supabase",
+      "src_lib_supabase_supabase",
+      "src_main",
+      "src_pages_admin_admin",
+      "src_pages_forum",
+      "src_pages_forum_categories",
+      "src_pages_forum_demo_threads",
+      "src_pages_forum_formattimeago",
+      "src_pages_forum_forum",
+      "src_pages_forum_sort_options",
+      "src_pages_forum_threadview",
+      "src_pages_wiadomosci_wiadomosci"
+    ],
+    "2": [
+      "src_app_profilepage",
+      "src_lib_api_apifetch",
+      "src_pages_admin",
+      "src_pages_admin_admin_emails",
+      "src_pages_admin_adstab",
+      "src_pages_admin_articleform",
+      "src_pages_admin_articlestab",
+      "src_pages_admin_audience_days",
+      "src_pages_admin_audiencedayspicker",
+      "src_pages_admin_btndanger",
+      "src_pages_admin_btnghost",
+      "src_pages_admin_btnprimary",
+      "src_pages_admin_card",
+      "src_pages_admin_categories",
+      "src_pages_admin_downscaleimage",
+      "src_pages_admin_empty_article",
+      "src_pages_admin_empty_event",
+      "src_pages_admin_empty_venue",
+      "src_pages_admin_eventstab",
+      "src_pages_admin_inputstyle",
+      "src_pages_admin_labelstyle",
+      "src_pages_admin_slugify",
+      "src_pages_admin_statstab",
+      "src_pages_admin_venue_scenes",
+      "src_pages_admin_venue_types",
+      "src_pages_admin_venuestab",
+      "src_pages_czat",
+      "src_pages_czat_czat",
+      "src_pages_czat_messagebubble"
+    ],
+    "3": [
+      "server_auth",
+      "server_auth_admin_emails",
+      "server_auth_isadmin",
+      "server_auth_isadminemail",
+      "server_auth_optionalauth",
+      "server_auth_verifyjwt",
+      "server_index",
+      "server_index_app",
+      "server_index_dirname",
+      "server_index_dist",
+      "server_index_root",
+      "server_meta",
+      "server_meta_esc",
+      "server_meta_sendarticlehtml",
+      "server_meta_senddicttermhtml",
+      "server_meta_sendhomehtml",
+      "server_meta_sendlistpagehtml",
+      "server_meta_sendsitemap",
+      "server_meta_sendvenuehtml",
+      "server_meta_slugify",
+      "server_meta_venueslug",
+      "server_routes",
+      "server_routes_registerroutes",
+      "server_supabase",
+      "server_supabase_supabaseadmin"
+    ],
+    "4": [
+      "autoprefixer",
+      "package",
+      "package_devdependencies",
+      "package_devdependencies_autoprefixer",
+      "package_devdependencies_postcss",
+      "package_devdependencies_tailwindcss",
+      "package_devdependencies_vite",
+      "package_devdependencies_vitejs_plugin_react",
+      "package_name",
+      "package_private",
+      "package_scripts",
+      "package_scripts_build",
+      "package_scripts_dev",
+      "package_scripts_preview",
+      "package_scripts_start",
+      "package_type",
+      "package_version",
+      "postcss",
+      "tailwindcss",
+      "vite",
+      "vitejs_plugin_react"
+    ],
+    "5": [
+      "src_components_calendarwidget",
+      "src_components_calendarwidget_calendarwidget",
+      "src_components_calendarwidget_type_icon",
+      "src_components_calendarwidget_type_label",
+      "src_lib_articles",
+      "src_lib_articles_articles",
+      "src_lib_articles_categories",
+      "src_lib_articles_getarticlesbycategory",
+      "src_lib_dictionary_getwordoftheday",
+      "src_lib_quiz_plazowicz",
+      "src_lib_quiz_plazowicz_interpretquizresult",
+      "src_lib_quiz_plazowicz_quiz_questions",
+      "src_lib_quiz_plazowicz_results",
+      "src_lib_quiz_plazowicz_type_map",
+      "src_pages_magazyn",
+      "src_pages_magazyn_estimatereadingtime",
+      "src_pages_magazyn_magazyn",
+      "src_pages_magazyn_quizview",
+      "src_pages_magazyn_slug_to_display"
+    ],
+    "6": [
+      "src_components_nocturne_articlecard",
+      "src_components_nocturne_articlecard_articlecard",
+      "src_components_nocturne_button",
+      "src_components_nocturne_button_button",
+      "src_components_nocturne_diamondrating",
+      "src_components_nocturne_diamondrating_diamondrating",
+      "src_components_nocturne_hero",
+      "src_components_nocturne_hero_hero",
+      "src_components_nocturne_index",
+      "src_components_nocturne_sectionheader",
+      "src_components_nocturne_sectionheader_sectionheader",
+      "src_pages_imprezy",
+      "src_pages_imprezy_day_pl",
+      "src_pages_imprezy_eventcard",
+      "src_pages_imprezy_formatdate",
+      "src_pages_imprezy_groupbydate",
+      "src_pages_imprezy_imprezy",
+      "src_pages_imprezy_month_pl",
+      "src_pages_wiadomosci"
+    ],
+    "7": [
+      "express",
+      "package_dependencies",
+      "package_dependencies_express",
+      "package_dependencies_react",
+      "package_dependencies_react_dom",
+      "package_dependencies_react_helmet_async",
+      "package_dependencies_serve",
+      "package_dependencies_supabase_supabase_js",
+      "package_dependencies_wouter",
+      "react",
+      "react_dom",
+      "react_helmet_async",
+      "serve",
+      "supabase_supabase_js",
+      "wouter"
+    ],
+    "8": [
+      "src_pages_articledetailpage",
+      "src_pages_articledetailpage_articledetailpage",
+      "src_pages_articledetailpage_category_colors",
+      "src_pages_articledetailpage_cta_default",
+      "src_pages_articledetailpage_cta_map",
+      "src_pages_articledetailpage_ctabox",
+      "src_pages_articledetailpage_maprail",
+      "src_pages_articledetailpage_parsebold",
+      "src_pages_articledetailpage_pickrelated",
+      "src_pages_articledetailpage_railrow",
+      "src_pages_articledetailpage_railsection",
+      "src_pages_articledetailpage_rendercontent",
+      "src_pages_articledetailpage_rightrail",
+      "src_pages_articledetailpage_slug_to_display"
+    ],
+    "9": [
+      "public_manifest",
+      "public_manifest_background_color",
+      "public_manifest_description",
+      "public_manifest_display",
+      "public_manifest_icons",
+      "public_manifest_lang",
+      "public_manifest_name",
+      "public_manifest_orientation",
+      "public_manifest_short_name",
+      "public_manifest_start_url",
+      "public_manifest_theme_color"
+    ],
+    "10": [
+      "src_lib_dictionary",
+      "src_lib_dictionary_dictionary_terms",
+      "src_lib_dictionary_getterm",
+      "src_lib_dictionary_gettermsbycategory",
+      "src_lib_dictionary_slugifyterm",
+      "src_pages_slownik",
+      "src_pages_slownik_slownik",
+      "src_pages_slownik_termrow",
+      "src_pages_slownikterm",
+      "src_pages_slownikterm_slownikterm"
+    ],
+    "11": [
+      "src_pages_aktualnosci",
+      "src_pages_aktualnosci_admin_emails",
+      "src_pages_aktualnosci_aktualnosci",
+      "src_pages_aktualnosci_firstsentence",
+      "src_pages_aktualnosci_hasimg",
+      "src_pages_aktualnosci_isforeign",
+      "src_pages_aktualnosci_sourcetile",
+      "src_pages_aktualnosci_timeago",
+      "src_pages_aktualnosci_translate",
+      "src_pages_aktualnosci_trcache"
+    ],
+    "12": [
+      "railway",
+      "railway_build",
+      "railway_build_buildcommand",
+      "railway_build_builder",
+      "railway_deploy",
+      "railway_deploy_healthcheckpath",
+      "railway_deploy_startcommand",
+      "railway_schema"
+    ],
+    "13": [
+      "mcp",
+      "mcp_command_python",
+      "mcp_mcp_server_code_review_graph"
+    ],
+    "14": [
+      "src_lib_quiz",
+      "src_lib_quiz_interpretquizresult",
+      "src_lib_quiz_quiz_questions"
+    ],
+    "15": [
+      "public_sw",
+      "public_sw_static_assets"
+    ],
+    "16": [
+      "postcss_config"
+    ],
+    "17": [
+      "tailwind_config"
+    ],
+    "18": [
+      "vite_config"
+    ]
+  },
+  "cohesion": {
+    "0": 0.11025641025641025,
+    "1": 0.10252100840336134,
+    "2": 0.08866995073891626,
+    "3": 0.16,
+    "4": 0.09523809523809523,
+    "5": 0.15204678362573099,
+    "6": 0.18128654970760233,
+    "7": 0.13333333333333333,
+    "8": 0.17582417582417584,
+    "9": 0.18181818181818182,
+    "10": 0.35555555555555557,
+    "11": 0.3111111111111111,
+    "12": 0.25,
+    "13": 0.6666666666666666,
+    "14": 0.6666666666666666,
+    "15": 1.0,
+    "16": 1.0,
+    "17": 1.0,
+    "18": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_lib_api_apifetch",
+      "label": "apiFetch()",
+      "degree": 27
+    },
+    {
+      "id": "src_hooks_useauth_useauth",
+      "label": "useAuth()",
+      "degree": 12
+    },
+    {
+      "id": "src_components_nocturne_button_button",
+      "label": "Button()",
+      "degree": 10
+    },
+    {
+      "id": "src_lib_geo_formatdistance",
+      "label": "formatDistance()",
+      "degree": 10
+    },
+    {
+      "id": "src_components_nocturne_hero_hero",
+      "label": "Hero()",
+      "degree": 9
+    },
+    {
+      "id": "src_pages_aktualnosci_aktualnosci",
+      "label": "Aktualnosci()",
+      "degree": 9
+    },
+    {
+      "id": "src_pages_plaze_plaze",
+      "label": "Plaze()",
+      "degree": 9
+    },
+    {
+      "id": "src_hooks_usegeolocation_usegeolocation",
+      "label": "useGeolocation()",
+      "degree": 8
+    },
+    {
+      "id": "src_pages_przewodnik_przewodnik",
+      "label": "Przewodnik()",
+      "degree": 8
+    },
+    {
+      "id": "src_pages_ogloszenia_ogloszenia",
+      "label": "Ogloszenia()",
+      "degree": 7
+    }
+  ],
+  "surprises": [
+    {
+      "source": "sendDictTermHtml()",
+      "target": "DICTIONARY_TERMS",
+      "source_files": [
+        "server/meta.js",
+        "src/lib/dictionary.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "why": "connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "registerRoutes()",
+      "target": "verifyJWT()",
+      "source_files": [
+        "server/routes.js",
+        "server/auth.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "why": "inferred connection - not explicitly stated in source"
+    },
+    {
+      "source": "registerRoutes()",
+      "target": "isAdmin()",
+      "source_files": [
+        "server/routes.js",
+        "server/auth.js"
+      ],
+      "confidence": "INFERRED",
+      "relation": "indirect_call",
+      "why": "inferred connection - not explicitly stated in source"
+    },
+    {
+      "source": "ProfilePage()",
+      "target": "apiFetch()",
+      "source_files": [
+        "src/App.jsx",
+        "src/lib/api.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `ProfilePage()` unexpectedly reaches hub `apiFetch()`"
+    },
+    {
+      "source": "AppInner()",
+      "target": "apiFetch()",
+      "source_files": [
+        "src/App.jsx",
+        "src/lib/api.js"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `apiFetch()` connect `Profile and Admin Management` to `Geolocation and Guides`, `Authentication Flow`, `Content and Quiz Display`, `Shared UI Components`, `Article Detail View`, `News Feed and Translation`?",
+      "why": "High betweenness centrality (0.089) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `registerRoutes()` connect `Server Authentication Logic` to `Vocabulary Lookup Tool`?",
+      "why": "High betweenness centrality (0.037) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `DICTIONARY_TERMS` connect `Vocabulary Lookup Tool` to `Server Authentication Logic`?",
+      "why": "High betweenness centrality (0.027) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `python`, `name`, `private` to the rest of the system?",
+      "why": "83 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Geolocation and Guides` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.11025641025641025 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Authentication Flow` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.10252100840336134 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Profile and Admin Management` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.08866995073891626 - nodes in this community are weakly interconnected."
+    }
+  ]
+}
