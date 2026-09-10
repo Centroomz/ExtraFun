@@ -248,6 +248,34 @@ export function ArticleDetailPage() {
   const canonical = `${BASE_URL}/magazyn/${article.slug || slug}`
   const ogImage = article.cover_image || `${BASE_URL}/og-default.jpg`
 
+  // BlogPosting structured data — lets Google/AI search cite the article
+  // (rich results, "według ExtraFun…" attributions) instead of only indexing
+  // it as plain text. Fields mirror the OG/Twitter tags above.
+  const isoDate = (() => {
+    if (!article.date) return null
+    const d = new Date(article.date)
+    return isNaN(d) ? null : d.toISOString()
+  })()
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: article.title,
+    description: article.seoDescription || article.description || '',
+    image: ogImage,
+    ...(isoDate ? { datePublished: isoDate, dateModified: isoDate } : {}),
+    author: { '@type': 'Person', name: article.author || 'Redakcja' },
+    publisher: {
+      '@type': 'Organization',
+      name: 'ExtraFun',
+      logo: { '@type': 'ImageObject', url: `${BASE_URL}/og-default.jpg` },
+    },
+    mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+    ...(article.category ? { articleSection: article.category } : {}),
+    ...(article.tags?.length ? { keywords: article.tags.join(', ') } : {}),
+    url: canonical,
+    inLanguage: 'pl-PL',
+  }
+
   // Right-rail sections derived from the full published list (fetched for related).
   const notCurrent = a => a.slug && a.slug !== slug
   const newest = allList.filter(notCurrent).slice(0, 5).map(mapRail)
@@ -271,6 +299,8 @@ export function ArticleDetailPage() {
         <meta name="twitter:title" content={article.seoTitle || article.title} />
         <meta name="twitter:description" content={article.seoDescription || article.description} />
         <meta name="twitter:image" content={ogImage} />
+
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
       <div className="lg:flex lg:gap-10 lg:pr-10">
