@@ -48,6 +48,18 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  // Open compose = a history entry, so Back closes the sheet instead of leaving
+  // the page. All explicit closes route through history.back() so the pushed
+  // entry is always consumed (no phantom Back press left behind).
+  useEffect(() => {
+    if (!compose) return
+    window.history.pushState({ efCompose: true }, '')
+    const onPop = () => setCompose(false)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [compose])
+
   const canMessage = !!ad.author_uuid
   const isOwner = !!(user && ad.author_uuid && user.id === ad.author_uuid)
 
@@ -131,7 +143,7 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
 
       {compose && (
         <div className="fixed inset-0 z-[1100] flex items-end md:items-center justify-center">
-          <div className="absolute inset-0 bg-black/70" onClick={() => !sending && setCompose(false)} />
+          <div className="absolute inset-0 bg-black/70" onClick={() => !sending && window.history.back()} />
           <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 pb-[calc(var(--nav-height)_+_env(safe-area-inset-bottom)_+_1.5rem)] md:pb-6 max-h-[90vh] overflow-y-auto">
             <div className="font-display font-semibold text-headline-sm text-on-surface mb-1">Napisz wiadomość</div>
             <div className="font-body text-body-md text-on-surface-variant mb-5">Do ogłoszeniodawcy · {ad.title}</div>
@@ -148,7 +160,7 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
                     className="bg-primary-container text-[#1a1400] px-10 py-4 font-body text-label-caps uppercase font-semibold hover:opacity-90 transition-opacity disabled:opacity-50">
                     {sending ? 'Wysyłam…' : 'Wyślij'}
                   </button>
-                  <button onClick={() => setCompose(false)} className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Anuluj</button>
+                  <button onClick={() => window.history.back()} className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Anuluj</button>
                 </div>
               </>
             )}
@@ -184,6 +196,15 @@ export function Ogloszenia({ user }) {
     return () => window.removeEventListener('popstate', onPop)
   }, [selectedAd])
 
+  // New-ad sheet = a history entry, so Back closes it instead of leaving the page.
+  useEffect(() => {
+    if (!showNewAd) return
+    window.history.pushState({ efNewAd: true }, '')
+    const onPop = () => setShowNewAd(false)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [showNewAd])
+
   async function loadAds() {
     try {
       const data = await apiFetch('/api/ads')
@@ -204,7 +225,7 @@ export function Ogloszenia({ user }) {
         latitude: location?.lat || null, longitude: location?.lng || null,
       }})
       setNewAd({ type: 'Pan szuka Pani', title: '', description: '', city: '' })
-      setShowNewAd(false)
+      window.history.back() // consume the pushed history entry; popstate closes the sheet
       loadAds()
     } catch (e) {
       console.error(e)
@@ -354,7 +375,7 @@ export function Ogloszenia({ user }) {
       {/* New ad sheet */}
       {showNewAd && (
         <div className="fixed inset-0 z-[1100] flex items-end md:items-center justify-center">
-          <div className="absolute inset-0 bg-black/70" onClick={() => setShowNewAd(false)} />
+          <div className="absolute inset-0 bg-black/70" onClick={() => window.history.back()} />
           <div className="relative w-full md:max-w-lg bg-surface-container-low border border-outline-variant/20 p-6 pb-[calc(var(--nav-height)_+_env(safe-area-inset-bottom)_+_1.5rem)] md:pb-6 max-h-[90vh] overflow-y-auto">
             <div className="font-display font-semibold text-headline-sm text-on-surface mb-6">Dodaj ogłoszenie</div>
 
