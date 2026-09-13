@@ -237,14 +237,23 @@ export function registerRoutes(app) {
   // Poczekalnia: to TEN SAM stream co biz — musi stosować te same reguły. GET
   // pokazuje TYLKO publiczne (held=false); wpisy w poczekalni (held=true) NIE
   // wyciekają na ExtraFun. Moderacja (odsłona „Wpuść") dzieje się na biz.
-  app.get('/api/shoutbox', async (req, res) => {
+  app.get('/api/shoutbox', optionalAuth, async (req, res) => {
     const limit = Math.min(parseInt(req.query.limit) || 50, 100)
     const { data, error } = await supabaseAdmin.from('shoutbox_messages')
       .select('id, user_id, username, content, created_at').eq('source', 'bizarriusz')
       .eq('held', false)
       .order('created_at', { ascending: false }).limit(limit)
     if (error) return res.status(500).json({ message: error.message })
-    res.json((data || []).reverse())
+    const rows = (data || []).reverse()
+    // Privacy: strip harvestable PII (user_id, full username) for logged-out
+    // visitors so an anonymous scraper can't build a user list. Mirrors the
+    // bizarriusz.pl fix; logged-in responses untouched.
+    const out = req.user ? rows : rows.map(m => ({
+      ...m,
+      user_id: null,
+      username: (m.username || '').trim() ? (m.username.trim()[0].toUpperCase() + '.') : 'Gość',
+    }))
+    res.json(out)
   })
 
   app.post('/api/shoutbox', verifyJWT, async (req, res) => {
