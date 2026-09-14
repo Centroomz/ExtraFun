@@ -133,24 +133,22 @@ const mapRail = (a) => ({ slug: a.slug, title: a.title, cover_image: a.cover_ima
 function CoverVideo({ src, poster, title }) {
   const ref = useRef(null)
   const [muted, setMuted] = useState(true)
-  const unmute = () => {
+  const toggle = () => {
     const v = ref.current
     if (!v) return
-    v.muted = false
-    v.currentTime = 0
-    v.play().catch(() => {})
-    setMuted(false)
+    const next = !muted
+    v.muted = next
+    if (!next) { v.currentTime = 0; v.play().catch(() => {}) }
+    setMuted(next)
   }
   return (
     <div className="relative w-full">
       <video ref={ref} src={src} poster={poster} autoPlay muted loop playsInline
         aria-label={title} className="w-full h-auto max-h-[60vh] object-cover" />
-      {muted && (
-        <button onClick={unmute} aria-label="Włącz dźwięk"
-          className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-2 backdrop-blur transition">
-          <span aria-hidden>🔊</span> Posłuchaj
-        </button>
-      )}
+      <button onClick={toggle} aria-label={muted ? 'Włącz dźwięk' : 'Wycisz'}
+        className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-2 backdrop-blur transition">
+        <span aria-hidden>{muted ? '🔊' : '🔇'}</span> {muted ? 'Posłuchaj' : 'Wycisz'}
+      </button>
     </div>
   )
 }
