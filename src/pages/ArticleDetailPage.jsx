@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
@@ -129,6 +129,32 @@ function CtaBox({ categorySlug }) {
 // "Czytaj też" teaser and bottom "Czytaj dalej" grid already cover onward reads.
 const mapRail = (a) => ({ slug: a.slug, title: a.title, cover_image: a.cover_image || null })
 
+// Autoplay-muted cover video with tap-to-unmute (browsers block autoplay with sound).
+function CoverVideo({ src, poster, title }) {
+  const ref = useRef(null)
+  const [muted, setMuted] = useState(true)
+  const unmute = () => {
+    const v = ref.current
+    if (!v) return
+    v.muted = false
+    v.currentTime = 0
+    v.play().catch(() => {})
+    setMuted(false)
+  }
+  return (
+    <div className="relative w-full">
+      <video ref={ref} src={src} poster={poster} autoPlay muted loop playsInline
+        aria-label={title} className="w-full h-auto max-h-[60vh] object-cover" />
+      {muted && (
+        <button onClick={unmute} aria-label="Włącz dźwięk"
+          className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-2 backdrop-blur transition">
+          <span aria-hidden>🔊</span> Posłuchaj
+        </button>
+      )}
+    </div>
+  )
+}
+
 function RailRow({ item }) {
   return (
     <Link href={`/magazyn/${item.slug}`} className="group flex gap-3 no-underline">
@@ -189,6 +215,7 @@ export function ArticleDetailPage() {
           categorySlug: data.category_slug || null,
           content: data.content || '',
           cover_image: data.cover_image || null,
+          cover_video: data.cover_video || null,
           author: data.author || 'Redakcja',
           date: data.publish_date || data.created_at || null,
           views: data.views ?? 0,
@@ -282,8 +309,12 @@ export function ArticleDetailPage() {
         </Link>
       </div>
 
-      {/* Hero image */}
-      {article.cover_image && (
+      {/* Hero: cover video (tap-to-unmute) if present, else cover image */}
+      {article.cover_video ? (
+        <div className="max-w-4xl mx-auto px-6 md:px-16 mt-6">
+          <CoverVideo src={article.cover_video} poster={article.cover_image} title={article.title} />
+        </div>
+      ) : article.cover_image && (
         <div className="max-w-4xl mx-auto px-6 md:px-16 mt-6">
           <img src={article.cover_image} alt={article.title} className="w-full h-auto max-h-[60vh] object-cover" />
         </div>

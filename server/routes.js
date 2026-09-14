@@ -175,7 +175,7 @@ export function registerRoutes(app) {
   // Single article by slug (+ fire-and-forget view increment)
   app.get('/api/articles/:slug', async (req, res) => {
     const { data, error } = await supabaseAdmin.from('articles')
-      .select('id, title, slug, excerpt, content, category_slug, cover_image, featured, seo_title, seo_description, author, tags, publish_date, created_at, views')
+      .select('id, title, slug, excerpt, content, category_slug, cover_image, cover_video, featured, seo_title, seo_description, author, tags, publish_date, created_at, views')
       .eq('site', 'extrafun').eq('status', 'published').eq('slug', req.params.slug)
       .maybeSingle()
     if (error) return res.status(500).json({ message: error.message })
