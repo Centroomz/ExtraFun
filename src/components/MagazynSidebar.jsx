@@ -4,19 +4,12 @@ import { getWordOfTheDay } from '../lib/dictionary'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
+import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
 
 // Deterministic day index — same scheme as getWordOfTheDay, so the rotating
 // picks below change once a day and stay stable within the day.
 function dayOfYear() {
   return Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000)
-}
-
-// Monthly theme. Only months with a REAL editorial theme live here; any other
-// month → module hidden (no placeholder). Keep in sync with the Magazyn hero.
-const MONTH_THEMES = {
-  7: { label: 'Lipiec · Nagie plaże', title: 'Skóra, słońce, woda.', lead: 'Naturyzm i lifestyle nad polską wodą.' },
-  8: { label: 'Sierpień · Nagie plaże', title: 'Skóra, słońce, woda.', lead: 'Naturyzm i lifestyle nad polską wodą.' },
-  9: { label: 'Wrzesień · Dogging', title: 'Las, Wisła, parking.', lead: 'Plenerowa scena: prawo, savoir-vivre i dlaczego krzaki zamiast klubu.' },
 }
 
 const railBox = 'border border-outline-variant/20 p-6'
@@ -79,23 +72,21 @@ function PopularModule() {
   )
 }
 
-/* ── Temat miesiąca ────────────────────────────────────────────── */
-function ThemeModule({ onSelectCategory }) {
-  const theme = MONTH_THEMES[new Date().getMonth() + 1]
-  if (!theme) return null
+/* ── Quiz miesiąca (desktop sidebar, na górze; mobile ma własne CTA nad hero) ── */
+function QuizModule({ onStartQuiz, quizDone }) {
+  if (quizDone || !onStartQuiz) return null
   return (
-    <div className={railBox} style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.10), rgba(212,175,55,0.02))' }}>
-      <div className={railLabel}>Temat miesiąca</div>
-      <div className="font-display text-headline-sm text-on-surface mb-1">{theme.title}</div>
-      <div className="font-body text-body-sm text-primary-container mb-2">{theme.label}</div>
-      <p className="font-body text-body-md text-on-surface-variant">{theme.lead}</p>
-      <button
-        onClick={() => { onSelectCategory && onSelectCategory('Temat Miesiąca'); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-        className={railLink}
-      >
-        Zobacz numer →
-      </button>
-    </div>
+    <button
+      onClick={onStartQuiz}
+      className="hidden lg:block group w-full text-left p-6 border border-primary-container/25"
+      style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.03))' }}
+    >
+      <div className="text-4xl mb-3">🌙</div>
+      <div className={railLabel}>Quiz miesiąca</div>
+      <div className="font-display text-headline-sm text-on-surface mb-2 leading-tight">{QUIZ_TITLE}</div>
+      <p className="font-body text-body-sm text-on-surface-variant mb-4">{QUIZ_INTRO}</p>
+      <span className="font-body text-label-caps uppercase text-primary-container group-hover:translate-x-1 transition-transform inline-block">Zacznij →</span>
+    </button>
   )
 }
 
@@ -161,12 +152,12 @@ function NearbyModule() {
   )
 }
 
-export function MagazynSidebar({ onSelectCategory }) {
+export function MagazynSidebar({ onStartQuiz, quizDone }) {
   return (
     <div className="space-y-8">
+      <QuizModule onStartQuiz={onStartQuiz} quizDone={quizDone} />
       <WordModule />
       <PopularModule />
-      <ThemeModule onSelectCategory={onSelectCategory} />
       <NearbyModule />
     </div>
   )
