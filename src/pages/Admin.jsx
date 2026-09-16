@@ -319,11 +319,11 @@ function ArticlesTab() {
               <img src={a.cover_image} alt="" style={{ width: 72, height: 52, objectFit: 'cover', borderRadius: 8, flexShrink: 0 }} />
             )}
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.title}</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#fff', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}><span style={{ color: '#d4af37', fontFamily: 'monospace', marginRight: 8 }}>#{a.id}</span>{a.title}</div>
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 6 }}>
                 <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#d4af37', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
                 <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : a.status === 'scheduled' ? 'rgba(100,149,237,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#d4af37' : a.status === 'scheduled' ? '#6495ED' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status === 'scheduled' ? 'Zaplanowany' : a.status}</span>
-                {a.status === 'scheduled' && a.publish_date && <span style={{ fontSize: 10, color: 'rgba(232,230,252,0.5)' }}>{new Date(a.publish_date).toLocaleString('pl-PL')}</span>}
+                {a.status === 'scheduled' && a.publish_date && <span style={{ fontSize: 13, fontWeight: 600, color: '#6495ED', background: 'rgba(100,149,237,0.12)', borderRadius: 6, padding: '2px 8px' }}>📅 {new Date(a.publish_date).toLocaleString('pl-PL')}</span>}
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
                 <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
