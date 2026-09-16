@@ -149,7 +149,8 @@ export function Magazyn() {
 
   // Hero from the monthly theme; fallback to newest article (never a placeholder).
   const newest = byDate(allArticles)[0]
-  const heroImage = secTemat[0]?.cover_image || theme?.image || newest?.cover_image
+  // Pinned theme image wins (stable hero); dynamic cover only as fallback.
+  const heroImage = theme?.image || secTemat[0]?.cover_image || newest?.cover_image
   const heroLabel = theme?.label || 'ExtraFun · Magazyn'
   const heroTitle = theme?.title || newest?.title || 'Magazyn'
   const heroLead  = theme?.lead  || newest?.description || ''

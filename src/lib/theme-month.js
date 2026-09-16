@@ -28,7 +28,7 @@ export const MONTH_THEMES = {
     label: 'Wrzesień · Temat Miesiąca: Dogging',
     title: 'Las, Wisła, parking.',
     lead: 'Wrzesień w rytmie doggingu: co mówi polskie prawo (i jak rzadko je egzekwuje), savoir-vivre plenerowej sceny i dlaczego część ludzi wybiera krzaki zamiast bezpiecznego klubu.',
-    image: '/editorial/hero-wrzesien-dogging.jpg',
+    image: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/212-1788864401553.webp',
     slugs: ['dogging'],
   },
 }
