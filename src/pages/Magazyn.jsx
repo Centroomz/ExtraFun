@@ -160,9 +160,15 @@ export function Magazyn() {
     ? byDate(archPool)
     : byDate(archPool.filter(a => a.category === activeCategory))
 
-  // Mobile = stary, płaski widok: WSZYSTKIE artykuły od najnowszego (bez dedup,
-  // bez sekcji). Filtr z pełnej listy kategorii.
-  const mobileCats = ['Wszystkie', ...Array.from(new Set(allArticles.map(a => a.category))).sort((a, b) => a.localeCompare(b, 'pl'))]
+  // Mobile = płaski widok: WSZYSTKIE artykuły od najnowszego. Filtr w kolejności
+  // rubryk (rytm tygodnia), Temat Miesiąca (bieżący motyw) na czele i wyróżniony.
+  const mobilePresent = new Set(allArticles.map(a => a.category))
+  const RUBRYKA_ORDER = [themeName, 'Naga Środa', 'Tam i Tam', 'Felieton', 'CNM 101', 'Pierwszy Raz', 'Bez Osądu', 'Plażing', 'Miejsca'].filter(Boolean)
+  const mobileCats = [
+    'Wszystkie',
+    ...RUBRYKA_ORDER.filter(c => mobilePresent.has(c)),
+    ...[...mobilePresent].filter(c => !RUBRYKA_ORDER.includes(c)).sort((a, b) => a.localeCompare(b, 'pl')),
+  ]
   const mobileList = activeCategory === 'Wszystkie'
     ? byDate(allArticles)
     : byDate(allArticles.filter(a => a.category === activeCategory))
@@ -239,19 +245,24 @@ export function Magazyn() {
         {/* MOBILE — stary, płaski widok: filtr + artykuły od najnowszego */}
         <div className="lg:hidden">
           <div className="flex flex-wrap gap-x-6 gap-y-3 mb-10 mt-8">
-            {mobileCats.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
-                  activeCategory === cat
-                    ? 'border-primary-container text-primary-container'
-                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {mobileCats.map(cat => {
+              const isTheme = themeName && cat === themeName
+              return (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
+                    activeCategory === cat
+                      ? 'border-primary-container text-primary-container'
+                      : isTheme
+                        ? 'border-primary-container/50 text-primary-container font-bold'
+                        : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  {isTheme ? `★ ${cat} · temat mies.` : cat}
+                </button>
+              )
+            })}
           </div>
           {mobileList.length > 0 ? (
             <div className="grid grid-cols-1 gap-y-10">
