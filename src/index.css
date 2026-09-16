@@ -171,8 +171,16 @@ body {
   height: 22px;
   transition: transform 0.2s;
 }
+@keyframes ef-nav-pulse {
+  0%, 100% { filter: drop-shadow(0 0 3px var(--cyan)); opacity: 1; transform: scale(1); }
+  50%      { filter: drop-shadow(0 0 11px var(--cyan)); opacity: 0.7; transform: scale(1.12); }
+}
 .nav-item.active svg {
   filter: drop-shadow(0 0 6px var(--cyan));
+  animation: ef-nav-pulse 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-item.active svg { animation: none; }
 }
 
 /* ── Glass Card ── */
