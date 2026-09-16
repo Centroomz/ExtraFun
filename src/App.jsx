@@ -16,6 +16,7 @@ import { ForgotPasswordPage } from './auth/ForgotPasswordPage'
 import { ResetPasswordPage } from './auth/ResetPasswordPage'
 import { Admin } from './pages/Admin'
 import { ArticleDetailPage } from './pages/ArticleDetailPage'
+import { KategoriaPage } from './pages/KategoriaPage'
 import { Imprezy } from './pages/Imprezy'
 import { Slownik } from './pages/Slownik'
 import { SlownikTerm } from './pages/SlownikTerm'
@@ -356,6 +357,7 @@ function AppInner() {
             <Route path="/" component={Magazyn} />
             <Route path="/magazyn" component={Magazyn} />
             <Route path="/aktualnosci" component={Aktualnosci} />
+            <Route path="/magazyn/rubryka/:slug">{(params) => <KategoriaPage slug={params.slug} />}</Route>
             <Route path="/magazyn/:slug" component={ArticleDetailPage} />
             <Route path="/imprezy" component={Imprezy} />
             <Route path="/slownik/:slug">{(params) => <SlownikTerm slug={params.slug} />}</Route>

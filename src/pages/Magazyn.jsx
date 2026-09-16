@@ -10,25 +10,12 @@ import { RubrykaSection } from '../components/RubrykaSection'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { Hero } from '../components/nocturne'
 import { getMonthTheme } from '../lib/theme-month'
+import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const BASE_URL = 'https://www.extrafun.pl'
 
 function estimateReadingTime(content) {
   return Math.max(1, Math.ceil((content || '').split(/\s+/).length / 200))
-}
-
-const SLUG_TO_DISPLAY = {
-  'cnm-101':        'CNM 101',
-  'pierwszy-raz':   'Pierwszy Raz',
-  'bez-osadu':      'Bez Osądu',
-  'tam-i-tam':      'Tam i Tam',
-  'slownik':        'Słownik',
-  'temat-miesiaca': 'Temat Miesiąca',
-  'felieton':       'Felieton',
-  'plazing':        'Plażing',
-  'dogging':        'Dogging',
-  'naga-sroda':     'Naga Środa',
-  'miejsca':        'Miejsca',
 }
 
 /* ─── Quiz View (inline, no URL needed) ──────────────────────── */
@@ -173,8 +160,7 @@ export function Magazyn() {
     : byDate(archPool.filter(a => a.category === activeCategory))
 
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
-  const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-  const goArchiwum = (cat) => { setActiveCategory(cat || 'Wszystkie'); document.getElementById('archiwum')?.scrollIntoView({ behavior: 'smooth' }) }
+  const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
 
   if (showQuiz) return <QuizView onBack={() => {
     setShowQuiz(false)
@@ -220,14 +206,14 @@ export function Magazyn() {
       <nav className="max-w-container-max mx-auto px-6 md:px-16">
         <div className="grid grid-cols-2 md:grid-cols-4 border-y border-outline-variant/40 mb-14">
           {[
-            ['Pon · Pt', 'Temat Miesiąca', 'sec-temat'],
-            ['Wtorek', 'Tam i Tam', 'sec-tam'],
-            ['Środa', 'Naga Środa', 'sec-naga'],
-            ['Sobota', 'Felieton', 'sec-felieton'],
-          ].map(([day, nm, id], i) => (
+            ['Pon · Pt', 'Temat Miesiąca', 'temat'],
+            ['Wtorek', 'Tam i Tam', 'tam-i-tam'],
+            ['Środa', 'Naga Środa', 'naga-sroda'],
+            ['Sobota', 'Felieton', 'felieton'],
+          ].map(([day, nm, rslug], i) => (
             <button
-              key={id}
-              onClick={() => scrollTo(id)}
+              key={rslug}
+              onClick={() => goRubryka(rslug)}
               className={`text-center py-4 px-3 hover:bg-primary-container/5 transition-colors border-outline-variant/40 ${i < 3 ? 'md:border-r' : ''} ${i < 2 ? 'border-b md:border-b-0' : ''}`}
             >
               <div className="font-body text-label-caps uppercase text-primary-container">{day}</div>
@@ -248,27 +234,27 @@ export function Magazyn() {
           label={themeName ? `Temat Miesiąca · ${themeName}` : 'Temat Miesiąca'}
           articles={secTemat}
           onOpen={openArticle}
-          onMore={() => goArchiwum(themeName)}
+          onMore={() => goRubryka('temat')}
           moreLabel="Cały numer →"
           layout="feature"
           limit={5}
         />
         <RubrykaSection
           id="sec-naga" label="Naga Środa" articles={secNaga}
-          onOpen={openArticle} onMore={() => goArchiwum('Naga Środa')} limit={3}
+          onOpen={openArticle} onMore={() => goRubryka('naga-sroda')} limit={3}
         />
         <RubrykaSection
           id="sec-tam" label="Tam i Tam" articles={secTam}
-          onOpen={openArticle} onMore={() => goArchiwum('Tam i Tam')}
+          onOpen={openArticle} onMore={() => goRubryka('tam-i-tam')}
           layout={secTam.length === 1 ? 'wide' : 'row'} limit={3}
         />
         <RubrykaSection
           id="sec-felieton" label="Felieton" articles={secFel}
-          onOpen={openArticle} onMore={() => goArchiwum('Felieton')} limit={3}
+          onOpen={openArticle} onMore={() => goRubryka('felieton')} limit={3}
         />
         <RubrykaSection
           id="sec-wiedza" label="Wiedza · CNM 101 · Pierwszy Raz · Bez Osądu"
-          articles={secWiedza} onOpen={openArticle} onMore={() => goArchiwum()} limit={3}
+          articles={secWiedza} onOpen={openArticle} onMore={() => goRubryka('wiedza')} limit={3}
         />
 
         {/* Archiwum — cały katalog z filtrem (kategorie realnie obecne) */}
