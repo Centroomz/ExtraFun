@@ -114,7 +114,7 @@ function ArticleForm({ initial, onSave, onCancel, saving }) {
             value={form.category_slug}
             onChange={e => set('category_slug', e.target.value)}>
             {CATEGORIES.map(c => (
-              <option key={c.slug} value={c.slug}>{c.name}</option>
+              <option key={c.slug} value={c.slug} style={{ background: '#1a1c1c', color: '#fff' }}>{c.name}</option>
             ))}
           </select>
         </div>
@@ -123,9 +123,9 @@ function ArticleForm({ initial, onSave, onCancel, saving }) {
           <select style={{ ...inputStyle, cursor: 'pointer' }}
             value={form.status}
             onChange={e => set('status', e.target.value)}>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-            <option value="scheduled">Zaplanowany</option>
+            <option value="draft" style={{ background: '#1a1c1c', color: '#fff' }}>Draft</option>
+            <option value="published" style={{ background: '#1a1c1c', color: '#fff' }}>Published</option>
+            <option value="scheduled" style={{ background: '#1a1c1c', color: '#fff' }}>Zaplanowany</option>
           </select>
         </div>
       </div>
@@ -596,8 +596,8 @@ function EventsTab() {
 
         <label style={lbl}>Klub (opcjonalnie)</label>
         <select style={inp} value={form.venue_id} onChange={e => set('venue_id', e.target.value)}>
-          <option value="">— brak / impreza zewnętrzna —</option>
-          {venues.map(v => <option key={v.id} value={v.id}>{v.name} ({v.city})</option>)}
+          <option value="" style={{ background: '#1a1c1c', color: '#fff' }}>— brak / impreza zewnętrzna —</option>
+          {venues.map(v => <option key={v.id} value={v.id} style={{ background: '#1a1c1c', color: '#fff' }}>{v.name} ({v.city})</option>)}
         </select>
 
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 14, color: 'rgba(255,255,255,0.8)', marginBottom: 10 }}>
@@ -781,8 +781,8 @@ function VenuesTab() {
         <label style={lbl}>Nazwa *</label><input style={inp} value={form.name} onChange={e => set('name', e.target.value)} />
         <div style={{ display: 'flex', gap: 8 }}>
           <div style={{ flex: 1 }}><label style={lbl}>Miasto *</label><input style={inp} value={form.city} onChange={e => set('city', e.target.value)} /></div>
-          <div style={{ flex: 1 }}><label style={lbl}>Typ</label><select style={inp} value={form.type} onChange={e => set('type', e.target.value)}>{VENUE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}</select></div>
-          <div style={{ flex: 1 }}><label style={lbl}>Scena</label><select style={inp} value={form.scene} onChange={e => set('scene', e.target.value)}>{VENUE_SCENES.map(s => <option key={s} value={s}>{s}</option>)}</select></div>
+          <div style={{ flex: 1 }}><label style={lbl}>Typ</label><select style={inp} value={form.type} onChange={e => set('type', e.target.value)}>{VENUE_TYPES.map(t => <option key={t} value={t} style={{ background: '#1a1c1c', color: '#fff' }}>{t}</option>)}</select></div>
+          <div style={{ flex: 1 }}><label style={lbl}>Scena</label><select style={inp} value={form.scene} onChange={e => set('scene', e.target.value)}>{VENUE_SCENES.map(s => <option key={s} value={s} style={{ background: '#1a1c1c', color: '#fff' }}>{s}</option>)}</select></div>
         </div>
         <label style={lbl}>Adres</label><input style={inp} value={form.address} onChange={e => set('address', e.target.value)} />
         <label style={lbl}>Strona WWW</label><input style={inp} value={form.website} onChange={e => set('website', e.target.value)} />
