@@ -154,12 +154,22 @@ export function Magazyn() {
   const heroTitle = theme?.title || newest?.title || 'Magazyn'
   const heroLead  = theme?.lead  || newest?.description || ''
 
-  // Archiwum filter built from categories actually present — no empty tabs.
-  const presentCats = Array.from(new Set(allArticles.map(a => a.category))).sort((a, b) => a.localeCompare(b, 'pl'))
+  // Archiwum = wszystko POZA tym, co już pokazane w blokach wyżej (bez dubli).
+  const shownIds = new Set([
+    ...secTemat.slice(0, 5),
+    ...secNaga.slice(0, 3),
+    ...secTam.slice(0, 3),
+    ...secFel.slice(0, 3),
+    ...secWiedza.slice(0, 3),
+  ].map(a => a.id))
+  const archPool = allArticles.filter(a => !shownIds.has(a.id))
+
+  // Filtr z kategorii realnie obecnych w archiwum — bez pustych tabów.
+  const presentCats = Array.from(new Set(archPool.map(a => a.category))).sort((a, b) => a.localeCompare(b, 'pl'))
   const archCategories = ['Wszystkie', ...presentCats]
   const archFiltered = activeCategory === 'Wszystkie'
-    ? byDate(allArticles)
-    : byDate(allArticles.filter(a => a.category === activeCategory))
+    ? byDate(archPool)
+    : byDate(archPool.filter(a => a.category === activeCategory))
 
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
