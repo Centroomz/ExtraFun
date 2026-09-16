@@ -45,8 +45,8 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
           {label && (onLabel
             ? <button onClick={onLabel} className={`font-body text-label-caps uppercase text-primary-container block hover:opacity-80 transition-opacity ${mobileCompact ? 'mb-2 md:mb-4' : 'mb-4'}`}>{label} →</button>
             : <span className={`font-body text-label-caps uppercase text-primary-container block ${mobileCompact ? 'mb-2 md:mb-4' : 'mb-4'}`}>{label}</span>)}
-          <h1 className={`font-display ${italic ? 'italic ' : ''}font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-none ${mobileCompact ? 'mb-0 md:mb-6' : 'mb-6'}`}>{title}</h1>
-          {lead && <p className={`font-body text-body-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed ${mobileCompact ? 'hidden md:block' : ''}`}>{lead}</p>}
+          <h1 className={`font-display ${italic ? 'italic ' : ''}font-semibold text-display-lg-mobile md:text-display-lg text-on-surface leading-none ${mobileCompact ? 'mb-3 md:mb-6' : 'mb-6'}`}>{title}</h1>
+          {lead && <p className={`font-body text-body-lg text-on-surface-variant max-w-2xl leading-relaxed ${mobileCompact ? 'mb-0 md:mb-8' : 'mb-8'}`}>{lead}</p>}
           {ctaLabel && <Button onClick={onCta}>{ctaLabel}</Button>}
         </div>
         {aside && <div className="hidden md:block shrink-0 w-[320px]">{aside}</div>}
