@@ -2,7 +2,7 @@ import { Button } from './Button'
 
 // Full-bleed editorial hero spread: moody image + vignette + left-aligned Bodoni headline.
 // Optional `aside` renders a panel on the right (desktop) — hidden on mobile.
-export function Hero({ image, label, title, lead, ctaLabel, onCta, aside }) {
+export function Hero({ image, label, title, lead, ctaLabel, onCta, aside, italic = true }) {
   return (
     <section className="relative w-full h-[58vh] min-h-[420px] flex flex-col justify-end overflow-hidden mb-16">
       <div className="absolute inset-0">
@@ -14,7 +14,7 @@ export function Hero({ image, label, title, lead, ctaLabel, onCta, aside }) {
       <div className={`relative z-10 px-6 md:px-16 pb-16 ${aside ? 'flex flex-col md:flex-row md:items-end md:justify-between gap-8' : ''}`}>
         <div className="max-w-3xl">
           {label && <span className="font-body text-label-caps uppercase text-primary-container mb-4 block">{label}</span>}
-          <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-6 leading-none">{title}</h1>
+          <h1 className={`font-display ${italic ? 'italic ' : ''}font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-6 leading-none`}>{title}</h1>
           {lead && <p className="font-body text-body-lg text-on-surface-variant max-w-2xl mb-8 leading-relaxed">{lead}</p>}
           {ctaLabel && <Button onClick={onCta}>{ctaLabel}</Button>}
         </div>

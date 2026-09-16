@@ -7,7 +7,8 @@ import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { MagazynSidebar } from '../components/MagazynSidebar'
 import { RubrykaSection } from '../components/RubrykaSection'
-import { Hero, ArticleCard, SectionHeader } from '../components/nocturne'
+import { MagCard, MagSectionHeader } from '../components/MagCard'
+import { Hero } from '../components/nocturne'
 import { getMonthTheme } from '../lib/theme-month'
 
 const BASE_URL = 'https://www.extrafun.pl'
@@ -148,7 +149,7 @@ export function Magazyn() {
 
   // Hero from the monthly theme; fallback to newest article (never a placeholder).
   const newest = byDate(allArticles)[0]
-  const heroImage = theme?.image || newest?.cover_image
+  const heroImage = secTemat[0]?.cover_image || theme?.image || newest?.cover_image
   const heroLabel = theme?.label || 'ExtraFun · Magazyn'
   const heroTitle = theme?.title || newest?.title || 'Magazyn'
   const heroLead  = theme?.lead  || newest?.description || ''
@@ -202,7 +203,7 @@ export function Magazyn() {
       {/* Hero = Temat Miesiąca (parasol) — sterowany configiem theme-month.
           Tekst na zdjęciu (scrim wbudowany w Hero). Quiz przeniesiony do
           sidebara (Quiz na górze). */}
-      <Hero image={heroImage} label={heroLabel} title={heroTitle} lead={heroLead} />
+      <Hero image={heroImage} label={heroLabel} title={heroTitle} lead={heroLead} italic={false} />
 
       {/* Rytm tygodnia — 4 kręgosłup-rubryki, scroll do sekcji */}
       <nav className="max-w-container-max mx-auto px-6 md:px-16">
@@ -239,7 +240,7 @@ export function Magazyn() {
           onMore={() => goArchiwum(themeName)}
           moreLabel="Cały numer →"
           layout="feature"
-          limit={3}
+          limit={5}
         />
         <RubrykaSection
           id="sec-naga" label="Naga Środa" articles={secNaga}
@@ -248,7 +249,7 @@ export function Magazyn() {
         <RubrykaSection
           id="sec-tam" label="Tam i Tam" articles={secTam}
           onOpen={openArticle} onMore={() => goArchiwum('Tam i Tam')}
-          layout={secTam.length === 1 ? 'feature' : 'row'} limit={3}
+          layout={secTam.length === 1 ? 'wide' : 'row'} limit={3}
         />
         <RubrykaSection
           id="sec-felieton" label="Felieton" articles={secFel}
@@ -261,8 +262,8 @@ export function Magazyn() {
 
         {/* Archiwum — cały katalog z filtrem (kategorie realnie obecne) */}
         <section id="archiwum" className="scroll-mt-24 mt-8">
-          <SectionHeader title="Więcej / Archiwum" />
-          <div className="flex flex-wrap gap-x-7 gap-y-3 mb-12 -mt-6">
+          <MagSectionHeader label="Więcej / Archiwum" />
+          <div className="flex flex-wrap gap-x-7 gap-y-3 mb-12">
             {archCategories.map(cat => (
               <button
                 key={cat}
@@ -278,23 +279,19 @@ export function Magazyn() {
             ))}
           </div>
           {archFiltered.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-16">
-              {archFiltered.map((article, idx) => {
-                const big = idx % 3 === 0
-                return (
-                  <div key={article.id} className={big ? 'md:col-span-8' : 'md:col-span-4'}>
-                    <ArticleCard
-                      image={article.cover_image || undefined}
-                      tag={article.category}
-                      title={article.title}
-                      lead={article.description}
-                      meta={`${article.reading_time} min czytania`}
-                      variant={big ? 'large' : 'small'}
-                      onClick={() => openArticle(article)}
-                    />
-                  </div>
-                )
-              })}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
+              {archFiltered.map(article => (
+                <MagCard
+                  key={article.id}
+                  image={article.cover_image}
+                  tag={article.category}
+                  title={article.title}
+                  lead={article.description}
+                  meta={`${article.reading_time} min`}
+                  size="sm"
+                  onClick={() => openArticle(article)}
+                />
+              ))}
             </div>
           ) : (
             <div className="py-24 text-center">
