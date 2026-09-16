@@ -214,7 +214,7 @@ export function Magazyn() {
       {/* Hero = Temat Miesiąca (parasol) — sterowany configiem theme-month.
           Tekst na zdjęciu (scrim wbudowany w Hero). Quiz przeniesiony do
           sidebara (Quiz na górze). */}
-      <Hero image={heroImage} video={heroVideo} imagePosition="center 38%" label={heroLabel} title={heroTitle} lead={heroLead} italic={false} mobileCompact />
+      <Hero image={heroImage} video={heroVideo} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} mobileCompact />
 
       {/* Rytm tygodnia — 4 kręgosłup-rubryki (desktop; mobile = płaska lista) */}
       <nav className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16">
