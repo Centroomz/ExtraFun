@@ -138,13 +138,14 @@ export function Magazyn() {
   const newest = byDate(allArticles)[0]
   // Pinned theme image wins (stable hero); dynamic cover only as fallback.
   const heroImage = theme?.image || secTemat[0]?.cover_image || newest?.cover_image
+  const heroVideo = theme?.video || null
   const heroLabel = theme?.label || 'ExtraFun · Magazyn'
   const heroTitle = theme?.title || newest?.title || 'Magazyn'
   const heroLead  = theme?.lead  || newest?.description || ''
 
   // Archiwum = wszystko POZA tym, co już pokazane w blokach wyżej (bez dubli).
   const shownIds = new Set([
-    ...secTemat.slice(0, 5),
+    ...secTemat.slice(0, 12),
     ...secNaga.slice(0, 3),
     ...secTam.slice(0, 3),
     ...secFel.slice(0, 3),
@@ -158,6 +159,13 @@ export function Magazyn() {
   const archFiltered = activeCategory === 'Wszystkie'
     ? byDate(archPool)
     : byDate(archPool.filter(a => a.category === activeCategory))
+
+  // Mobile = stary, płaski widok: WSZYSTKIE artykuły od najnowszego (bez dedup,
+  // bez sekcji). Filtr z pełnej listy kategorii.
+  const mobileCats = ['Wszystkie', ...Array.from(new Set(allArticles.map(a => a.category))).sort((a, b) => a.localeCompare(b, 'pl'))]
+  const mobileList = activeCategory === 'Wszystkie'
+    ? byDate(allArticles)
+    : byDate(allArticles.filter(a => a.category === activeCategory))
 
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
@@ -200,10 +208,10 @@ export function Magazyn() {
       {/* Hero = Temat Miesiąca (parasol) — sterowany configiem theme-month.
           Tekst na zdjęciu (scrim wbudowany w Hero). Quiz przeniesiony do
           sidebara (Quiz na górze). */}
-      <Hero image={heroImage} label={heroLabel} title={heroTitle} lead={heroLead} italic={false} />
+      <Hero image={heroImage} video={heroVideo} imagePosition="center 28%" label={heroLabel} title={heroTitle} lead={heroLead} italic={false} />
 
-      {/* Rytm tygodnia — 4 kręgosłup-rubryki, scroll do sekcji */}
-      <nav className="max-w-container-max mx-auto px-6 md:px-16">
+      {/* Rytm tygodnia — 4 kręgosłup-rubryki (desktop; mobile = płaska lista) */}
+      <nav className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16">
         <div className="grid grid-cols-2 md:grid-cols-4 border-y border-outline-variant/40 mb-14">
           {[
             ['Pon · Pt', 'Temat Miesiąca', 'temat'],
@@ -228,6 +236,48 @@ export function Magazyn() {
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           <div className="lg:col-span-8">
 
+        {/* MOBILE — stary, płaski widok: filtr + artykuły od najnowszego */}
+        <div className="lg:hidden">
+          <div className="flex flex-wrap gap-x-6 gap-y-3 mb-10 mt-8">
+            {mobileCats.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
+                  activeCategory === cat
+                    ? 'border-primary-container text-primary-container'
+                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          {mobileList.length > 0 ? (
+            <div className="grid grid-cols-1 gap-y-10">
+              {mobileList.map(article => (
+                <MagCard
+                  key={article.id}
+                  image={article.cover_image}
+                  tag={article.category}
+                  title={article.title}
+                  lead={article.description}
+                  meta={`${article.reading_time} min`}
+                  size="sm"
+                  onClick={() => openArticle(article)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-24 text-center">
+              <div className="font-display text-headline-sm text-on-surface mb-2">Brak artykułów</div>
+              <div className="font-body text-body-md text-on-surface-variant">W tej kategorii nie ma jeszcze żadnych artykułów.</div>
+            </div>
+          )}
+        </div>
+
+        {/* DESKTOP — magazyn sekcyjny */}
+        <div className="hidden lg:block">
         {/* Bloki per rubryka — kolejność = rytm tygodnia. Puste znikają. */}
         <RubrykaSection
           id="sec-temat"
@@ -237,7 +287,7 @@ export function Magazyn() {
           onMore={() => goRubryka('temat')}
           moreLabel="Cały numer →"
           layout="feature"
-          limit={5}
+          limit={12}
         />
         <RubrykaSection
           id="sec-naga" label="Naga Środa" articles={secNaga}
@@ -297,6 +347,7 @@ export function Magazyn() {
             </div>
           )}
         </section>
+        </div>{/* /desktop magazyn */}
 
           </div>{/* /content col */}
 

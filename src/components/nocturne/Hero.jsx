@@ -2,13 +2,21 @@ import { Button } from './Button'
 
 // Full-bleed editorial hero spread: moody image + vignette + left-aligned Bodoni headline.
 // Optional `aside` renders a panel on the right (desktop) — hidden on mobile.
-export function Hero({ image, label, title, lead, ctaLabel, onCta, aside, italic = true }) {
+export function Hero({ image, video, imagePosition = 'center', label, title, lead, ctaLabel, onCta, aside, italic = true }) {
   return (
     <section className="relative w-full h-[58vh] min-h-[420px] flex flex-col justify-end overflow-hidden mb-16">
       <div className="absolute inset-0">
+        {video && (
+          <video
+            className="lg:hidden w-full h-full object-cover"
+            autoPlay muted loop playsInline
+            poster={image || undefined}
+            src={video}
+          />
+        )}
         {image
-          ? <div className="w-full h-full bg-cover bg-center" style={{ backgroundImage: `url('${image}')` }} />
-          : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}
+          ? <div className={`${video ? 'hidden lg:block ' : ''}w-full h-full bg-cover`} style={{ backgroundImage: `url('${image}')`, backgroundPosition: imagePosition }} />
+          : <div className={`${video ? 'hidden lg:block ' : ''}w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest`} />}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(18,20,20,.95) 5%, rgba(18,20,20,.4) 45%, rgba(18,20,20,.2) 100%)' }} />
       </div>
       <div className={`relative z-10 px-6 md:px-16 pb-16 ${aside ? 'flex flex-col md:flex-row md:items-end md:justify-between gap-8' : ''}`}>
