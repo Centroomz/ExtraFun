@@ -122,7 +122,6 @@ function QuizModule({ onStartQuiz, quizDone }) {
       className="group w-full text-left p-6 border border-primary-container/25"
       style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.03))' }}
     >
-      <div className="text-4xl mb-3">🌙</div>
       <div className={railLabel}>Quiz miesiąca</div>
       <div className="font-display text-headline-sm text-on-surface mb-2 leading-tight">{QUIZ_TITLE}</div>
       <p className="font-body text-body-sm text-on-surface-variant mb-4">{QUIZ_INTRO}</p>

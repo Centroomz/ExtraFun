@@ -2302,3 +2302,7 @@ select.form-input option { background: #151538; }
   text-transform: uppercase;
   color: rgba(232,230,252,0.72);
 }
+
+/* Horizontal tile strips (MagazynMobileFeed): hide scrollbar, keep swipe */
+.scrollbar-none { scrollbar-width: none; -ms-overflow-style: none; }
+.scrollbar-none::-webkit-scrollbar { display: none; }

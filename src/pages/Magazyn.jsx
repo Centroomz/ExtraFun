@@ -8,6 +8,7 @@ import { CalendarWidget } from '../components/CalendarWidget'
 import { SiteRail } from '../components/SiteRail'
 import { RubrykaSection } from '../components/RubrykaSection'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
+import { MagazynMobileFeed, firstParagraph } from '../components/MagazynMobileFeed'
 import { Hero } from '../components/nocturne'
 import { getMonthTheme } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
@@ -120,6 +121,8 @@ export function Magazyn() {
             cover_image: a.cover_image || null,
             featured: a.featured || false,
             publish_date: a.publish_date || a.created_at || null,
+            views: a.views || 0,
+            firstParagraph: firstParagraph(a.content),
           })))
         }
       })
@@ -168,19 +171,6 @@ export function Magazyn() {
     ? byDate(archPool)
     : byDate(archPool.filter(a => a.category === activeCategory))
 
-  // Mobile = płaski widok: WSZYSTKIE artykuły od najnowszego. Filtr w kolejności
-  // rubryk (rytm tygodnia), Temat Miesiąca (bieżący motyw) na czele i wyróżniony.
-  const mobilePresent = new Set(allArticles.map(a => a.category))
-  const RUBRYKA_ORDER = [themeName, 'Naga Środa', 'Tam i Tam', 'Felieton', 'CNM 101', 'Pierwszy Raz', 'Bez Osądu', 'Plażing', 'Miejsca'].filter(Boolean)
-  const mobileCats = [
-    'Wszystkie',
-    ...RUBRYKA_ORDER.filter(c => mobilePresent.has(c)),
-    ...[...mobilePresent].filter(c => !RUBRYKA_ORDER.includes(c)).sort((a, b) => a.localeCompare(b, 'pl')),
-  ]
-  const mobileList = activeCategory === 'Wszystkie'
-    ? byDate(allArticles)
-    : byDate(allArticles.filter(a => a.category === activeCategory))
-
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
 
@@ -203,26 +193,13 @@ export function Magazyn() {
         <meta property="og:site_name" content="ExtraFun" />
       </Helmet>
 
-      {/* Quiz CTA — mobile only: prominentna karta nad hero */}
-      {!quizDone && (
-        <button
-          onClick={() => setShowQuiz(true)}
-          className="md:hidden group w-full text-left p-5 flex items-center gap-4"
-          style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.04))' }}
-        >
-          <div className="text-4xl shrink-0">🌙</div>
-          <div className="flex-1 min-w-0">
-            <div className="font-body text-label-caps uppercase text-primary-container mb-1">Quiz miesiąca</div>
-            <div className="font-display text-headline-sm text-on-surface leading-tight">{QUIZ_TITLE}</div>
-          </div>
-          <span className="font-body text-label-caps uppercase text-primary-container shrink-0">Zacznij →</span>
-        </button>
-      )}
-
       {/* Hero = Temat Miesiąca (parasol) — sterowany configiem theme-month.
           Tekst na zdjęciu (scrim wbudowany w Hero). Quiz przeniesiony do
           sidebara (Quiz na górze). */}
-      <Hero image={heroImage} video={heroVideo} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} mobileCompact />
+      {/* Desktop hero; on mobile the theme is the first tile of the feed. */}
+      <div className="hidden lg:block">
+        <Hero image={heroImage} video={heroVideo} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} />
+      </div>
 
       {/* Rytm tygodnia — 4 kręgosłup-rubryki (desktop; mobile = płaska lista) */}
       <nav className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16">
@@ -250,50 +227,16 @@ export function Magazyn() {
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           <div className="lg:col-span-8">
 
-        {/* MOBILE — stary, płaski widok: filtr + artykuły od najnowszego */}
-        <div className="lg:hidden">
-          <div className="flex flex-wrap gap-x-6 gap-y-3 mb-10 mt-8">
-            {mobileCats.map(cat => {
-              const isTheme = themeName && cat === themeName
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
-                    activeCategory === cat
-                      ? 'border-primary-container text-primary-container'
-                      : isTheme
-                        ? 'border-primary-container/50 text-primary-container font-bold'
-                        : 'border-transparent text-on-surface-variant hover:text-on-surface'
-                  }`}
-                >
-                  {isTheme ? `★ ${cat} · temat mies.` : cat}
-                </button>
-              )
-            })}
-          </div>
-          {mobileList.length > 0 ? (
-            <div className="grid grid-cols-1 gap-y-10">
-              {mobileList.map(article => (
-                <MagCard
-                  key={article.id}
-                  image={article.cover_image}
-                  tag={article.category}
-                  title={article.title}
-                  lead={article.description}
-                  meta={`${article.reading_time} min`}
-                  size="sm"
-                  onClick={() => openArticle(article)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="py-24 text-center">
-              <div className="font-display text-headline-sm text-on-surface mb-2">Brak artykułów</div>
-              <div className="font-body text-body-md text-on-surface-variant">W tej kategorii nie ma jeszcze żadnych artykułów.</div>
-            </div>
-          )}
-        </div>
+        {/* MOBILE — kafelki pełnoekranowe (IG/Reels): temat → artykuły od najnowszego */}
+        <MagazynMobileFeed
+          theme={theme}
+          themeSlug={themeSlugs[0] || 'temat'}
+          themeArticles={secTemat}
+          articles={byDate(allArticles)}
+          popular={[...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5)}
+          quizDone={quizDone}
+          onStartQuiz={() => setShowQuiz(true)}
+        />
 
         {/* DESKTOP — magazyn sekcyjny */}
         <div className="hidden lg:block">
