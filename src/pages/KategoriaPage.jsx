@@ -5,6 +5,7 @@ import { apiFetch } from '../lib/api'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { SLUG_TO_DISPLAY, RUBRYKA_GROUPS } from '../lib/rubryki'
 import { getMonthTheme } from '../lib/theme-month'
+import { PageWithRail } from '../components/PageWithRail'
 
 const BASE_URL = 'https://www.extrafun.pl'
 
@@ -60,6 +61,7 @@ export function KategoriaPage({ slug }) {
       </Helmet>
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 py-12 pb-24">
+        <PageWithRail>
         <Link href="/magazyn" className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface inline-block mb-8">← Magazyn</Link>
 
         <MagSectionHeader label={label} />
@@ -87,6 +89,7 @@ export function KategoriaPage({ slug }) {
             ))}
           </div>
         )}
+      </PageWithRail>
       </main>
     </div>
   )

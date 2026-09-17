@@ -5,7 +5,7 @@ import { ARTICLES as FALLBACK_ARTICLES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE } from '../lib/quiz-dogging'
 import { apiFetch } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
-import { MagazynSidebar } from '../components/MagazynSidebar'
+import { SiteRail } from '../components/SiteRail'
 import { RubrykaSection } from '../components/RubrykaSection'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { Hero } from '../components/nocturne'
@@ -363,11 +363,9 @@ export function Magazyn() {
           </div>{/* /content col */}
 
           <aside className="mt-16 lg:mt-0 lg:col-span-4">
-            <MagazynSidebar
-              onSelectCategory={setActiveCategory}
-              onStartQuiz={() => setShowQuiz(true)}
-              quizDone={quizDone}
-            />
+            <div className="sticky top-8">
+              <SiteRail onStartQuiz={() => setShowQuiz(true)} quizDone={quizDone} />
+            </div>
           </aside>
         </div>{/* /magazyn grid */}
 

@@ -5,6 +5,8 @@ import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
 import { Hero, Button } from '../components/nocturne'
+import { PageWithRail } from '../components/PageWithRail'
+import { SiteRail } from '../components/SiteRail'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
@@ -598,6 +600,7 @@ export function Przewodnik({ city: cityParam }) {
       {cityParam ? (
         /* ════════ CITY PAGE ════════ */
         <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
+        <PageWithRail>
           <button onClick={() => navigate('/miejsca')} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Przewodnik</button>
           <h1 className="font-display italic font-semibold text-display-lg-mobile md:text-display-lg text-on-surface mb-2 leading-none">
             {isPolska ? 'Polska' : cityName}
@@ -624,7 +627,8 @@ export function Przewodnik({ city: cityParam }) {
               {cityVenues.map(v => <VenueRow key={v.id} venue={v} onClick={() => navigate('/miejsca/' + venueSlug(v))} />)}
             </div>
           )}
-        </main>
+        </PageWithRail>
+      </main>
       ) : (
         /* ════════ HUB ════════ */
         <>
@@ -705,6 +709,7 @@ export function Przewodnik({ city: cityParam }) {
                   </div>
                   <span className="ml-auto text-primary-container text-xl">→</span>
                 </div>
+                <div className="hidden lg:block"><SiteRail /></div>
               </aside>
 
             </div>

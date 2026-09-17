@@ -3,6 +3,7 @@ import { Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { DICTIONARY_TERMS, getTermsByCategory } from '../lib/dictionary'
 import { Hero } from '../components/nocturne'
+import { PageWithRail } from '../components/PageWithRail'
 
 export function Slownik() {
   const [q, setQ] = useState('')
@@ -56,6 +57,7 @@ export function Slownik() {
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        <PageWithRail>
         {/* Szukaj */}
         <input
           value={q}
@@ -138,6 +140,7 @@ export function Slownik() {
             Zaproponuj hasło
           </a>
         </section>
+      </PageWithRail>
       </main>
     </div>
   )

@@ -4,6 +4,7 @@ import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
 import { Hero, Button } from '../components/nocturne'
+import { PageWithRail } from '../components/PageWithRail'
 
 const COUNTRY_ORDER = [
   'Polska', 'Hiszpania', 'Portugalia', 'Francja', 'Włochy',
@@ -219,6 +220,7 @@ export function Plaze() {
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        <PageWithRail>
         {/* Filters: po krajach + blisko mnie */}
         <div className="flex flex-wrap gap-x-7 gap-y-3 items-center mb-4">
           <button className={chip(!nearMe && activeCountry === 'all')}
@@ -276,6 +278,7 @@ export function Plaze() {
             ))}
           </div>
         )}
+      </PageWithRail>
       </main>
     </div>
   )

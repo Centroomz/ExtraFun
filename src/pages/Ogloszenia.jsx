@@ -4,6 +4,7 @@ import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 import { Button, Hero } from '../components/nocturne'
+import { PageWithRail } from '../components/PageWithRail'
 
 // Real shared-pool categories (posting). Filters are derived from live data below.
 const POST_CATEGORIES = [
@@ -285,6 +286,7 @@ export function Ogloszenia({ user }) {
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        <PageWithRail>
         {user && (
           <div className="flex justify-end mb-4">
             <Link href="/wiadomosci">
@@ -384,6 +386,7 @@ export function Ogloszenia({ user }) {
             </button>
           )}
         </div>
+      </PageWithRail>
       </main>
 
       {/* FAB */}

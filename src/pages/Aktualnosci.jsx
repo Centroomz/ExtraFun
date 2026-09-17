@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
 import { Hero } from '../components/nocturne'
+import { PageWithRail } from '../components/PageWithRail'
 
 const BASE_URL = 'https://www.extrafun.pl'
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
@@ -151,6 +152,7 @@ export function Aktualnosci() {
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        <PageWithRail>
         {all.length > 0 && (
           <div className="flex flex-wrap gap-3 mb-12">
             {[['all', 'Wszystko'], ['Polska', 'Polska'], ['International', 'Świat']].map(([key, label]) => (
@@ -176,6 +178,7 @@ export function Aktualnosci() {
             {list.map(n => <Card key={n.id} n={n} />)}
           </div>
         )}
+      </PageWithRail>
       </main>
     </div>
   )

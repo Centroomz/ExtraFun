@@ -2,19 +2,21 @@ import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { Hero } from '../components/nocturne'
+import { PageWithRail } from '../components/PageWithRail'
 
 const DAY_PL = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb']
 const MONTH_PL = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia']
 
 function formatDate(dateStr) {
-  const d = new Date(dateStr + 'T12:00:00')
+  // event_date arrives as '2026-09-18T00:00:00' (timestamp column) — keep the day part only.
+  const d = new Date(String(dateStr).slice(0, 10) + 'T12:00:00')
   return `${DAY_PL[d.getDay()]}, ${d.getDate()} ${MONTH_PL[d.getMonth()]}`
 }
 
 function groupByDate(events) {
   const groups = {}
   for (const e of events) {
-    (groups[e.event_date] ||= []).push(e)
+    (groups[String(e.event_date).slice(0, 10)] ||= []).push(e)
   }
   return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b))
 }
@@ -113,6 +115,7 @@ export function Imprezy() {
       />
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+        <PageWithRail>
         <div className="flex gap-3 mb-10">
           {[
             { id: 'all', label: 'Wszystkie' },
@@ -140,6 +143,7 @@ export function Imprezy() {
             ))}
           </div>
         )}
+      </PageWithRail>
       </main>
     </div>
   )

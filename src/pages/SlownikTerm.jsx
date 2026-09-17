@@ -1,6 +1,7 @@
 import { Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { getTerm, DICTIONARY_TERMS } from '../lib/dictionary'
+import { PageWithRail } from '../components/PageWithRail'
 
 export function SlownikTerm({ slug }) {
   const term = getTerm(slug)
@@ -45,7 +46,8 @@ export function SlownikTerm({ slug }) {
         })}</script>
       </Helmet>
 
-      <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
+      <main className="max-w-container-max mx-auto px-6 md:px-16 pt-12 pb-24">
+        <PageWithRail narrow>
         <Link href="/slownik">
           <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer hover:opacity-80">← Słownik</span>
         </Link>
@@ -94,6 +96,7 @@ export function SlownikTerm({ slug }) {
             Zobacz wszystkie {DICTIONARY_TERMS.length} terminów →
           </div>
         </Link>
+      </PageWithRail>
       </main>
     </div>
   )
