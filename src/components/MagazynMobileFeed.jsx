@@ -23,14 +23,29 @@ function clip(text, max) {
 // First body paragraph. Content is md-lite for most articles but raw HTML for
 // the SwingTowns-adapted ones — strip tags first, then skip headings/lists/blanks
 // and drop **bold** / [link](url) markers.
-export function firstParagraph(content) {
+// `skip` = title/excerpt: some articles repeat the title (or the hook) as the
+// first body line — that is not a paragraph.
+export function firstParagraph(content, skip = []) {
+  // Near-duplicate check (the in-body title often differs by a word from the DB
+  // title): share >= 70% of the shorter one's words -> same thing, skip it.
+  const words = (t) => new Set((t || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(' ').filter(w => w.length > 2))
+  const skipWords = skip.map(words).filter(w => w.size)
+  const isDup = (line) => {
+    const lw = words(line)
+    if (!lw.size) return false
+    return skipWords.some(sw => {
+      const small = lw.size <= sw.size ? lw : sw, big = small === lw ? sw : lw
+      let hit = 0; for (const w of small) if (big.has(w)) hit++
+      return hit / small.size >= 0.7
+    })
+  }
   const text = (content || '')
     .replace(/<(h[1-6]|li)[^>]*>[\s\S]*?<\/\1>/gi, '\n')
     .replace(/<\/(p|div)>|<br\s*\/?>/gi, '\n')
     .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
   const line = text.split('\n').map(l => l.trim())
-    .find(l => l && !l.startsWith('#') && !l.startsWith('- ') && !l.startsWith('!['))
+    .find(l => l && !l.startsWith('#') && !l.startsWith('- ') && !l.startsWith('![') && !isDup(l))
   return (line || '').replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
 }
 

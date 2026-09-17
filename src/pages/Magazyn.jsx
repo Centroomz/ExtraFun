@@ -122,7 +122,7 @@ export function Magazyn() {
             featured: a.featured || false,
             publish_date: a.publish_date || a.created_at || null,
             views: a.views || 0,
-            firstParagraph: firstParagraph(a.content),
+            firstParagraph: firstParagraph(a.content, [a.title, a.excerpt]),
           })))
         }
       })
