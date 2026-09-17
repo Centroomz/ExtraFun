@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'wouter'
+import { Link, useLocation } from 'wouter'
 import { getWordOfTheDay } from '../lib/dictionary'
 import { apiFetch } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
@@ -109,12 +109,16 @@ function WordModule() {
   )
 }
 
-/* ── Quiz miesiąca — only where the page passes onStartQuiz (Magazyn) ── */
+/* ── Quiz miesiąca — same module on every page. Magazyn opens the quiz in place
+   (onStartQuiz); elsewhere the button routes to /magazyn?quiz=1. ── */
 function QuizModule({ onStartQuiz, quizDone }) {
-  if (quizDone || !onStartQuiz) return null
+  const [, navigate] = useLocation()
+  const done = quizDone ?? (() => { try { return localStorage.getItem('ef_quiz_dogging_done') === '1' } catch { return false } })()
+  if (done) return null
+  const start = onStartQuiz || (() => navigate('/magazyn?quiz=1'))
   return (
     <button
-      onClick={onStartQuiz}
+      onClick={start}
       className="group w-full text-left p-6 border border-primary-container/25"
       style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.03))' }}
     >
@@ -186,7 +190,7 @@ const toRow = (a) => ({ slug: a.slug, title: a.title, cover_image: a.cover_image
  * Shared right column.
  * @param {object[]} [related]   article page only — "Powiązane" rows
  * @param {string}   [exclude]   slug of the current article (dropped from popular/newest)
- * @param {function} [onStartQuiz] Magazyn only — shows the quiz module
+ * @param {function} [onStartQuiz] Magazyn only — opens the quiz in place (elsewhere it links to /magazyn?quiz=1)
  * @param {boolean}  [quizDone]
  */
 export function SiteRail({ related = [], exclude = null, onStartQuiz, quizDone }) {

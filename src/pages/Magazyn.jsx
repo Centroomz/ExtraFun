@@ -95,6 +95,14 @@ export function Magazyn() {
     try { return localStorage.getItem('ef_quiz_dogging_done') === '1' } catch { return false }
   })
 
+  // SiteRail on other pages links here with ?quiz=1 → open the quiz right away.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('quiz') === '1') {
+      setShowQuiz(true)
+      window.history.replaceState(null, '', '/magazyn')
+    }
+  }, [])
+
   useEffect(() => {
     apiFetch('/api/articles')
       .then(data => {

@@ -14,14 +14,14 @@ export const MONTH_THEMES = {
     label: 'Lipiec · Temat Miesiąca: Plażing',
     title: 'Skóra, słońce, woda.',
     lead: 'Naturyzm i lifestyle nad polską wodą — gdzie, z kim i bez czego.',
-    image: '/editorial/hero-lipiec-plazing.jpg',
+    image: '/editorial/hero-plaze.jpg',
     slugs: ['plazing'],
   },
   8: {
     label: 'Sierpień · Temat Miesiąca: Plażing',
     title: 'Skóra, słońce, woda.',
     lead: 'Naturyzm i lifestyle nad polską wodą — gdzie, z kim i bez czego.',
-    image: '/editorial/hero-sierpien-plazing.jpg',
+    image: '/editorial/hero-plaze.jpg',
     slugs: ['plazing'],
   },
   9: {
