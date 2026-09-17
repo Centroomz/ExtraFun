@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, Link } from 'wouter'
+import { useParams, Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
@@ -156,6 +156,7 @@ function CoverVideo({ src, poster, title }) {
 
 export function ArticleDetailPage() {
   const { slug } = useParams()
+  const [, navigate] = useLocation()
   const { user } = useAuth()
   const isAdmin = ADMIN_EMAILS.includes(user?.email)
   const [article, setArticle] = useState(null)
@@ -262,9 +263,12 @@ export function ArticleDetailPage() {
       <div className="w-full min-w-0 flex-1">
       {/* Back bar */}
       <div className="max-w-4xl mx-auto px-6 md:px-16 pt-8">
-        <Link href="/magazyn">
-          <span className="font-body text-label-caps uppercase text-primary-container cursor-pointer hover:opacity-80">← Powrót</span>
-        </Link>
+        {/* Go BACK in history (restores the feed position), not to a fresh /magazyn.
+            Direct entry (share link, search) has no SPA history → plain navigate. */}
+        <button
+          onClick={() => { if ((window.__efNavCount || 0) > 1) window.history.back(); else navigate('/magazyn') }}
+          className="font-body text-label-caps uppercase text-primary-container cursor-pointer hover:opacity-80"
+        >← Powrót</button>
       </div>
 
       {/* Hero: cover video (tap-to-unmute) if present, else cover image */}

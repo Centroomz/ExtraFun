@@ -285,6 +285,9 @@ function AppInner() {
   // The flag is raised by the module-level listener below — it must run before
   // wouter's own popstate handler re-renders the route, or the page mounts too early.
   useEffect(() => {
+    // In-app route changes seen this session — "← Powrót" buttons use it to tell an
+    // internal history entry (safe to history.back()) from an external referrer.
+    window.__efNavCount = (window.__efNavCount || 0) + 1
     if (window.__efBackNav) { setTimeout(() => { window.__efBackNav = false }, 0); return }
     window.scrollTo(0, 0)
     document.querySelector('.page-content')?.scrollTo(0, 0)
