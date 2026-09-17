@@ -359,7 +359,7 @@ export function ArticleDetailPage() {
       </article>
       </div>
       <aside className="hidden lg:block w-[300px] flex-shrink-0 pt-8">
-        <div className="sticky top-8">
+        <div>
           <SiteRail related={related.slice(0, 5)} exclude={slug} />
         </div>
       </aside>

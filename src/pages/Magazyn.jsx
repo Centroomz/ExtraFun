@@ -363,7 +363,7 @@ export function Magazyn() {
           </div>{/* /content col */}
 
           <aside className="mt-16 lg:mt-0 lg:col-span-4">
-            <div className="sticky top-8">
+            <div>
               <SiteRail onStartQuiz={() => setShowQuiz(true)} quizDone={quizDone} />
             </div>
           </aside>
