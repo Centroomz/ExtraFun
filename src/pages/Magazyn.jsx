@@ -20,9 +20,11 @@ function estimateReadingTime(content) {
 }
 
 /* ─── Quiz View (inline, no URL needed) ──────────────────────── */
-function QuizView({ onBack }) {
-  const [current, setCurrent] = useState(0)
-  const [scores, setScores] = useState([0, 0, 0, 0])
+// `firstAnswer` = option index already picked on the mobile quiz tile (question 1
+// answered in the feed) — the view then opens straight on question 2.
+function QuizView({ onBack, firstAnswer = null }) {
+  const [current, setCurrent] = useState(firstAnswer == null ? 0 : 1)
+  const [scores, setScores] = useState(() => [0, 0, 0, 0].map((_, i) => (i === firstAnswer ? 1 : 0)))
   const [selected, setSelected] = useState(null)
   const [done, setDone] = useState(false)
   const [result, setResult] = useState(null)
@@ -91,6 +93,7 @@ export function Magazyn() {
   const [, navigate] = useLocation()
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const [showQuiz, setShowQuiz] = useState(false)
+  const [quizFirstAnswer, setQuizFirstAnswer] = useState(null)
   const [dbArticles, setDbArticles] = useState(null)
   const [quizDone, setQuizDone] = useState(() => {
     try { return localStorage.getItem('ef_quiz_dogging_done') === '1' } catch { return false }
@@ -206,8 +209,9 @@ export function Magazyn() {
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
 
-  if (showQuiz) return <QuizView onBack={() => {
+  if (showQuiz) return <QuizView firstAnswer={quizFirstAnswer} onBack={() => {
     setShowQuiz(false)
+    setQuizFirstAnswer(null)
     try { setQuizDone(localStorage.getItem('ef_quiz_dogging_done') === '1') } catch {}
   }} />
 
@@ -267,7 +271,7 @@ export function Magazyn() {
           articles={byDate(allArticles)}
           popular={[...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5)}
           quizDone={quizDone}
-          onStartQuiz={() => setShowQuiz(true)}
+          onStartQuiz={(firstAnswer = null) => { setQuizFirstAnswer(typeof firstAnswer === 'number' ? firstAnswer : null); setShowQuiz(true) }}
         />
 
         {/* DESKTOP — magazyn sekcyjny */}

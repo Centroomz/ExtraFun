@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'wouter'
-import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
+import { QUIZ_TITLE, QUIZ_QUESTIONS } from '../lib/quiz-dogging'
 
 // Mobile /magazyn = full-screen tiles, Instagram/Reels logic (spec 2026-09-17,
 // faza B): swipe down = next piece, swipe right inside a tile = more of the same
@@ -143,16 +143,25 @@ function ThemeTile({ theme, articles, themeSlug }) {
   )
 }
 
-/* ── Quiz tile (rail module as a tile) ── */
+/* ── Quiz tile: question 1 answered right here (IG-poll style); tapping an
+   option opens the quiz on question 2 with that answer counted. ── */
 function QuizTile({ onStart }) {
+  const q = QUIZ_QUESTIONS[0]
   return (
-    <button onClick={onStart} className={`relative block w-full ${TILE_H} snap-start text-left px-margin-mobile flex flex-col justify-center`}
+    <div className={`relative w-full ${TILE_H} snap-start px-margin-mobile flex flex-col justify-center`}
       style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.14), rgba(212,175,55,0.03))' }}>
-      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Quiz miesiąca</span>
-      <h2 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-4">{QUIZ_TITLE}</h2>
-      <p className="font-body text-body-lg text-on-surface-variant leading-snug mb-6">{QUIZ_INTRO}</p>
-      <span className="font-body text-label-caps uppercase text-primary-container">Zacznij →</span>
-    </button>
+      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Quiz miesiąca · pytanie 1 z {QUIZ_QUESTIONS.length}</span>
+      <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-2">{QUIZ_TITLE}</h2>
+      <p className="font-body text-body-lg text-on-surface leading-snug mb-5">{q.question}</p>
+      <div className="flex flex-col gap-2">
+        {q.options.map((opt, i) => (
+          <button key={i} onClick={() => onStart(i)}
+            className="w-full text-left font-body text-body-md text-on-surface px-4 py-3 border border-primary-container/30 bg-surface/40 active:bg-primary-container/15 transition-colors">
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
   )
 }
 
