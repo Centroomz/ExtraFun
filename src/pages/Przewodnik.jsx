@@ -7,6 +7,7 @@ import { calculateDistance, formatDistance } from '../lib/geo'
 import { Hero, Button } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
 import { SiteRail } from '../components/SiteRail'
+import { MiejscaMobileFeed } from '../components/MiejscaMobileFeed'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
@@ -632,13 +633,33 @@ export function Przewodnik({ city: cityParam }) {
       ) : (
         /* ════════ HUB ════════ */
         <>
+          {/* Mobile: full-screen tiles (scope+day hero, then venues open that day) */}
+          <MiejscaMobileFeed
+            venues={hubVenues}
+            scope={effectiveScope}
+            cities={chooserCities}
+            onScope={setHubScope}
+            dayOffset={dayOffset}
+            onDay={setDayOffset}
+            hasLocation={!!location}
+            geoLoading={geoLoading}
+            geoError={geoError}
+            onRequestLocation={requestLocation}
+            loading={loading}
+            renderStatus={(v) => <VenueStatus venue={v} />}
+            typeCfgOf={getTypeConfig}
+            onOpenVenue={(v) => navigate('/miejsca/' + venueSlug(v))}
+          />
+
+          <div className="hidden lg:block">
           <Hero
             image="/editorial/hero-przewodnik.jpg"
             label="PRZEWODNIK"
             title="Scena lifestyle — blisko Ciebie"
             lead="Kluby, sauny i miejsca dla par i singli. Filtruj po mieście, typie i dniu."
           />
-          <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+          </div>
+          <main className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16 pb-24">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-x-10 gap-y-16">
 
               {/* LEFT — club column: city chooser + day tabs + list (narrow) */}

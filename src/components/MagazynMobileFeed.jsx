@@ -8,7 +8,7 @@ import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
 // tiles are for browsing, not reading.
 
 // Tile height: viewport minus sticky mobile topbar (56px) and the bottom nav.
-const TILE_H = 'h-[calc(100dvh-56px-var(--nav-height)-env(safe-area-inset-bottom))]'
+export const TILE_H = 'h-[calc(100dvh-56px-var(--nav-height)-env(safe-area-inset-bottom))]'
 // Same bottom scrim as nocturne/Hero — text sits on the cover, never on bare image.
 const SCRIM = 'linear-gradient(0deg, rgba(18,20,20,.96) 0%, rgba(18,20,20,.75) 35%, rgba(18,20,20,.25) 65%, rgba(18,20,20,.05) 100%)'
 
@@ -51,7 +51,7 @@ export function firstParagraph(content, skip = []) {
 
 
 /* ── Snap container: sets y-snap on <html> while mounted (window scrolls on mobile) ── */
-function useHtmlSnap(enabled) {
+export function useHtmlSnap(enabled) {
   useEffect(() => {
     // Desktop scrolls .page-content, not <html> — only touch the root below lg.
     if (!enabled || !window.matchMedia('(max-width: 1023px)').matches) return
@@ -64,7 +64,7 @@ function useHtmlSnap(enabled) {
 }
 
 /* ── Cover + scrim shared by article-like tiles ── */
-function Cover({ image, video, position = 'center' }) {
+export function Cover({ image, video, position = 'center' }) {
   return (
     <div className="absolute inset-0">
       {video
@@ -100,7 +100,7 @@ function ArticleTile({ article, label, className = '' }) {
 }
 
 /* ── Dots for a horizontal strip ── */
-function Dots({ count, active }) {
+export function Dots({ count, active }) {
   if (count < 2) return null
   return (
     <div className="absolute top-4 inset-x-0 flex justify-center gap-1.5 z-10 pointer-events-none">
