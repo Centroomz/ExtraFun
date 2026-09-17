@@ -79,6 +79,21 @@ export function Cover({ image, video, position = 'center' }) {
   )
 }
 
+/* ── Generic hero tile for list feeds (Imprezy/Plaże/Słownik): cover + label +
+   title, controls in `children` (bottom-anchored). ── */
+export function TileHero({ image, label, title, children }) {
+  return (
+    <div className={`relative w-full ${TILE_H} snap-start overflow-hidden`}>
+      <Cover image={image} position="center" />
+      <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
+        {label && <span className="font-body text-label-caps uppercase text-primary-container block mb-2">{label}</span>}
+        <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-5">{title}</h1>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 /* ── Article tile: cover, category, title, hook, first paragraph, meta ── */
 function ArticleTile({ article, label, className = '' }) {
   const ref = useImpression('article', article.id)

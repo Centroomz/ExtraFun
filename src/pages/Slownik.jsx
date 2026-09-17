@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { DICTIONARY_TERMS, getTermsByCategory } from '../lib/dictionary'
 import { Hero } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
+import { SlownikMobileFeed } from '../components/ListMobileFeeds'
 
 export function Slownik() {
   const [q, setQ] = useState('')
@@ -49,14 +50,24 @@ export function Slownik() {
         <link rel="canonical" href="https://www.extrafun.pl/slownik" />
       </Helmet>
 
+      <SlownikMobileFeed
+        terms={sortedFiltered}
+        total={DICTIONARY_TERMS.length}
+        q={q} setQ={setQ}
+        categories={categories}
+        activeCategory={activeCategory} setActiveCategory={setActiveCategory}
+      />
+
+      <div className="hidden lg:block">
       <Hero
         image="/editorial/hero-slownik.jpg"
         label="LEKSYKON WSPÓŁCZESNEJ INTYMNOŚCI"
         title="Słownik Pojęć"
         lead={`Encyklopedia niemonogamii, świadomej zgody i ewoluującej architektury bliskości. ${DICTIONARY_TERMS.length} haseł — CNM, poliamoria, swinging, BDSM.`}
       />
+      </div>
 
-      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+      <main className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16 pb-24">
         <PageWithRail>
         {/* Szukaj */}
         <input

@@ -8,6 +8,7 @@ import { Hero, Button } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
 import { SiteRail } from '../components/SiteRail'
 import { MiejscaMobileFeed } from '../components/MiejscaMobileFeed'
+import { slugify, venueSlug } from '../lib/venueSlug'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from '../components/CardStatBadge'
 
@@ -290,19 +291,7 @@ function ArticleCard({ article, hero, onClick }) {
 }
 
 // ─── City helpers ─────────────────────────────────────────────────────────────
-function slugify(s) {
-  return String(s).toLowerCase()
-    .replace(/ł/g, 'l')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-}
 const PL_CITY_SET = ['Warszawa', 'Kraków', 'Wrocław', 'Gdańsk', 'Poznań', 'Łódź', 'Katowice', 'Sopot', 'Szczecin', 'Lublin', 'Czeladź', 'Lubliniec']
-
-// Per-venue URL slug — id-prefixed (like gay.pl) so each club has its own
-// shareable, indexable, AI-citable page: /miejsca/123-heaven-warszawa.
-function venueSlug(v) {
-  return `${v.id}-${slugify(v.name)}${v.city ? '-' + slugify(v.city) : ''}`
-}
 
 // On ExtraFun a venue counts as a swing venue only on its swing_days (when set).
 // swing_days null/[] = no restriction (swing every day). Mirrors the server's

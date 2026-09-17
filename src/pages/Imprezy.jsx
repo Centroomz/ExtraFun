@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { apiFetch } from '../lib/api'
 import { Hero } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
+import { ImprezyMobileFeed } from '../components/ListMobileFeeds'
 
 const DAY_PL = ['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb']
 const MONTH_PL = ['stycznia', 'lutego', 'marca', 'kwietnia', 'maja', 'czerwca', 'lipca', 'sierpnia', 'września', 'października', 'listopada', 'grudnia']
@@ -107,14 +108,18 @@ export function Imprezy() {
         <link rel="canonical" href="https://www.extrafun.pl/imprezy" />
       </Helmet>
 
+      <ImprezyMobileFeed events={loading ? [] : filtered} loading={loading} filter={filter} setFilter={setFilter} />
+
+      <div className="hidden lg:block">
       <Hero
         image="/editorial/hero-imprezy.jpg"
         label="IMPREZY"
         title="Noc ma swój kalendarz"
         lead="Nadchodzące eventy — kluby lifestyle i imprezy prywatne w całej Polsce."
       />
+      </div>
 
-      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+      <main className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16 pb-24">
         <PageWithRail>
         <div className="flex gap-3 mb-10">
           {[

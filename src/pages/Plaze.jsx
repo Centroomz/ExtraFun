@@ -5,6 +5,7 @@ import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
 import { Hero, Button } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
+import { PlazeMobileFeed } from '../components/ListMobileFeeds'
 
 const COUNTRY_ORDER = [
   'Polska', 'Hiszpania', 'Portugalia', 'Francja', 'Włochy',
@@ -212,14 +213,30 @@ export function Plaze() {
         <meta name="description" content="Mapa plaż naturystycznych i FKK w Polsce i Europie. Sprawdź lokalizacje, GPS i opisy plaż nudystycznych w Chorwacji, Grecji, Francji, Włoszech i nie tylko." />
       </Helmet>
 
+      <PlazeMobileFeed
+        beaches={loading ? [] : (nearMe ? (location ? nearbyList : []) : grouped.flatMap(g => g.beaches))}
+        countryOf={resolveCountry}
+        loading={loading}
+        countries={presentCountries}
+        activeCountry={activeCountry}
+        setActiveCountry={(c) => { setNearMe(false); setActiveCountry(c) }}
+        nearMe={nearMe}
+        onNearMe={handleNearMe}
+        hasLocation={!!location}
+        geoLoading={geoLoading}
+        geoError={geoError}
+      />
+
+      <div className="hidden lg:block">
       <Hero
         image="/editorial/hero-plaze.jpg"
         label="PLAŻE"
         title="Słońce, woda, wolność"
         lead="Plaże naturystyczne i FKK w Polsce i całej Europie — z GPS, opisami i opcją „blisko mnie”."
       />
+      </div>
 
-      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+      <main className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16 pb-24">
         <PageWithRail>
         {/* Filters: po krajach + blisko mnie */}
         <div className="flex flex-wrap gap-x-7 gap-y-3 items-center mb-4">
