@@ -150,8 +150,9 @@ function QuizTile({ onStart }) {
   return (
     <div className={`relative w-full ${TILE_H} snap-start px-margin-mobile flex flex-col justify-center`}
       style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.14), rgba(212,175,55,0.03))' }}>
-      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Quiz miesiąca · pytanie 1 z {QUIZ_QUESTIONS.length}</span>
-      <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-2">{QUIZ_TITLE}</h2>
+      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Quiz miesiąca · {QUIZ_QUESTIONS.length} pytań</span>
+      <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-6">{QUIZ_TITLE}</h2>
+      <span className="font-body text-label-caps uppercase text-on-surface-variant block mb-2">Pytanie 1</span>
       <p className="font-body text-body-lg text-on-surface leading-snug mb-5">{q.question}</p>
       <div className="flex flex-col gap-2">
         {q.options.map((opt, i) => (

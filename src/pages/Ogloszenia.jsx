@@ -5,6 +5,8 @@ import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 import { Button, Hero } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
+import { OgloszeniaMobileFeed } from '../components/OgloszeniaMobileFeed'
+import { useAuth } from '../hooks/useAuth'
 
 // Real shared-pool categories (posting). Filters are derived from live data below.
 const POST_CATEGORIES = [
@@ -173,6 +175,7 @@ function AdDetail({ ad, onBack, user, onDeleted }) {
 }
 
 export function Ogloszenia({ user }) {
+  const { profile } = useAuth()
   const [ads, setAds] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
@@ -245,7 +248,7 @@ export function Ogloszenia({ user }) {
         latitude: location?.lat || null, longitude: location?.lng || null,
       }})
       setNewAd({ type: 'Pan szuka Pani', title: '', description: '', city: '' })
-      window.history.back() // consume the pushed history entry; popstate closes the sheet
+      if (showNewAd) window.history.back() // consume the pushed history entry; popstate closes the sheet (desktop sheet only)
       loadAds()
     } catch (e) {
       console.error(e)
@@ -278,14 +281,38 @@ export function Ogloszenia({ user }) {
 
   return (
     <div className="bg-background min-h-screen text-on-surface">
+      {/* Mobile: tiles — add-ad hero (profile pre-filled) + search, then one tile per ad */}
+      <OgloszeniaMobileFeed
+        ads={loading ? [] : displayAds}
+        loading={loading}
+        onOpenAd={(ad) => { listScroll.current = { pc: 0, win: window.scrollY || 0 }; setSelectedAd(ad.id) }}
+        catEmoji={catEmoji}
+        user={user}
+        profile={profile}
+        avatarUrl={user?.user_metadata?.avatar_url || null}
+        age={user?.user_metadata?.age || null}
+        categories={categories}
+        postCategories={POST_CATEGORIES}
+        newAd={newAd}
+        setNewAd={setNewAd}
+        onSubmit={submitAd}
+        submitting={submitting}
+        search={search}
+        setSearch={setSearch}
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
+
+      <div className="hidden lg:block">
       <Hero
         image="/editorial/hero-ogloszenia.jpg"
         label="OD SPOŁECZNOŚCI"
         title="Ogłoszenia"
         lead="Anonse od ludzi z naszej sceny — pary, single, wydarzenia, fetysz."
       />
+      </div>
 
-      <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
+      <main className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16 pb-24">
         <PageWithRail>
         {user && (
           <div className="flex justify-end mb-4">
@@ -392,7 +419,7 @@ export function Ogloszenia({ user }) {
       {/* FAB */}
       {user && (
         <button onClick={() => setShowNewAd(true)}
-          className="fixed bottom-24 right-6 z-40 w-14 h-14 bg-primary-container text-[#1a1400] text-2xl font-semibold flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity">
+          className="hidden lg:flex fixed bottom-24 right-6 z-40 w-14 h-14 bg-primary-container text-[#1a1400] text-2xl font-semibold flex items-center justify-center shadow-lg hover:opacity-90 transition-opacity">
           +
         </button>
       )}
