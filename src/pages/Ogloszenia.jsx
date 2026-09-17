@@ -7,6 +7,8 @@ import { Button, Hero } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
 import { OgloszeniaMobileFeed } from '../components/OgloszeniaMobileFeed'
 import { useAuth } from '../hooks/useAuth'
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from '../components/CardStatBadge'
 
 // Real shared-pool categories (posting). Filters are derived from live data below.
 const POST_CATEGORIES = [
@@ -42,6 +44,30 @@ function Avatar({ src, size = 28 }) {
   return src && ok
     ? <img src={src} alt="" onError={() => setOk(false)} className="rounded-full object-cover shrink-0" style={style} />
     : <span className="rounded-full bg-surface-container flex items-center justify-center shrink-0 text-on-surface-variant" style={style}>👤</span>
+}
+
+// Desktop list row (impression/click counted for the admin badge).
+function AdRow({ ad, onOpen }) {
+  const ref = useImpression('ad', ad.id)
+  return (
+    <div ref={ref} onClick={() => { trackClick('ad', ad.id); onOpen() }} className="group relative py-5 border-b border-outline-variant/15 cursor-pointer">
+      <CardStatBadge kind="ad" id={ad.id} className="absolute top-2 right-0 z-10" />
+      <div className="flex items-center justify-between gap-3 mb-1.5 font-body text-label-caps uppercase">
+        <span className="text-primary-container">{catEmoji(ad.category)} {ad.category || 'Ogłoszenie'}</span>
+        {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
+      </div>
+      <div className="font-body font-semibold text-body-lg text-on-surface leading-snug group-hover:text-primary-container transition-colors">{ad.title}</div>
+      <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed line-clamp-2">{ad.description}</div>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2.5 font-body text-label-caps uppercase text-outline">
+        <span className="flex items-center gap-2">
+          <Avatar src={ad.author_avatar} size={22} />
+          <span className="text-on-surface-variant">{ad.author_name || 'Użytkownik'}{ad.author_age ? ` · ${ad.author_age} l.` : ''}</span>
+        </span>
+        {ad.city && <span>📍 {ad.city}</span>}
+        <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
+      </div>
+    </div>
+  )
 }
 
 function AdDetail({ ad, onBack, user, onDeleted }) {
@@ -376,30 +402,14 @@ export function Ogloszenia({ user }) {
             <div className="font-body text-label-caps uppercase text-outline mb-4">{displayAds.length} {displayAds.length === 1 ? 'ogłoszenie' : 'ogłoszeń'}</div>
             <div className="md:grid md:grid-cols-2 md:gap-x-10">
             {displayAds.map(ad => (
-              <div key={ad.id} onClick={() => {
+              <AdRow key={ad.id} ad={ad} onOpen={() => {
                 listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }
                 setSelectedAd(ad.id)
-              }} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
-                <div className="flex items-center justify-between gap-3 mb-1.5 font-body text-label-caps uppercase">
-                  <span className="text-primary-container">{catEmoji(ad.category)} {ad.category || 'Ogłoszenie'}</span>
-                  {ad.distance != null && <span className="text-outline">{formatDistance(ad.distance)}</span>}
-                </div>
-                <div className="font-body font-semibold text-body-lg text-on-surface leading-snug group-hover:text-primary-container transition-colors">{ad.title}</div>
-                <div className="font-body text-body-md text-on-surface-variant mt-1 leading-relaxed line-clamp-2">{ad.description}</div>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2.5 font-body text-label-caps uppercase text-outline">
-                  <span className="flex items-center gap-2">
-                    <Avatar src={ad.author_avatar} size={22} />
-                    <span className="text-on-surface-variant">{ad.author_name || 'Użytkownik'}{ad.author_age ? ` · ${ad.author_age} l.` : ''}</span>
-                  </span>
-                  {ad.city && <span>📍 {ad.city}</span>}
-                  <span>{new Date(ad.created_at).toLocaleDateString('pl')}</span>
-                </div>
-              </div>
+              }} />
             ))}
             </div>
           </div>
         )}
-
         {/* Location — optional, secondary (only 13/343 ads have coordinates) */}
         <div className="mt-12 flex items-center gap-4 flex-wrap p-4 border border-outline-variant/20">
           <span className="flex-1 min-w-[150px] font-body text-body-sm text-on-surface-variant">

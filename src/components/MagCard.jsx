@@ -1,14 +1,18 @@
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from './CardStatBadge'
 // Magazine card matching the approved mockup: clean 16:10 thumb, gold caps tag
 // ABOVE a non-italic Bodoni title, optional lead, muted meta. Deliberately not
 // the shared nocturne ArticleCard (italic + tag-on-image) — the magazine front
 // wants this quieter, more editorial treatment.
 //
 // size: 'lg' (feature) | 'sm' (grid/row)
-export function MagCard({ image, tag, title, lead, meta, size = 'sm', onClick }) {
+export function MagCard({ id, image, tag, title, lead, meta, size = 'sm', onClick }) {
   const titleSize = size === 'lg' ? 'text-headline-md' : 'text-body-lg'
+  const ref = useImpression('article', id)
   return (
-    <article onClick={onClick} className="group cursor-pointer">
+    <article ref={ref} onClick={() => { if (id != null) trackClick('article', id); onClick?.() }} className="group cursor-pointer">
       <div className="relative w-full aspect-[16/10] overflow-hidden mb-4 bg-surface-container">
+        <CardStatBadge kind="article" id={id} className="absolute top-2 left-2 z-10" />
         {image ? (
           <div
             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"

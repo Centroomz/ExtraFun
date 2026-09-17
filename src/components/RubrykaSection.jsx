@@ -41,6 +41,7 @@ export function RubrykaSection({
         <div className="grid grid-cols-1 md:grid-cols-12 gap-x-10 gap-y-8 mb-16">
           <div className="md:col-span-7">
             <MagCard
+              id={items[0].id}
               image={items[0].cover_image}
               tag={items[0].category}
               title={items[0].title}
@@ -91,6 +92,7 @@ export function RubrykaSection({
           {items.map(a => (
             <MagCard
               key={a.id}
+              id={a.id}
               image={a.cover_image}
               tag={a.category}
               title={a.title}

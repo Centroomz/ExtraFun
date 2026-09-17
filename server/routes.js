@@ -108,13 +108,14 @@ export function registerRoutes(app) {
   })
 
   // === ANALYTICS ===
+const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|python-|urllib|curl\/|wget|scrapy|http-?client|go-http|java\/|node-fetch|axios\/|okhttp|bytespider|gptbot|claudebot|ccbot|perplexity|amazonbot|dataforseo|semrush|ahrefs|dotbot|mj12|petalbot|yandex|bingpreview|facebookexternalhit|meta-externalagent/i
+
   app.post('/api/track', async (req, res) => {
     const { path, referrer, device, sessionId, utmSource, utmMedium } = req.body || {}
     if (!path) return res.status(400).json({ message: 'path required' })
     // Flag bots by user-agent — don't block, just mark, so dashboards split real vs
     // bot (a headless-crawler burst like 2026-07-17 shouldn't read as growth). Empty
     // UA = flagged; real browsers always send one.
-    const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|python-|urllib|curl\/|wget|scrapy|http-?client|go-http|java\/|node-fetch|axios\/|okhttp|bytespider|gptbot|claudebot|ccbot|perplexity|amazonbot|dataforseo|semrush|ahrefs|dotbot|mj12|petalbot|yandex|bingpreview|facebookexternalhit|meta-externalagent/i
     const ua = String(req.headers['user-agent'] || '')
     const isBot = ua === '' || BOT_UA.test(ua)
     await supabaseAdmin.from('page_views').insert({
@@ -126,6 +127,20 @@ export function registerRoutes(app) {
       user_agent: ua ? ua.slice(0, 300) : null,
       is_bot: isBot,
     }).then(() => {}, () => {})
+    res.json({ ok: true })
+  })
+
+  // Card impressions/clicks (article / venue / ad tiles). Aggregated per day in
+  // card_stats via bump_card_stat — no IP, no user id. Sent as a beacon batch.
+  app.post('/api/card-stats', async (req, res) => {
+    const events = Array.isArray(req.body?.events) ? req.body.events.slice(0, 40) : []
+    const ua = String(req.headers['user-agent'] || '')
+    if (!events.length || ua === '' || BOT_UA.test(ua)) return res.json({ ok: true })
+    const KINDS = new Set(['article', 'venue', 'ad'])
+    await Promise.all(events
+      .filter(e => e && KINDS.has(e.kind) && (e.ev === 'imp' || e.ev === 'click') && e.id != null)
+      .map(e => supabaseAdmin.rpc('bump_card_stat', { p_kind: e.kind, p_ref: String(e.id).slice(0, 64), p_ev: e.ev })
+        .then(() => {}, () => {})))
     res.json({ ok: true })
   })
 
@@ -591,6 +606,23 @@ export function registerRoutes(app) {
       from += PAGE
     }
     res.json(allRows)
+  })
+
+  // Admin: per-card impressions/clicks over the last N days → { 'kind:id': {imp, clicks} }
+  app.get('/api/admin/card-stats', verifyJWT, isAdmin, async (req, res) => {
+    const days = Math.min(parseInt(req.query.days) || 30, 365)
+    const since = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
+    const { data, error } = await supabaseAdmin.from('card_stats')
+      .select('kind, ref_id, impressions, clicks')
+      .eq('site', 'extrafun').gte('day', since).limit(20000)
+    if (error) return res.status(500).json({ message: error.message })
+    const out = {}
+    for (const r of (data || [])) {
+      const k = `${r.kind}:${r.ref_id}`
+      out[k] = out[k] || { imp: 0, clicks: 0 }
+      out[k].imp += r.impressions; out[k].clicks += r.clicks
+    }
+    res.json({ days, stats: out })
   })
 
   app.get('/api/admin/ads', verifyJWT, isAdmin, async (_req, res) => {

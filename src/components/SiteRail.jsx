@@ -7,6 +7,8 @@ import { sortByDistance, formatDistance } from '../lib/geo'
 import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
 import { MONTH_THEMES } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from './CardStatBadge'
 
 // One shared right column for every desktop content page (spec:
 // docs/superpowers/specs/2026-09-17-ef-site-rail-desktop-design.md).
@@ -18,8 +20,10 @@ const railLink = 'inline-block mt-4 font-body text-label-caps uppercase text-pri
 
 /* ── Article row: cover thumbnail + title (covers sell the click) ── */
 function ArticleRow({ item }) {
+  const ref = useImpression('article', item.id)
   return (
-    <Link href={`/magazyn/${item.slug}`} className="group flex gap-3 no-underline">
+    <Link href={`/magazyn/${item.slug}`} ref={ref} onClick={() => { if (item.id != null) trackClick('article', item.id) }} className="group relative flex gap-3 no-underline">
+      <CardStatBadge kind="article" id={item.id} className="absolute -top-1 right-0 z-10" />
       {item.cover_image && (
         <div className="w-14 h-14 flex-shrink-0 overflow-hidden bg-surface-container">
           <img src={item.cover_image} alt="" loading="lazy" className="w-full h-full object-cover" />
@@ -183,7 +187,7 @@ function NearbyModule() {
   )
 }
 
-const toRow = (a) => ({ slug: a.slug, title: a.title, cover_image: a.cover_image || null })
+const toRow = (a) => ({ id: a.id, slug: a.slug, title: a.title, cover_image: a.cover_image || null })
 
 /**
  * Shared right column.

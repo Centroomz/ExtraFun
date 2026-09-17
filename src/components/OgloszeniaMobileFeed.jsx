@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'wouter'
 import { TILE_H, Cover, useHtmlSnap } from './MagazynMobileFeed'
 import { formatDistance } from '../lib/geo'
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from './CardStatBadge'
 
 // Mobile /ogloszenia = full-screen tiles. Tile 1: top 2/3 = "add an ad" with the
 // profile's own data pre-filled (tick to keep / untick to drop), bottom 1/3 =
@@ -105,8 +107,10 @@ function HeroTile({ user, profile, avatarUrl, age, categories, catEmoji, postCat
 
 /* ── Ad tile ── */
 function AdTile({ ad, catEmoji, onOpen }) {
+  const ref = useImpression('ad', ad.id)
   return (
-    <button onClick={onOpen} className={`relative block w-full ${TILE_H} snap-start overflow-hidden text-left`}>
+    <button ref={ref} onClick={() => { trackClick('ad', ad.id); onOpen() }} className={`relative block w-full ${TILE_H} snap-start overflow-hidden text-left`}>
+      <CardStatBadge kind="ad" id={ad.id} className="absolute top-4 left-margin-mobile z-10" />
       {/* No cover photos on ads; the author avatar stays small (user photos are
           not sized for a full-screen tile). */}
       <div className="absolute inset-0 bg-surface-container-low flex items-start justify-center pt-24">

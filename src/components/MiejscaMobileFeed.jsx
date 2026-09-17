@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
 import { TILE_H, Cover, Dots, useHtmlSnap } from './MagazynMobileFeed'
 import { formatDistance } from '../lib/geo'
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from './CardStatBadge'
 
 // Mobile /miejsca = full-screen tiles (same logic as the magazine feed):
 // tile 1 = scope chooser (Blisko mnie / city) + day; then one tile per venue
@@ -75,6 +77,8 @@ function VenueTile({ venue, typeCfg, status, onOpen }) {
   const [active, setActive] = useState(0)
   const hasWeek = (venue.events && venue.events.length > 0) || (venue.oneTime && venue.oneTime.length > 0)
   const onScroll = () => { const el = ref.current; if (el) setActive(Math.round(el.scrollLeft / el.clientWidth)) }
+  const impRef = useImpression('venue', venue.id)
+  const open = () => { trackClick('venue', venue.id); onOpen() }
 
   const today = new Date()
   const week = hasWeek ? [0, 1, 2, 3, 4, 5, 6].map(off => {
@@ -87,11 +91,12 @@ function VenueTile({ venue, typeCfg, status, onOpen }) {
   }) : []
 
   return (
-    <div className={`relative w-full ${TILE_H} snap-start overflow-hidden`}>
+    <div ref={impRef} className={`relative w-full ${TILE_H} snap-start overflow-hidden`}>
       <Dots count={hasWeek ? 2 : 1} active={active} />
+      <CardStatBadge kind="venue" id={venue.id} className="absolute top-4 left-margin-mobile z-10" />
       <div ref={ref} onScroll={onScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-none">
         {/* Slide 1 — the card */}
-        <button onClick={onOpen} className="relative block shrink-0 w-full h-full snap-start text-left">
+        <button onClick={open} className="relative block shrink-0 w-full h-full snap-start text-left">
           <LogoPanel venue={venue} typeCfg={typeCfg} />
           <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6" style={{ background: 'linear-gradient(0deg, rgba(18,20,20,.98) 0%, rgba(18,20,20,.9) 70%, rgba(18,20,20,0) 100%)' }}>
             <span className="font-body text-label-caps uppercase text-primary-container block mb-2">
@@ -137,7 +142,7 @@ function VenueTile({ venue, typeCfg, status, onOpen }) {
                 </div>
               ))}
             </div>
-            <button onClick={onOpen} className="font-body text-label-caps uppercase text-primary-container mt-6">Zobacz lokal →</button>
+            <button onClick={open} className="font-body text-label-caps uppercase text-primary-container mt-6">Zobacz lokal →</button>
           </div>
         )}
       </div>

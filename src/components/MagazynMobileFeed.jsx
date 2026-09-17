@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'wouter'
 import { QUIZ_TITLE, QUIZ_QUESTIONS } from '../lib/quiz-dogging'
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from './CardStatBadge'
 
 // Mobile /magazyn = full-screen tiles, Instagram/Reels logic (spec 2026-09-17,
 // faza B): swipe down = next piece, swipe right inside a tile = more of the same
@@ -79,9 +81,11 @@ export function Cover({ image, video, position = 'center' }) {
 
 /* ── Article tile: cover, category, title, hook, first paragraph, meta ── */
 function ArticleTile({ article, label, className = '' }) {
+  const ref = useImpression('article', article.id)
   return (
-    <Link href={`/magazyn/${article.slug}`} className={`relative block w-full ${TILE_H} snap-start overflow-hidden no-underline ${className}`}>
+    <Link href={`/magazyn/${article.slug}`} ref={ref} onClick={() => trackClick('article', article.id)} className={`relative block w-full ${TILE_H} snap-start overflow-hidden no-underline ${className}`}>
       <Cover image={article.cover_image} position="center 30%" />
+      <CardStatBadge kind="article" id={article.id} className="absolute top-4 left-margin-mobile z-10" />
       <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
         <span className="font-body text-label-caps uppercase text-primary-container block mb-2">{label || article.category}</span>
         <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-3 line-clamp-3">{article.title}</h2>

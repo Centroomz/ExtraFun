@@ -8,6 +8,8 @@ import { Hero, Button } from '../components/nocturne'
 import { PageWithRail } from '../components/PageWithRail'
 import { SiteRail } from '../components/SiteRail'
 import { MiejscaMobileFeed } from '../components/MiejscaMobileFeed'
+import { useImpression, trackClick } from '../lib/cardStats'
+import { CardStatBadge } from '../components/CardStatBadge'
 
 // ─── TYPE CONFIG (DB uses English keys) ───────────────────────────────────────
 const TYPE_CONFIG = {
@@ -341,8 +343,10 @@ function VenueStatus({ venue }) {
 // a gold frame + name + status. Big 4/3 cards (VenueRow) are for the city grids.
 function VenueRowCompact({ venue, onClick }) {
   const t = getTypeConfig(venue.type)
+  const ref = useImpression('venue', venue.id)
   return (
-    <article onClick={onClick} className="group flex gap-5 py-5 border-b border-outline-variant/15 cursor-pointer">
+    <article ref={ref} onClick={() => { trackClick('venue', venue.id); onClick() }} className="group relative flex gap-5 py-5 border-b border-outline-variant/15 cursor-pointer">
+      <CardStatBadge kind="venue" id={venue.id} className="absolute top-1 right-0 z-10" />
       <div className="w-20 h-20 flex-shrink-0 border border-primary-container/20 bg-surface-container-low flex items-center justify-center overflow-hidden transition-colors group-hover:border-primary-container/50">
         {venue.logo_url
           ? <img src={venue.logo_url} alt={venue.name} className="max-w-[78%] max-h-[78%] object-contain" />
@@ -363,8 +367,10 @@ function VenueRowCompact({ venue, onClick }) {
 // Image-tile card (4/3, logo-forward) — used in the city grids.
 function VenueRow({ venue, onClick }) {
   const t = getTypeConfig(venue.type)
+  const ref = useImpression('venue', venue.id)
   return (
-    <article onClick={onClick} className="group flex flex-col gap-5 cursor-pointer">
+    <article ref={ref} onClick={() => { trackClick('venue', venue.id); onClick() }} className="group relative flex flex-col gap-5 cursor-pointer">
+      <CardStatBadge kind="venue" id={venue.id} className="absolute top-3 left-3 z-10" />
       {/* Logo-forward tile — colour logo, framed centre, gold hairline. Shorter
           than a photo card (4/3) because the asset is a wordmark, not a photo. */}
       <div className="relative aspect-[4/3] overflow-hidden border border-primary-container/20 bg-surface-container-low flex items-center justify-center transition-colors duration-500 group-hover:border-primary-container/50">

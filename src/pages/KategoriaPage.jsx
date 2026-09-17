@@ -78,6 +78,7 @@ export function KategoriaPage({ slug }) {
             {articles.map(a => (
               <MagCard
                 key={a.id}
+                id={a.id}
                 image={a.cover_image}
                 tag={a.category}
                 title={a.title}

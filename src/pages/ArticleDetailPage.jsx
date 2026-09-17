@@ -94,6 +94,7 @@ function pickRelated(list, current, slug, limit = 4) {
     .sort((x, y) => (y.overlap - x.overlap) || (y.sameCat - x.sameCat) || (y.a.featured ? 1 : 0) - (x.a.featured ? 1 : 0))
     .slice(0, limit)
     .map(({ a }) => ({
+      id: a.id,
       slug: a.slug,
       title: a.title,
       category: SLUG_TO_DISPLAY[a.category_slug] || a.category_slug || 'CNM 101',

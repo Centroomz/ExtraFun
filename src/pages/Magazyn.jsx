@@ -328,6 +328,7 @@ export function Magazyn() {
               {archFiltered.map(article => (
                 <MagCard
                   key={article.id}
+                  id={article.id}
                   image={article.cover_image}
                   tag={article.category}
                   title={article.title}
