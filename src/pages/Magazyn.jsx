@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { ARTICLES as FALLBACK_ARTICLES } from '../lib/articles'
@@ -103,6 +103,38 @@ export function Magazyn() {
       window.history.replaceState(null, '', '/magazyn')
     }
   }, [])
+
+  // Leaving the page: remember where the feed was. Coming back via history:
+  // restore once the list has rendered (App skips its scroll-to-top on popstate).
+  useEffect(() => {
+    let t = null
+    const save = () => {
+      if (t) return
+      t = setTimeout(() => {
+        t = null
+        try { sessionStorage.setItem('ef_magazyn_scroll', String(window.scrollY || document.querySelector('.page-content')?.scrollTop || 0)) } catch {}
+      }, 200)
+    }
+    window.addEventListener('scroll', save, { passive: true })
+    document.querySelector('.page-content')?.addEventListener('scroll', save, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', save)
+      document.querySelector('.page-content')?.removeEventListener('scroll', save)
+      if (t) clearTimeout(t)
+    }
+  }, [])
+  const cameBack = useRef(!!window.__efBackNav)
+  useEffect(() => {
+    if (!dbArticles || !cameBack.current) return
+    cameBack.current = false
+    let y = 0
+    try { y = Number(sessionStorage.getItem('ef_magazyn_scroll')) || 0 } catch {}
+    if (!y) return
+    requestAnimationFrame(() => {
+      window.scrollTo(0, y)
+      document.querySelector('.page-content')?.scrollTo(0, y)
+    })
+  }, [dbArticles])
 
   useEffect(() => {
     apiFetch('/api/articles')

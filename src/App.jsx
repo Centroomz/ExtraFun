@@ -24,6 +24,13 @@ import { Plaze } from './pages/Plaze'
 import { Wiadomosci } from './pages/Wiadomosci'
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
+// Raised on browser back/forward, consumed by the scroll effect in App and by
+// pages that restore their own position. Registered at module level on purpose
+// (see App's scroll effect).
+if (typeof window !== 'undefined') {
+  window.addEventListener('popstate', () => { window.__efBackNav = true })
+}
+
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 const isAdmin = (email) => ADMIN_EMAILS.includes(email)
 
@@ -273,7 +280,12 @@ function AppInner() {
   // `.page-content` (overflow-y:auto; height:100vh), not the window — so window.scrollTo
   // is a no-op there and the old scroll position leaks into the next page (short pages
   // clamp to their bottom). Reset both.
+  // Back/forward (popstate) keeps the position: the page being returned to
+  // restores its own scroll (Magazyn mobile feed reads `window.__efBackNav`).
+  // The flag is raised by the module-level listener below — it must run before
+  // wouter's own popstate handler re-renders the route, or the page mounts too early.
   useEffect(() => {
+    if (window.__efBackNav) { setTimeout(() => { window.__efBackNav = false }, 0); return }
     window.scrollTo(0, 0)
     document.querySelector('.page-content')?.scrollTo(0, 0)
   }, [location])
