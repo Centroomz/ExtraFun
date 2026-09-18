@@ -208,6 +208,7 @@ function ArticlesTab() {
   const [mode, setMode] = useState(null) // null | 'add' | { article }
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
+  const [filter, setFilter] = useState('all') // 'all' | 'published' | 'scheduled' | 'draft'
 
   const load = async () => {
     setLoading(true)
@@ -303,16 +304,80 @@ function ArticlesTab() {
     )
   }
 
+  const counts = {
+    all: articles.length,
+    published: articles.filter(a => a.status === 'published').length,
+    scheduled: articles.filter(a => a.status === 'scheduled').length,
+    draft: articles.filter(a => a.status === 'draft').length,
+  }
+
+  const filtered = (() => {
+    if (filter === 'published') {
+      return articles
+        .filter(a => a.status === 'published')
+        .slice()
+        .sort((a, b) => new Date(b.publish_date || 0) - new Date(a.publish_date || 0))
+    }
+    if (filter === 'scheduled') {
+      return articles
+        .filter(a => a.status === 'scheduled')
+        .slice()
+        .sort((a, b) => new Date(a.publish_date || 0) - new Date(b.publish_date || 0))
+    }
+    if (filter === 'draft') {
+      return articles
+        .filter(a => a.status === 'draft')
+        .slice()
+        .sort((a, b) => (b.id || 0) - (a.id || 0))
+    }
+    return articles
+  })()
+
+  const tabBtn = (key, label) => {
+    const active = filter === key
+    return (
+      <button
+        key={key}
+        onClick={() => setFilter(key)}
+        style={{
+          padding: '6px 12px',
+          borderRadius: 8,
+          fontSize: 12,
+          fontWeight: 600,
+          border: '1px solid ' + (active ? '#d4af37' : 'rgba(255,255,255,0.1)'),
+          background: active ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.03)',
+          color: active ? '#d4af37' : 'rgba(232,230,252,0.8)',
+          cursor: 'pointer',
+        }}
+      >
+        {label} <span style={{ opacity: 0.6, marginLeft: 4 }}>{counts[key]}</span>
+      </button>
+    )
+  }
+
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div style={{ fontSize: 13, color: 'rgba(232,230,252,0.8)' }}>{articles.length} artykułów</div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, flexWrap: 'wrap', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+          {tabBtn('all', 'Wszystkie')}
+          {tabBtn('published', 'Opublikowane')}
+          {tabBtn('scheduled', 'Zaplanowane')}
+          {tabBtn('draft', 'Drafty')}
+        </div>
         <button style={btnPrimary} onClick={() => setMode('add')}>+ Nowy artykuł</button>
+      </div>
+      <div style={{ fontSize: 12, color: 'rgba(232,230,252,0.55)', marginBottom: 12 }}>
+        {filter === 'published' && 'Sortowanie: data publikacji (najnowsze pierwsze)'}
+        {filter === 'scheduled' && 'Sortowanie: data odsłonięcia (najbliższe pierwsze)'}
+        {filter === 'draft' && 'Drafty bez daty publikacji (najnowsze ID pierwsze)'}
+        {filter === 'all' && `${filtered.length} artykułów`}
       </div>
       {msg && <div style={{ padding: '10px 14px', borderRadius: 10, background: 'rgba(233,193,118,0.1)', color: '#d4af37', marginBottom: 12, fontSize: 13 }}>{msg}</div>}
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.72)' }}>Ładowanie...</div>
-      ) : articles.map(a => (
+      ) : filtered.length === 0 ? (
+        <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.5)', fontSize: 13 }}>Brak artykułów w tej kategorii</div>
+      ) : filtered.map(a => (
         <div key={a.id} style={card}>
           <div style={{ display: 'flex', gap: 12 }}>
             {a.cover_image && (
@@ -324,6 +389,7 @@ function ArticlesTab() {
                 <span style={{ fontSize: 11, background: 'rgba(157,78,221,0.2)', color: '#d4af37', borderRadius: 6, padding: '2px 7px' }}>{a.category_slug}</span>
                 <span style={{ fontSize: 11, background: a.status === 'published' ? 'rgba(233,193,118,0.15)' : a.status === 'scheduled' ? 'rgba(100,149,237,0.15)' : 'rgba(255,255,255,0.08)', color: a.status === 'published' ? '#d4af37' : a.status === 'scheduled' ? '#6495ED' : 'rgba(232,230,252,0.8)', borderRadius: 6, padding: '2px 7px' }}>{a.status === 'scheduled' ? 'Zaplanowany' : a.status}</span>
                 {a.status === 'scheduled' && a.publish_date && <span style={{ fontSize: 13, fontWeight: 600, color: '#6495ED', background: 'rgba(100,149,237,0.12)', borderRadius: 6, padding: '2px 8px' }}>📅 {new Date(a.publish_date).toLocaleString('pl-PL')}</span>}
+                {a.status === 'published' && a.publish_date && <span style={{ fontSize: 12, color: 'rgba(212,175,55,0.85)', background: 'rgba(212,175,55,0.08)', borderRadius: 6, padding: '2px 7px' }}>📅 {new Date(a.publish_date).toLocaleDateString('pl-PL')}</span>}
                 {a.featured && <span style={{ fontSize: 11, background: 'rgba(255,200,0,0.15)', color: '#FFC800', borderRadius: 6, padding: '2px 7px' }}>★ featured</span>}
                 <span style={{ fontSize: 11, background: 'rgba(0,255,150,0.12)', color: '#00FF96', borderRadius: 6, padding: '2px 7px' }}>👁 {a.views ?? 0}</span>
               </div>
