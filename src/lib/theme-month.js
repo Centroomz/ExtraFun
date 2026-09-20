@@ -29,7 +29,7 @@ export const MONTH_THEMES = {
     title: 'Las, Wisła, parking.',
     lead: 'Wrzesień w rytmie doggingu: co mówi polskie prawo (i jak rzadko je egzekwuje), savoir-vivre plenerowej sceny i dlaczego część ludzi wybiera krzaki zamiast bezpiecznego klubu.',
     image: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/212-1788864401553.webp',
-    video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/hero-pola-dogging.mp4?v=2',
+    video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/hero-pola-dogging-540.mp4',
     slugs: ['dogging'],
   },
 }
