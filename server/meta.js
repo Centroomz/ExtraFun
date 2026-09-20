@@ -2,6 +2,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { supabaseAdmin } from './supabase.js'
 import { DICTIONARY_TERMS } from '../src/lib/dictionary.js'
+import { getMonthTheme } from '../src/lib/theme-month.js'
 
 function esc(s = '') {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -174,7 +175,15 @@ export function sendListPageHtml(req, res, dist, { title, desc }) {
 // For the homepage, inject Organization + WebSite JSON-LD so AI engines recognize
 // what ExtraFun IS as an entity (was zero structured data on the homepage).
 export function sendHomeHtml(_req, res, dist) {
-  const html = readFileSync(join(dist, 'index.html'), 'utf8')
+  let html = readFileSync(join(dist, 'index.html'), 'utf8')
+  // LCP on mobile is the Temat Miesiąca cover (hero tile), known from config —
+  // preload it from the HTML so it doesn't wait for the bundle to execute
+  // (Lighthouse 4G: ~2.6s "load delay" before the browser even asked for it).
+  const theme = getMonthTheme()
+  if (theme?.image) {
+    html = html.replace('</head>', `<link rel="preload" as="image" href="${esc(theme.image)}" fetchpriority="high">
+</head>`)
+  }
   try {
     const ld = JSON.stringify({
       '@context': 'https://schema.org',
