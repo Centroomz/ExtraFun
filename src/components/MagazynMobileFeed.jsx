@@ -66,11 +66,32 @@ export function useHtmlSnap(enabled) {
   }, [enabled])
 }
 
+/* ── Near-viewport gate for tile covers. Native loading="lazy" was not enough:
+   Chrome fetched all ~40 covers (11 MB) the moment the list rendered, in
+   parallel with the LCP poster. src is set only once the tile is within one
+   viewport height of the screen (rootMargin 100%), so swiping never waits. ── */
+function useNearViewport(ref) {
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || near) return
+    if (!('IntersectionObserver' in window)) { setNear(true); return }
+    const io = new IntersectionObserver(entries => {
+      if (entries.some(e => e.isIntersecting)) { setNear(true); io.disconnect() }
+    }, { rootMargin: '100% 100% 100% 100%' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [ref, near])
+  return near
+}
+
 /* ── Cover + scrim shared by article-like tiles ── */
 export function Cover({ image, video, position = 'center' }) {
   const videoReady = useDeferredVideo(image)
+  const ref = useRef(null)
+  const near = useNearViewport(ref)
   return (
-    <div className="absolute inset-0">
+    <div ref={ref} className="absolute inset-0">
       {/* With a clip: the poster <img> is painted first (it is the LCP) and the
           <video> is layered on top once mounted — swapping the img out made
           the clip's first frame the LCP element (~6s on 4G). */}
@@ -80,7 +101,7 @@ export function Cover({ image, video, position = 'center' }) {
             {videoReady && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={image || undefined} src={video} />}
           </>
         : image
-          ? <img src={image} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
+          ? <img src={near ? image : undefined} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
           : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}
       <div className="absolute inset-0" style={{ background: SCRIM }} />
     </div>
