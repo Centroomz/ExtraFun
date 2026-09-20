@@ -18,20 +18,19 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
   return (
     <section className="relative w-full h-[58vh] min-h-[420px] flex flex-col justify-end overflow-hidden mb-16">
       <div className="absolute inset-0">
+        {/* Clip is deferred (useDeferredVideo) and layered over the still image,
+            which stays underneath so the LCP is the image, not the clip's first frame. */}
         {video && videoReady && (
           <video
             ref={videoRef}
-            className="lg:hidden w-full h-full object-cover"
+            className="lg:hidden absolute inset-0 w-full h-full object-cover"
             autoPlay muted loop playsInline
             poster={image || undefined}
             src={video}
           />
         )}
-        {video && !videoReady && image && (
-          <div className="lg:hidden w-full h-full bg-cover" style={{ backgroundImage: `url('${image}')`, backgroundPosition: imagePosition }} />
-        )}
         {image
-          ? <div className={`${video ? 'hidden lg:block ' : ''}w-full h-full bg-cover`} style={{ backgroundImage: `url('${image}')`, backgroundPosition: imagePosition }} />
+          ? <div className="w-full h-full bg-cover" style={{ backgroundImage: `url('${image}')`, backgroundPosition: imagePosition }} />
           : <div className={`${video ? 'hidden lg:block ' : ''}w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest`} />}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(18,20,20,.95) 5%, rgba(18,20,20,.4) 45%, rgba(18,20,20,.2) 100%)' }} />
       </div>

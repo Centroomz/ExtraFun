@@ -71,10 +71,14 @@ export function Cover({ image, video, position = 'center' }) {
   const videoReady = useDeferredVideo()
   return (
     <div className="absolute inset-0">
-      {video && videoReady
-        ? <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster={image || undefined} src={video} />
-        : video && image
-        ? <img src={image} alt="" fetchPriority="high" className="w-full h-full object-cover" />
+      {/* With a clip: the poster <img> is painted first (it is the LCP) and the
+          <video> is layered on top once mounted — swapping the img out made
+          the clip's first frame the LCP element (~6s on 4G). */}
+      {video
+        ? <>
+            {image && <img src={image} alt="" fetchPriority="high" className="w-full h-full object-cover" />}
+            {videoReady && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={image || undefined} src={video} />}
+          </>
         : image
           ? <img src={image} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
           : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { Switch, Route, useLocation, Link } from 'wouter'
 import { apiFetch } from './lib/api'
 import { AuthProvider, useAuth } from './hooks/useAuth'
@@ -6,23 +6,26 @@ import { AgeGate } from './components/AgeGate'
 import { BottomNav } from './components/BottomNav'
 // 128 px webp (1 KB) — rendered at 32 px; the 512 px PNG was 207 KB on every visit.
 import extrafunLogo from '/extrafun-logo.webp'
+// Code-splitting: Magazyn (home) and ArticleDetailPage (Google landers) stay in
+// the main bundle; every other page loads on demand so a newcomer doesn't
+// download admin/chat/messages code before the first screen.
 import { Magazyn } from './pages/Magazyn'
-import { Aktualnosci } from './pages/Aktualnosci'
-import { Przewodnik } from './pages/Przewodnik'
-import { Czat } from './pages/Czat'
-import { Ogloszenia } from './pages/Ogloszenia'
-import { LoginPage } from './auth/LoginPage'
-import { SignupPage } from './auth/SignupPage'
-import { ForgotPasswordPage } from './auth/ForgotPasswordPage'
-import { ResetPasswordPage } from './auth/ResetPasswordPage'
-import { Admin } from './pages/Admin'
 import { ArticleDetailPage } from './pages/ArticleDetailPage'
-import { KategoriaPage } from './pages/KategoriaPage'
-import { Imprezy } from './pages/Imprezy'
-import { Slownik } from './pages/Slownik'
-import { SlownikTerm } from './pages/SlownikTerm'
-import { Plaze } from './pages/Plaze'
-import { Wiadomosci } from './pages/Wiadomosci'
+const Aktualnosci = lazy(() => import('./pages/Aktualnosci').then(m => ({ default: m.Aktualnosci })))
+const Przewodnik = lazy(() => import('./pages/Przewodnik').then(m => ({ default: m.Przewodnik })))
+const Czat = lazy(() => import('./pages/Czat').then(m => ({ default: m.Czat })))
+const Ogloszenia = lazy(() => import('./pages/Ogloszenia').then(m => ({ default: m.Ogloszenia })))
+const LoginPage = lazy(() => import('./auth/LoginPage').then(m => ({ default: m.LoginPage })))
+const SignupPage = lazy(() => import('./auth/SignupPage').then(m => ({ default: m.SignupPage })))
+const ForgotPasswordPage = lazy(() => import('./auth/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })))
+const ResetPasswordPage = lazy(() => import('./auth/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })))
+const Admin = lazy(() => import('./pages/Admin').then(m => ({ default: m.Admin })))
+const KategoriaPage = lazy(() => import('./pages/KategoriaPage').then(m => ({ default: m.KategoriaPage })))
+const Imprezy = lazy(() => import('./pages/Imprezy').then(m => ({ default: m.Imprezy })))
+const Slownik = lazy(() => import('./pages/Slownik').then(m => ({ default: m.Slownik })))
+const SlownikTerm = lazy(() => import('./pages/SlownikTerm').then(m => ({ default: m.SlownikTerm })))
+const Plaze = lazy(() => import('./pages/Plaze').then(m => ({ default: m.Plaze })))
+const Wiadomosci = lazy(() => import('./pages/Wiadomosci').then(m => ({ default: m.Wiadomosci })))
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 // Raised on browser back/forward, consumed by the scroll effect in App and by
@@ -369,6 +372,8 @@ function AppInner() {
         <DesktopNav user={user} profile={profile} onSignOut={handleSignOut} />
 
         <div className="page-content">
+          {/* fallback null: the layout shell stays put while a route chunk loads */}
+          <Suspense fallback={null}>
           <Switch>
             <Route path="/" component={Magazyn} />
             <Route path="/magazyn" component={Magazyn} />
@@ -398,6 +403,7 @@ function AppInner() {
             }</Route>
             <Route>{() => <Magazyn />}</Route>
           </Switch>
+          </Suspense>
 
           {/* Sister site — inside content column so it doesn't become a flex
               row sibling stealing ~155px of page width on desktop */}
