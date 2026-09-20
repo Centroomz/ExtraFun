@@ -105,8 +105,12 @@ export function TileHero({ image, label, title, children }) {
 /* ── Article tile: cover, category, title, hook, first paragraph, meta ── */
 function ArticleTile({ article, label, className = '' }) {
   const ref = useImpression('article', article.id)
+  // content-visibility:auto — the feed is ~45 full-screen tiles; Chrome was
+  // laying out all of them and fetching every lazy cover (37 images, 4 MB)
+  // right after the article list arrived. Skipped tiles cost nothing until
+  // they scroll near; the height is explicit (TILE_H) so nothing jumps.
   return (
-    <Link href={`/magazyn/${article.slug}`} ref={ref} onClick={() => trackClick('article', article.id)} className={`relative block w-full ${TILE_H} snap-start overflow-hidden no-underline ${className}`}>
+    <Link href={`/magazyn/${article.slug}`} ref={ref} onClick={() => trackClick('article', article.id)} className={`relative block w-full ${TILE_H} snap-start overflow-hidden no-underline [content-visibility:auto] ${className}`}>
       <Cover image={article.cover_image} position="center 30%" />
       <CardStatBadge kind="article" id={article.id} className="absolute top-4 left-margin-mobile z-10" />
       <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
