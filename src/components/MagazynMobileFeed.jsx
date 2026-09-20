@@ -87,7 +87,9 @@ function useNearViewport(ref) {
 
 /* ── Cover + scrim shared by article-like tiles ── */
 export function Cover({ image, video, position = 'center' }) {
-  const videoReady = useDeferredVideo(image)
+  // Only tiles with a clip need the deferral (and the poster warm-up): calling
+  // it for every tile made new Image() fetch all 40 covers at once.
+  const videoReady = useDeferredVideo(video ? image : null, !!video)
   const ref = useRef(null)
   const near = useNearViewport(ref)
   return (

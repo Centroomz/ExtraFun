@@ -5,9 +5,10 @@ import { useEffect, useState } from 'react'
 // Mount the <video> only after (a) window.load + 1.5s and (b) the poster image
 // has been decoded — so the clip never shares bandwidth with the frame the
 // visitor is actually looking at. Until then the poster stays on screen.
-export function useDeferredVideo(poster, delay = 1500) {
+export function useDeferredVideo(poster, enabled = true, delay = 1500) {
   const [ready, setReady] = useState(false)
   useEffect(() => {
+    if (!enabled) return
     let t, cancelled = false
     const loaded = new Promise(resolve => {
       const go = () => { t = setTimeout(resolve, delay) }
@@ -19,6 +20,6 @@ export function useDeferredVideo(poster, delay = 1500) {
       : Promise.resolve()
     Promise.all([loaded, decoded]).then(() => { if (!cancelled) setReady(true) })
     return () => { cancelled = true; clearTimeout(t) }
-  }, [poster, delay])
+  }, [poster, enabled, delay])
   return ready
 }
