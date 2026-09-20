@@ -234,7 +234,11 @@ export function Magazyn() {
           sidebara (Quiz na górze). */}
       {/* Desktop hero; on mobile the theme is the first tile of the feed. */}
       <div className="hidden lg:block">
-        <Hero image={heroImage} video={heroVideo} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} />
+        {/* No `video` here: this Hero sits in a hidden-below-lg wrapper and its clip
+            is lg:hidden — so the <video> was never visible on any viewport, yet
+            autoplay downloaded the 3.4 MB clip on every visit (mobile got it
+            twice, once per hero). The mobile tile (MagazynMobileFeed) plays it. */}
+        <Hero image={heroImage} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} />
       </div>
 
       {/* Rytm tygodnia — 4 kręgosłup-rubryki (desktop; mobile = płaska lista) */}
