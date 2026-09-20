@@ -7,7 +7,7 @@ import { useDeferredVideo } from '../../lib/useDeferredVideo'
 export function Hero({ image, video, imagePosition = 'center', label, onLabel, title, lead, ctaLabel, onCta, aside, italic = true, mobileCompact = false }) {
   const videoRef = useRef(null)
   const [muted, setMuted] = useState(true)
-  const videoReady = useDeferredVideo()
+  const videoReady = useDeferredVideo(image)
   const toggleSound = () => {
     const v = videoRef.current
     if (!v) return

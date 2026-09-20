@@ -68,7 +68,7 @@ export function useHtmlSnap(enabled) {
 
 /* ── Cover + scrim shared by article-like tiles ── */
 export function Cover({ image, video, position = 'center' }) {
-  const videoReady = useDeferredVideo()
+  const videoReady = useDeferredVideo(image)
   return (
     <div className="absolute inset-0">
       {/* With a clip: the poster <img> is painted first (it is the LCP) and the
