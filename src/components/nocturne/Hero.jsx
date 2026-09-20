@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react'
 import { Button } from './Button'
+import { useDeferredVideo } from '../../lib/useDeferredVideo'
 
 // Full-bleed editorial hero spread: moody image + vignette + left-aligned Bodoni headline.
 // Optional `aside` renders a panel on the right (desktop) — hidden on mobile.
 export function Hero({ image, video, imagePosition = 'center', label, onLabel, title, lead, ctaLabel, onCta, aside, italic = true, mobileCompact = false }) {
   const videoRef = useRef(null)
   const [muted, setMuted] = useState(true)
+  const videoReady = useDeferredVideo()
   const toggleSound = () => {
     const v = videoRef.current
     if (!v) return
@@ -16,7 +18,7 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
   return (
     <section className="relative w-full h-[58vh] min-h-[420px] flex flex-col justify-end overflow-hidden mb-16">
       <div className="absolute inset-0">
-        {video && (
+        {video && videoReady && (
           <video
             ref={videoRef}
             className="lg:hidden w-full h-full object-cover"
@@ -24,6 +26,9 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
             poster={image || undefined}
             src={video}
           />
+        )}
+        {video && !videoReady && image && (
+          <div className="lg:hidden w-full h-full bg-cover" style={{ backgroundImage: `url('${image}')`, backgroundPosition: imagePosition }} />
         )}
         {image
           ? <div className={`${video ? 'hidden lg:block ' : ''}w-full h-full bg-cover`} style={{ backgroundImage: `url('${image}')`, backgroundPosition: imagePosition }} />

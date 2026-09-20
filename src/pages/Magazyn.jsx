@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { ARTICLES as FALLBACK_ARTICLES } from '../lib/articles'
 import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE } from '../lib/quiz-dogging'
-import { apiFetch } from '../lib/api'
+import { apiFetchShared } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { SiteRail } from '../components/SiteRail'
 import { RubrykaSection } from '../components/RubrykaSection'
@@ -140,7 +140,7 @@ export function Magazyn() {
   }, [dbArticles])
 
   useEffect(() => {
-    apiFetch('/api/articles')
+    apiFetchShared('/api/articles')
       .then(data => {
         if (!data || data.length === 0) {
           setDbArticles([])

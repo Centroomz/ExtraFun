@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'wouter'
 import { getWordOfTheDay } from '../lib/dictionary'
-import { apiFetch } from '../lib/api'
+import { apiFetch, apiFetchShared } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
@@ -140,7 +140,7 @@ function NearbyModule() {
   const { location, error, loading, requestLocation } = useGeolocation()
 
   useEffect(() => {
-    apiFetch('/api/places')
+    apiFetchShared('/api/places')
       // ExtraFun "kluby": drop naturist beaches (own /plaze page) and gay-scene
       // venues (gay.pl) — otherwise the 66 gay beaches bury the ~13 swing clubs.
       .then(data => setVenues((data || []).filter(v => v.name && v.type !== 'plaża' && v.scene !== 'gay')))
@@ -199,7 +199,7 @@ const toRow = (a) => ({ id: a.id, slug: a.slug, title: a.title, cover_image: a.c
 export function SiteRail({ related = [], exclude = null, onStartQuiz, quizDone }) {
   const [articles, setArticles] = useState([])
   useEffect(() => {
-    apiFetch('/api/articles')
+    apiFetchShared('/api/articles')
       .then(data => setArticles((data || []).filter(a => a.slug && a.title)))
       .catch(() => setArticles([]))
   }, [])

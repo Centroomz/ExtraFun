@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "start": "node server/index.js"
+    "start": "node server/index.js",
+    "clips": "sh scripts/shrink-clips.sh",
+    "hooks": "sh scripts/install-hooks.sh"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",

@@ -69,6 +69,9 @@ app.get('/szukaj', (req, res) => sendListPageHtml(req, res, DIST, {
 // shadowed by any stale dist/sitemap.xml.
 app.get('/sitemap.xml', (req, res) => sendSitemap(req, res))
 
+// Vite emits content-hashed files under /assets → cache for a year (default
+// max-age=0 made every visit revalidate the 200 kB bundle).
+app.use('/assets', express.static(join(DIST, 'assets'), { immutable: true, maxAge: '1y' }))
 app.use(express.static(DIST))
 app.use((_req, res) => res.sendFile(join(DIST, 'index.html')))
 

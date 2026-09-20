@@ -3,6 +3,7 @@ import { Link } from 'wouter'
 import { QUIZ_TITLE, QUIZ_QUESTIONS } from '../lib/quiz-dogging'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from './CardStatBadge'
+import { useDeferredVideo } from '../lib/useDeferredVideo'
 
 // Mobile /magazyn = full-screen tiles, Instagram/Reels logic (spec 2026-09-17,
 // faza B): swipe down = next piece, swipe right inside a tile = more of the same
@@ -67,10 +68,13 @@ export function useHtmlSnap(enabled) {
 
 /* ── Cover + scrim shared by article-like tiles ── */
 export function Cover({ image, video, position = 'center' }) {
+  const videoReady = useDeferredVideo()
   return (
     <div className="absolute inset-0">
-      {video
+      {video && videoReady
         ? <video className="w-full h-full object-cover" autoPlay muted loop playsInline poster={image || undefined} src={video} />
+        : video && image
+        ? <img src={image} alt="" fetchPriority="high" className="w-full h-full object-cover" />
         : image
           ? <img src={image} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
           : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}
