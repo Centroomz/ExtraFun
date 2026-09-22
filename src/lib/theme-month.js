@@ -32,6 +32,12 @@ export const MONTH_THEMES = {
     video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/hero-pola-dogging-540.mp4',
     slugs: ['dogging'],
   },
+  10: {
+    label: 'Październik · Temat Miesiąca: Miłość, Zazdrość, Swing',
+    title: 'Miłość, zazdrość, zgoda.',
+    lead: 'Październik o tym, co się dzieje z miłością, kiedy przestaje być umową na wyłączność: softcore swing, kompersja zamiast zazdrości, granice i rozmowy, które trzeba odbyć wcześniej niż myślisz.',
+    slugs: ['temat-miesiaca'],
+  },
 }
 
 export function getMonthTheme(date = new Date()) {
