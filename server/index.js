@@ -25,10 +25,16 @@ app.use((_req, res, next) => {
 // HTML is rendered per request (the meta injection in meta.js queries the DB),
 // so every ad click from Bizarriusz paid a 0.4-1.4 s TTFB for the same bytes.
 // 60 s is long enough to absorb a campaign burst and short enough that a
-// publish is visible almost immediately. /api is excluded: those responses are
-// per-user (sessions, DMs) and must never be cached by a shared proxy.
+// publish is visible almost immediately.
+// Two exclusions, both load-bearing:
+//   /api  — those responses are per-user (sessions, DMs) and must never be
+//           cached by a shared proxy.
+//   paths with a file extension — send() only applies its own Cache-Control
+//   when the header is still unset (send/index.js: `!res.getHeader(...)`), so
+//   setting it here first silently downgraded /assets from 1y immutable to
+//   60 s, and sitemap.xml from its own 1h.
 app.use((req, res, next) => {
-  if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+  if (req.method === 'GET' && !req.path.startsWith('/api/') && !/\.[a-z0-9]+$/i.test(req.path)) {
     res.setHeader('Cache-Control', 'public, max-age=60')
   }
   next()
