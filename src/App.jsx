@@ -265,9 +265,22 @@ function AppInner() {
     typeof navigator !== 'undefined' ? navigator.userAgent : ''
   )
 
+  // Bizarriusz is an 18+ club site behind its own gate, so a visitor arriving
+  // from one of its ads has already confirmed. Showing the gate again meant the
+  // ad click landed on a consent screen instead of the article it promised.
+  // The confirmation is persisted, so the gate stays gone on later visits.
+  const fromBizarriusz = () => {
+    try {
+      if (new URLSearchParams(window.location.search).get('utm_source') !== 'bizarriusz') return false
+      localStorage.setItem('ef_age', '1')
+      return true
+    } catch { return false }
+  }
+
   const [ageConfirmed, setAgeConfirmed] = useState(() => {
     if (isBot) return true
-    try { return localStorage.getItem('ef_age') === '1' } catch { return false }
+    try { if (localStorage.getItem('ef_age') === '1') return true } catch {}
+    return fromBizarriusz()
   })
 
   const handleAgeConfirm = () => {

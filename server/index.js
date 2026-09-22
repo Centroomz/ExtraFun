@@ -22,6 +22,18 @@ app.use((_req, res, next) => {
   next()
 })
 
+// HTML is rendered per request (the meta injection in meta.js queries the DB),
+// so every ad click from Bizarriusz paid a 0.4-1.4 s TTFB for the same bytes.
+// 60 s is long enough to absorb a campaign burst and short enough that a
+// publish is visible almost immediately. /api is excluded: those responses are
+// per-user (sessions, DMs) and must never be cached by a shared proxy.
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+    res.setHeader('Cache-Control', 'public, max-age=60')
+  }
+  next()
+})
+
 // Domain redirect (.fun/.club → .pl) — preserved from old server.js
 app.use((req, res, next) => {
   const host = req.hostname || ''
