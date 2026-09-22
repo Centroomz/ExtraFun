@@ -243,19 +243,20 @@ export function Magazyn() {
         <Hero image={heroImage} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} />
       </div>
 
-      {/* Rytm tygodnia — 4 kręgosłup-rubryki (desktop; mobile = płaska lista) */}
+      {/* Rytm tygodnia — 5 kręgosłup-rubryk (desktop; mobile = płaska lista) */}
       <nav className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 border-y border-outline-variant/40 mb-14">
+        <div className="grid grid-cols-2 md:grid-cols-5 border-y border-outline-variant/40 mb-14">
           {[
             ['Pon · Pt', 'Temat Miesiąca', 'temat'],
             ['Wtorek', 'Tam i Tam', 'tam-i-tam'],
             ['Środa', 'Naga Środa', 'naga-sroda'],
+            ['Czwartek', 'Pierwszy Raz', 'pierwszy-raz'],
             ['Sobota', 'Felieton', 'felieton'],
           ].map(([day, nm, rslug], i) => (
             <button
               key={rslug}
               onClick={() => goRubryka(rslug)}
-              className={`text-center py-4 px-3 hover:bg-primary-container/5 transition-colors border-outline-variant/40 ${i < 3 ? 'md:border-r' : ''} ${i < 2 ? 'border-b md:border-b-0' : ''}`}
+              className={`text-center py-4 px-3 hover:bg-primary-container/5 transition-colors border-outline-variant/40 ${i < 4 ? 'md:border-r' : ''} ${i < 2 ? 'border-b md:border-b-0' : ''}`}
             >
               <div className="font-body text-label-caps uppercase text-primary-container">{day}</div>
               <div className="font-display text-headline-sm text-on-surface mt-1">{nm}</div>
