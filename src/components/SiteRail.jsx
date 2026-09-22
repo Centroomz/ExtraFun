@@ -9,6 +9,8 @@ import { MONTH_THEMES } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from './CardStatBadge'
+import { coverUrl } from '../lib/images'
+import { useIsDesktop } from '../hooks/useIsDesktop'
 
 // One shared right column for every desktop content page (spec:
 // docs/superpowers/specs/2026-09-17-ef-site-rail-desktop-design.md).
@@ -26,7 +28,7 @@ function ArticleRow({ item }) {
       <CardStatBadge kind="article" id={item.id} className="absolute -top-1 right-0 z-10" />
       {item.cover_image && (
         <div className="w-14 h-14 flex-shrink-0 overflow-hidden bg-surface-container">
-          <img src={item.cover_image} alt="" loading="lazy" className="w-full h-full object-cover" />
+          <img src={coverUrl(item.cover_image, 160)} alt="" loading="lazy" className="w-full h-full object-cover" />
         </div>
       )}
       <h4 className="font-body text-body-md text-on-surface leading-snug line-clamp-3 group-hover:text-primary-container transition-colors">{item.title}</h4>
@@ -88,7 +90,7 @@ function LastThemeModule() {
       <Link href={`/magazyn/rubryka/${slug}`} className="group block no-underline">
         {theme.image && (
           <div className="aspect-[16/9] overflow-hidden bg-surface-container mb-3">
-            <img src={theme.image} alt="" loading="lazy" className="w-full h-full object-cover" />
+            <img src={coverUrl(theme.image, 800)} alt="" loading="lazy" className="w-full h-full object-cover" />
           </div>
         )}
         <div className="font-display italic font-medium text-headline-sm text-on-surface leading-tight group-hover:text-primary-container transition-colors">{name}</div>
@@ -197,18 +199,24 @@ const toRow = (a) => ({ id: a.id, slug: a.slug, title: a.title, cover_image: a.c
  * @param {boolean}  [quizDone]
  */
 export function SiteRail({ related = [], exclude = null, onStartQuiz, quizDone }) {
+  // Desktop-only by mount, not by CSS: `hidden lg:block` still ran every
+  // module's useEffect on phones (3 API calls + 11 covers for nothing).
+  const isDesktop = useIsDesktop()
   const [articles, setArticles] = useState([])
   useEffect(() => {
+    if (!isDesktop) return
     apiFetchShared('/api/articles')
       .then(data => setArticles((data || []).filter(a => a.slug && a.title)))
       .catch(() => setArticles([]))
-  }, [])
+  }, [isDesktop])
 
   const pool = exclude ? articles.filter(a => a.slug !== exclude) : articles
   const popular = [...pool].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5).map(toRow)
   const newest = [...pool]
     .sort((a, b) => new Date(b.publish_date || b.created_at || 0) - new Date(a.publish_date || a.created_at || 0))
     .slice(0, 5).map(toRow)
+
+  if (!isDesktop) return null
 
   return (
     <div className="space-y-10">

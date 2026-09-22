@@ -4,6 +4,7 @@ import { QUIZ_TITLE, QUIZ_QUESTIONS } from '../lib/quiz-dogging'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from './CardStatBadge'
 import { useDeferredVideo } from '../lib/useDeferredVideo'
+import { coverUrl, coverSrcSet } from '../lib/images'
 
 // Mobile /magazyn = full-screen tiles, Instagram/Reels logic (spec 2026-09-17,
 // faza B): swipe down = next piece, swipe right inside a tile = more of the same
@@ -14,6 +15,9 @@ import { useDeferredVideo } from '../lib/useDeferredVideo'
 export const TILE_H = 'h-[calc(100dvh-56px-var(--nav-height)-env(safe-area-inset-bottom))]'
 // Same bottom scrim as nocturne/Hero — text sits on the cover, never on bare image.
 const SCRIM = 'linear-gradient(0deg, rgba(18,20,20,.96) 0%, rgba(18,20,20,.75) 35%, rgba(18,20,20,.25) 65%, rgba(18,20,20,.05) 100%)'
+
+// Tile is full-bleed: 420 covers a 1x phone, 750/1080 the 2x/3x ones.
+const TILE_WIDTHS = [420, 750, 1080]
 
 const HOOK_MAX = 140
 const PARA_MAX = 280
@@ -99,11 +103,11 @@ export function Cover({ image, video, position = 'center' }) {
           the clip's first frame the LCP element (~6s on 4G). */}
       {video
         ? <>
-            {image && <img src={image} alt="" fetchPriority="high" className="w-full h-full object-cover" />}
-            {videoReady && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={image || undefined} src={video} />}
+            {image && <img src={coverUrl(image, 750)} srcSet={coverSrcSet(image, TILE_WIDTHS)} sizes="100vw" alt="" fetchPriority="high" className="w-full h-full object-cover" />}
+            {videoReady && near && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={coverUrl(image, 750) || undefined} src={video} />}
           </>
         : image
-          ? <img src={near ? image : undefined} alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
+          ? <img src={near ? coverUrl(image, 750) : undefined} srcSet={near ? coverSrcSet(image, TILE_WIDTHS) : undefined} sizes="100vw" alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
           : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}
       <div className="absolute inset-0" style={{ background: SCRIM }} />
     </div>
@@ -227,7 +231,7 @@ function PopularTile({ items }) {
           <li key={a.slug}>
             <Link href={`/magazyn/${a.slug}`} className="flex gap-4 items-center no-underline">
               <span className="font-display text-headline-sm text-primary-container/50 w-6 shrink-0">{i + 1}</span>
-              {a.cover_image && <img src={a.cover_image} alt="" loading="lazy" className="w-16 h-16 object-cover shrink-0" />}
+              {a.cover_image && <img src={coverUrl(a.cover_image, 192)} alt="" loading="lazy" className="w-16 h-16 object-cover shrink-0" />}
               <span className="font-display text-headline-sm text-on-surface leading-tight line-clamp-2">{a.title}</span>
             </Link>
           </li>

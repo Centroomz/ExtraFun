@@ -375,7 +375,10 @@ export function Magazyn() {
 
           </div>{/* /content col */}
 
-          <aside className="mt-16 lg:mt-0 lg:col-span-4">
+          {/* Desktop-only: on mobile the rail duplicated the tile feed below the
+              fold and still cost 3 API calls (/api/places 34 kB gz) plus 11
+              full-res thumbnails — 2185 px of off-screen column. */}
+          <aside className="hidden lg:block mt-16 lg:mt-0 lg:col-span-4">
             <div>
               <SiteRail onStartQuiz={() => setShowQuiz(true)} quizDone={quizDone} />
             </div>

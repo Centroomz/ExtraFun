@@ -42,11 +42,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!-- Non-blocking: the two Google Fonts CSS files were render-blocking ~1s on
-         4G. Text paints in the fallback font and swaps (display=swap) when ready. -->
-    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+         4G. Text paints in the fallback font and swaps (display=swap) when ready.
+         DM Sans is roman-only (400..900): every italic in the app resolves to
+         --serif (Bodoni), so the two italic files were 54 kB of dead weight. -->
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=DM+Sans:wght@400..900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript>
-      <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=DM+Sans:ital,wght@0,100..1000;1,100..1000&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=DM+Sans:wght@400..900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet" />
       <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0&display=swap" rel="stylesheet" />
     </noscript>
   </head>
