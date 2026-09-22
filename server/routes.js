@@ -95,7 +95,7 @@ export function registerRoutes(app) {
     // Audience-by-day: on extrafun (swing) show a venue's events only on its swing
     // days; label each (a day also in gay_days = mixed crowd). NULL swing_days =
     // unset → behave as before (show all). getDay 0=Sun..6=Sat.
-    res.json((venues || []).map(v => {
+    const out = (venues || []).map(v => {
       const sd = v.swing_days, gd = v.gay_days
       const unset = !sd || sd.length === 0   // empty array [] = unset, same as NULL (else [].includes()=false hides every day — bug hit Bizarriusz v5)
       const allow = (dow) => unset || sd.includes(dow)
@@ -104,7 +104,9 @@ export function registerRoutes(app) {
       const events = (byVenue[key] || []).filter(e => allow(e.day_of_week)).map(e => ({ ...e, audience: label(e.day_of_week) }))
       // Alias venues columns back to the swingers shape the frontend expects.
       return { ...v, latitude: v.lat, longitude: v.lng, logo_url: v.cover_image, events, oneTime: otByVenue[key] || [] }
-    }))
+    })
+    res.set('Cache-Control', 'public, max-age=60')
+    res.json(out)
   })
 
   // === ANALYTICS ===
@@ -184,7 +186,16 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
       .order('publish_date', { ascending: false, nullsFirst: false })
       .order('created_at', { ascending: false })
     if (error) return res.status(500).json({ message: error.message })
-    res.json(data || [])
+    // The list never renders full bodies — it only needs a reading time and the
+    // first paragraph (mobile tiles). Shipping every `content` made this 158 kB
+    // raw; the preview + precomputed reading_time cut that by ~85%.
+    const list = (data || []).map(({ content, ...rest }) => ({
+      ...rest,
+      reading_time: Math.max(1, Math.ceil((content || '').split(/\s+/).length / 200)),
+      content_preview: (content || '').slice(0, 900),
+    }))
+    res.set('Cache-Control', 'public, max-age=60')
+    res.json(list)
   })
 
   // Single article by slug (+ fire-and-forget view increment)

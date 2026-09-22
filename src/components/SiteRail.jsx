@@ -50,7 +50,7 @@ function TodayEventsModule() {
   useEffect(() => {
     const today = new Date().toISOString().slice(0, 10)
     // event_date is a timestamp ('…T00:00:00'), so `to=today` alone would exclude today.
-    apiFetch(`/api/events?from=${today}&to=${today}T23:59:59`)
+    apiFetchShared(`/api/events?from=${today}&to=${today}T23:59:59`)
       .then(data => setEvents((data || []).filter(e => e.event_name && String(e.event_date).slice(0, 10) === today).slice(0, 5)))
       .catch(() => setEvents([]))
   }, [])

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
-import { apiFetch } from '../lib/api'
+import { apiFetchShared } from '../lib/api'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { SLUG_TO_DISPLAY, RUBRYKA_GROUPS } from '../lib/rubryki'
 import { getMonthTheme } from '../lib/theme-month'
@@ -34,7 +34,7 @@ export function KategoriaPage({ slug }) {
   const { label, slugs } = resolveRubryka(slug)
 
   useEffect(() => {
-    apiFetch('/api/articles')
+    apiFetchShared('/api/articles')
       .then(data => {
         const list = (data || [])
           .filter(a => slugs.includes(a.category_slug))
@@ -45,7 +45,7 @@ export function KategoriaPage({ slug }) {
             title: a.title,
             description: a.excerpt || '',
             category: SLUG_TO_DISPLAY[a.category_slug] || a.category_slug,
-            reading_time: estimateReadingTime(a.content),
+            reading_time: a.reading_time ?? estimateReadingTime(a.content),
             cover_image: a.cover_image || null,
           }))
         setArticles(list)

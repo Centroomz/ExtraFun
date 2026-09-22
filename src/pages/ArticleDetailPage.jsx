@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useParams, Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
-import { apiFetch } from '../lib/api'
+import { apiFetch, apiFetchShared } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
 import { useAuth } from '../hooks/useAuth'
 import { SiteRail } from '../components/SiteRail'
@@ -189,7 +189,7 @@ export function ArticleDetailPage() {
           reading_time: Math.max(1, Math.ceil((data.content || '').split(/\s+/).length / 200)),
         })
         // Onward reads (client-side, no backend change).
-        apiFetch('/api/articles')
+        apiFetchShared('/api/articles')
           .then(list => setRelated(pickRelated(list, data, slug)))
           .catch(() => setRelated([]))
       } catch {

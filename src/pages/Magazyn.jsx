@@ -152,12 +152,12 @@ export function Magazyn() {
             description: a.excerpt || '',
             category_slug: a.category_slug || null,
             category: SLUG_TO_DISPLAY[a.category_slug] || a.category_slug || 'CNM 101',
-            reading_time: estimateReadingTime(a.content),
+            reading_time: a.reading_time ?? estimateReadingTime(a.content),
             cover_image: a.cover_image || null,
             featured: a.featured || false,
             publish_date: a.publish_date || a.created_at || null,
             views: a.views || 0,
-            firstParagraph: firstParagraph(a.content, [a.title, a.excerpt]),
+            firstParagraph: firstParagraph(a.content || a.content_preview, [a.title, a.excerpt]),
           })))
         }
       })
