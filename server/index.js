@@ -2,7 +2,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
-import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendSitemap, sendListPageHtml } from './meta.js'
+import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendListPageHtml } from './meta.js'
 import { supabaseAdmin } from './supabase.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -83,9 +83,9 @@ app.get('/szukaj', (req, res) => sendListPageHtml(req, res, DIST, {
   desc: 'Szukaj artykułów, miejsc i pojęć na ExtraFun — magazynie CNM, poliamorii i lifestyle.',
 }))
 
-// Dynamic sitemap (built from the DB) — must precede static so it isn't
-// shadowed by any stale dist/sitemap.xml.
-app.get('/sitemap.xml', (req, res) => sendSitemap(req, res))
+// NOTE: /sitemap.xml is served by registerRoutes() in routes.js, which runs
+// first and wins. sendSitemap() here never ran — removed rather than left as
+// a second, silently-dead definition of the same route.
 
 // Vite emits content-hashed files under /assets → cache for a year (default
 // max-age=0 made every visit revalidate the 200 kB bundle).

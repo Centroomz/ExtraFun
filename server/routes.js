@@ -955,6 +955,10 @@ ${termLines}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')}
 </urlset>`
+    // This handler shadows the one in index.js (registerRoutes runs first), and
+    // that one was the only place setting a cache header — so the sitemap was
+    // answering with none at all.
+    res.setHeader('Cache-Control', 'public, max-age=3600')
     res.type('application/xml').send(xml)
   })
 }
