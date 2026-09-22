@@ -4,7 +4,10 @@ import { useDeferredVideo } from '../../lib/useDeferredVideo'
 
 // Full-bleed editorial hero spread: moody image + vignette + left-aligned Bodoni headline.
 // Optional `aside` renders a panel on the right (desktop) — hidden on mobile.
-export function Hero({ image, video, imagePosition = 'center', label, onLabel, title, lead, ctaLabel, onCta, aside, italic = true, mobileCompact = false }) {
+// `footer` — optional strip pinned to the hero's bottom edge, inside the scrim
+// (magazine uses it for the weekly-rhythm rail, so the rail costs no extra
+// vertical space above the fold). Text block tightens its bottom padding when set.
+export function Hero({ image, video, imagePosition = 'center', label, onLabel, title, lead, ctaLabel, onCta, aside, footer, italic = true, mobileCompact = false }) {
   const videoRef = useRef(null)
   const [muted, setMuted] = useState(true)
   const videoReady = useDeferredVideo(image, !!video)
@@ -44,7 +47,7 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
           <span className="text-xl leading-none">{muted ? '🔇' : '🔊'}</span>
         </button>
       )}
-      <div className={`relative z-10 px-6 md:px-16 ${mobileCompact ? 'pb-6 md:pb-16' : 'pb-16'} ${aside ? 'flex flex-col md:flex-row md:items-end md:justify-between gap-8' : ''}`}>
+      <div className={`relative z-10 px-6 md:px-16 ${footer ? 'pb-8' : (mobileCompact ? 'pb-6 md:pb-16' : 'pb-16')} ${aside ? 'flex flex-col md:flex-row md:items-end md:justify-between gap-8' : ''}`}>
         <div className="max-w-3xl">
           {label && (onLabel
             ? <button onClick={onLabel} className={`font-body text-label-caps uppercase text-primary-container block hover:opacity-80 transition-opacity ${mobileCompact ? 'mb-2 md:mb-4' : 'mb-4'}`}>{label} →</button>
@@ -55,6 +58,11 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
         </div>
         {aside && <div className="hidden md:block shrink-0 w-[320px]">{aside}</div>}
       </div>
+      {footer && (
+        <div className="relative z-10 border-t border-outline-variant/30" style={{ background: 'rgba(18,20,20,0.55)', backdropFilter: 'blur(4px)' }}>
+          {footer}
+        </div>
+      )}
     </section>
   )
 }

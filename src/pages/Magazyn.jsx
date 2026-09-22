@@ -240,30 +240,35 @@ export function Magazyn() {
             is lg:hidden — so the <video> was never visible on any viewport, yet
             autoplay downloaded the 3.4 MB clip on every visit (mobile got it
             twice, once per hero). The mobile tile (MagazynMobileFeed) plays it. */}
-        <Hero image={heroImage} imagePosition="center 38%" label={heroLabel} onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false} />
+        {/* Rytm tygodnia wjechał do stopki hero — nie zabiera już pasa nad
+            zgięciem, dzięki czemu "Najnowsze" widać bez przewijania. */}
+        <Hero
+          image={heroImage} imagePosition="center 38%" label={heroLabel}
+          onLabel={() => goRubryka('temat')} title={heroTitle} lead={heroLead} italic={false}
+          footer={
+            <nav className="max-w-container-max mx-auto px-6 md:px-16">
+              <div className="grid grid-cols-5">
+                {[
+                  ['Pon · Pt', 'Temat Miesiąca', 'temat'],
+                  ['Wtorek', 'Tam i Tam', 'tam-i-tam'],
+                  ['Środa', 'Naga Środa', 'naga-sroda'],
+                  ['Czwartek', 'Pierwszy Raz', 'pierwszy-raz'],
+                  ['Sobota', 'Felieton', 'felieton'],
+                ].map(([day, nm, rslug], i) => (
+                  <button
+                    key={rslug}
+                    onClick={() => goRubryka(rslug)}
+                    className={`text-center py-3 px-3 hover:bg-primary-container/5 transition-colors border-outline-variant/30 ${i < 4 ? 'border-r' : ''}`}
+                  >
+                    <div className="font-body text-label-caps uppercase text-primary-container">{day}</div>
+                    <div className="font-display text-headline-sm text-on-surface mt-1">{nm}</div>
+                  </button>
+                ))}
+              </div>
+            </nav>
+          }
+        />
       </div>
-
-      {/* Rytm tygodnia — 5 kręgosłup-rubryk (desktop; mobile = płaska lista) */}
-      <nav className="hidden lg:block max-w-container-max mx-auto px-6 md:px-16">
-        <div className="grid grid-cols-2 md:grid-cols-5 border-y border-outline-variant/40 mb-14">
-          {[
-            ['Pon · Pt', 'Temat Miesiąca', 'temat'],
-            ['Wtorek', 'Tam i Tam', 'tam-i-tam'],
-            ['Środa', 'Naga Środa', 'naga-sroda'],
-            ['Czwartek', 'Pierwszy Raz', 'pierwszy-raz'],
-            ['Sobota', 'Felieton', 'felieton'],
-          ].map(([day, nm, rslug], i) => (
-            <button
-              key={rslug}
-              onClick={() => goRubryka(rslug)}
-              className={`text-center py-4 px-3 hover:bg-primary-container/5 transition-colors border-outline-variant/40 ${i < 4 ? 'md:border-r' : ''} ${i < 2 ? 'border-b md:border-b-0' : ''}`}
-            >
-              <div className="font-body text-label-caps uppercase text-primary-container">{day}</div>
-              <div className="font-display text-headline-sm text-on-surface mt-1">{nm}</div>
-            </button>
-          ))}
-        </div>
-      </nav>
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
 
@@ -283,6 +288,15 @@ export function Magazyn() {
 
         {/* DESKTOP — magazyn sekcyjny */}
         <div className="hidden lg:block">
+        {/* Najnowsze — jeden świeży tekst nad rubrykami. Teksty wchodzą
+            codziennie poza niedzielą, więc karta zmienia się co dobę; sobotnia
+            wisi do poniedziałku. Bez `onMore` (nie ma rubryki "najnowsze").
+            Ten sam artykuł zostaje też w swoim bloku niżej — rubryki nie tracą
+            świeżej pozycji, a rytm tygodnia zostaje nienaruszony. */}
+        <RubrykaSection
+          id="sec-najnowsze" label="Najnowsze" articles={newest ? [newest] : []}
+          onOpen={openArticle} layout="wide" limit={1}
+        />
         {/* Bloki per rubryka — kolejność = rytm tygodnia. Puste znikają. */}
         <RubrykaSection
           id="sec-temat"
