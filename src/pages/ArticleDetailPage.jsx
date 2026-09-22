@@ -5,6 +5,8 @@ import { apiFetch, apiFetchShared } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
 import { useAuth } from '../hooks/useAuth'
 import { SiteRail } from '../components/SiteRail'
+import { coverUrl, coverSrcSet } from '../lib/images'
+import { useDeferredVideo } from '../lib/useDeferredVideo'
 
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 
@@ -131,9 +133,14 @@ function CtaBox({ categorySlug }) {
 // "Czytaj też" teaser and bottom "Czytaj dalej" grid already cover onward reads.
 
 // Autoplay-muted cover video with tap-to-unmute (browsers block autoplay with sound).
+// The clips are 1280x720 originals — 3.3 MB for a box that is 327 px wide on a
+// phone — and this page is where the Bizarriusz ads land. The <video> is mounted
+// only after window.load + 1.5 s (useDeferredVideo); until then the poster holds
+// the frame, so the clip never competes with the text the visitor came for.
 function CoverVideo({ src, poster, title }) {
   const ref = useRef(null)
   const [muted, setMuted] = useState(true)
+  const ready = useDeferredVideo(poster, true)
   const toggle = () => {
     const v = ref.current
     if (!v) return
@@ -144,12 +151,15 @@ function CoverVideo({ src, poster, title }) {
   }
   return (
     <div className="relative w-full">
-      <video ref={ref} src={src} poster={poster} autoPlay muted loop playsInline
-        aria-label={title} className="w-full h-auto max-h-[60vh] object-cover" />
-      <button onClick={toggle} aria-label={muted ? 'Włącz dźwięk' : 'Wycisz'}
+      {ready
+        ? <video ref={ref} src={src} poster={poster} preload="none" autoPlay muted loop playsInline
+            aria-label={title} className="w-full h-auto max-h-[60vh] object-cover" />
+        : <img src={coverUrl(poster, 750)} srcSet={coverSrcSet(poster, [420, 750, 1080])} sizes="(min-width: 1024px) 896px, 100vw"
+            alt={title} className="w-full h-auto max-h-[60vh] object-cover" />}
+      {ready && <button onClick={toggle} aria-label={muted ? 'Włącz dźwięk' : 'Wycisz'}
         className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-2 backdrop-blur transition">
         <span aria-hidden>{muted ? '🔊' : '🔇'}</span> {muted ? 'Posłuchaj' : 'Wycisz'}
-      </button>
+      </button>}
     </div>
   )
 }
@@ -278,7 +288,8 @@ export function ArticleDetailPage() {
         </div>
       ) : article.cover_image && (
         <div className="max-w-4xl mx-auto px-6 md:px-16 mt-6">
-          <img src={article.cover_image} alt={article.title} className="w-full h-auto max-h-[60vh] object-cover" />
+          <img src={coverUrl(article.cover_image, 750)} srcSet={coverSrcSet(article.cover_image, [420, 750, 1080])} sizes="(min-width: 1024px) 896px, 100vw"
+            alt={article.title} className="w-full h-auto max-h-[60vh] object-cover" />
         </div>
       )}
 
@@ -350,7 +361,7 @@ export function ArticleDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {related.map(r => (
                 <Link key={r.slug} href={`/magazyn/${r.slug}`} className="group no-underline">
-                  {r.cover_image && <img src={r.cover_image} alt="" loading="lazy" className="w-full h-44 object-cover mb-3" />}
+                  {r.cover_image && <img src={coverUrl(r.cover_image, 640)} alt="" loading="lazy" className="w-full h-44 object-cover mb-3" />}
                   <span className="block font-body text-label-caps uppercase text-primary-container">{r.category}</span>
                   <h3 className="font-display italic font-medium text-body-lg text-on-surface mt-1 group-hover:text-primary-container transition-colors">{r.title}</h3>
                   <span className="block font-body text-label-caps uppercase text-outline mt-1">{r.reading_time} min</span>
