@@ -175,10 +175,11 @@ export function Magazyn() {
 
   // Backbone rubrics (newest first). Empty ones render nothing (RubrykaSection).
   const secTemat  = bySlugs(themeSlugs)
+  const secPierw  = bySlugs(['pierwszy-raz'])
   const secNaga   = bySlugs(['naga-sroda'])
   const secTam    = bySlugs(['tam-i-tam'])
   const secFel    = bySlugs(['felieton'])
-  const secWiedza = bySlugs(['cnm-101', 'pierwszy-raz', 'bez-osadu'])
+  const secWiedza = bySlugs(['cnm-101', 'bez-osadu'])
 
   // Hero from the monthly theme; fallback to newest article (never a placeholder).
   const newest = byDate(allArticles)[0]
@@ -192,6 +193,7 @@ export function Magazyn() {
   // Archiwum = wszystko POZA tym, co już pokazane w blokach wyżej (bez dubli).
   const shownIds = new Set([
     ...secTemat.slice(0, 12),
+    ...secPierw.slice(0, 3),
     ...secNaga.slice(0, 3),
     ...secTam.slice(0, 3),
     ...secFel.slice(0, 3),
@@ -292,6 +294,10 @@ export function Magazyn() {
           limit={12}
         />
         <RubrykaSection
+          id="sec-pierwszy-raz" label="Pierwszy Raz" articles={secPierw}
+          onOpen={openArticle} onMore={() => goRubryka('pierwszy-raz')} limit={3}
+        />
+        <RubrykaSection
           id="sec-naga" label="Naga Środa" articles={secNaga}
           onOpen={openArticle} onMore={() => goRubryka('naga-sroda')} limit={3}
         />
@@ -305,7 +311,7 @@ export function Magazyn() {
           onOpen={openArticle} onMore={() => goRubryka('felieton')} limit={3}
         />
         <RubrykaSection
-          id="sec-wiedza" label="Wiedza · CNM 101 · Pierwszy Raz · Bez Osądu"
+          id="sec-wiedza" label="Wiedza · CNM 101 · Bez Osądu"
           articles={secWiedza} onOpen={openArticle} onMore={() => goRubryka('wiedza')} limit={3}
         />
 
