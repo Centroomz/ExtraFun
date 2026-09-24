@@ -37,15 +37,21 @@ async function loadVisibleProfiles() {
     if (data.users.length < 200) break;
   }
   rows.sort((a, b) => String(b.lastSeen).localeCompare(String(a.lastSeen)));
-  // Fallback avatar: newest gallery photo for anyone without an avatar.
-  const noAvatar = rows.filter(p => !p.avatarUrl).map(p => p.id);
-  if (noAvatar.length) {
-    const { data: g } = await supabaseAdmin.from('user_gallery')
-      .select('user_id, image_url, created_at').in('user_id', noAvatar)
-      .order('created_at', { ascending: false });
-    const first = new Map();
-    for (const row of (g || [])) if (!first.has(row.user_id)) first.set(row.user_id, row.image_url);
-    for (const p of rows) if (!p.avatarUrl && first.has(p.id)) p.avatarUrl = first.get(p.id);
+  // Gallery: pull the whole table rather than `.in(id, <890 ids>)` — that IN
+  // list would blow past the URL query-string limit. user_gallery is bounded
+  // by actual photo count, not visible-profile count, so this is the smaller read.
+  const { data: g } = await supabaseAdmin.from('user_gallery')
+    .select('user_id, image_url, created_at')
+    .order('created_at', { ascending: false });
+  const firstPhoto = new Map();
+  const galleryIds = new Set();
+  for (const row of (g || [])) {
+    galleryIds.add(row.user_id);
+    if (!firstPhoto.has(row.user_id)) firstPhoto.set(row.user_id, row.image_url);
+  }
+  for (const p of rows) {
+    p.hasGallery = galleryIds.has(p.id);
+    if (!p.avatarUrl && firstPhoto.has(p.id)) p.avatarUrl = firstPhoto.get(p.id);
   }
   _finderCache = { at: Date.now(), profiles: rows };
   return rows;
@@ -388,8 +394,17 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
       const blocks = await finderBlockedSet(me);
       const q = String(req.query.q || '').trim().toLowerCase();
       const mode = String(req.query.mode || 'all');
-      let items = all.filter(p => p.id !== me && !blocks.has(p.id));
+      const visible = all.filter(p => p.id !== me && !blocks.has(p.id));
+      // Global stats (unaffected by the current filter) so the client can show
+      // "N profili · M ze zdjęciem · K z galerią" regardless of which mode is active.
+      const stats = {
+        total: visible.length,
+        withPhoto: visible.filter(p => !!p.avatarUrl).length,
+        withGallery: visible.filter(p => p.hasGallery).length,
+      };
+      let items = visible;
       if (mode === 'photos') items = items.filter(p => !!p.avatarUrl);
+      else if (mode === 'gallery') items = items.filter(p => p.hasGallery);
       else if (mode === 'new') items = [...items].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
       else if (mode === 'active') {
         const cutoff = new Date(Date.now() - 30 * 86400000).toISOString();
@@ -402,7 +417,7 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
         items = items.filter(p => p.age != null && p.age >= lo && p.age <= hi);
       }
       if (q) items = items.filter(p => p.displayName.toLowerCase().includes(q) || (p.lookingFor || '').toLowerCase().includes(q));
-      res.json({ count: items.length, locked: false, items });
+      res.json({ count: items.length, locked: false, items, stats });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }

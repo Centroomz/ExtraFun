@@ -7,6 +7,7 @@ import { FinderProfile } from './FinderProfile'
 const MODES = [
   { id: 'all', label: 'Wszyscy' },
   { id: 'photos', label: 'Ze zdjęciem' },
+  { id: 'gallery', label: 'Z galerią' },
   { id: 'new', label: 'Nowi' },
   { id: 'active', label: 'Aktywni' },
 ]
@@ -66,7 +67,7 @@ function FinderCard({ p, onOpen }) {
 // when Phase 3 flips the gate; until then this always renders the locked state.
 export function Finder({ user }) {
   const { profile } = useAuth()
-  const [state, setState] = useState({ loading: true, locked: true, count: 0, items: [] })
+  const [state, setState] = useState({ loading: true, locked: true, count: 0, items: [], stats: null })
   const [mode, setMode] = useState('all')
   const [q, setQ] = useState('')
   const [selectedId, setSelectedId] = useState(null)
@@ -94,7 +95,7 @@ export function Finder({ user }) {
     const params = new URLSearchParams({ mode })
     if (q.trim()) params.set('q', q.trim())
     apiFetch(`/api/finder?${params}`)
-      .then(d => { if (alive) setState({ loading: false, locked: !!d.locked, count: d.count || 0, items: d.items || [] }) })
+      .then(d => { if (alive) setState({ loading: false, locked: !!d.locked, count: d.count || 0, items: d.items || [], stats: d.stats || null }) })
       .catch(() => { if (alive) setState(s => ({ ...s, loading: false })) })
     return () => { alive = false }
   }, [mode, q])
@@ -126,10 +127,13 @@ export function Finder({ user }) {
           </div>
         ) : (
           <>
-            <div className="font-body text-body-sm text-on-surface-variant mb-4">
-              {state.items.length} {state.items.length === 1 ? 'profil' : 'profili'}
-              {' · '}{state.items.filter(p => p.avatarUrl).length} ze zdjęciem
-            </div>
+            {state.stats && (
+              <div className="font-body text-body-sm text-on-surface-variant mb-4">
+                {state.stats.total} {state.stats.total === 1 ? 'profil' : 'profili'}
+                {' · '}{state.stats.withPhoto} ze zdjęciem
+                {' · '}{state.stats.withGallery} z galerią
+              </div>
+            )}
             <div className="flex flex-wrap items-center gap-4 mb-6">
               <input
                 value={q}
