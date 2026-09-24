@@ -1,29 +1,20 @@
-// Covers are stored full-res (1104×1472, 84 kB webp) and were served as-is to
-// a 375 px phone tile. The render/image endpoint resizes and re-encodes, and
-// honours the browser's Accept header, so Chrome still gets webp:
-//   measured on 212-*.webp, 375 px slot @2x → 37 kB instead of 84 kB.
-// Both endpoints answer `public, max-age=3600` on GET (a HEAD says `no-cache`
-// — that is a CDN quirk, not the real policy; check with GET before believing
-// a caching claim here).
-// Only bucket objects are rewritten; local files (/editorial/…) pass through.
-const OBJECT = '/storage/v1/object/public/'
-const RENDER = '/storage/v1/render/image/public/'
-
-// `width` alone does NOT keep the aspect ratio: the default resize mode holds
-// the source height, so a 1104×1472 cover came back 420×1472 — squeezed.
-// `resize=contain` with a height bound no cover can reach fits the image inside
-// the box instead, so 1104×1472 → 750×1000 and 1344×768 → 750×429.
-const MAX_H = 4000
-
-export function coverUrl(src, width, quality = 60) {
-  if (!src || !src.includes(OBJECT)) return src
-  const u = src.replace(OBJECT, RENDER)
-  return `${u}${u.includes('?') ? '&' : '?'}width=${width}&height=${MAX_H}&resize=contain&quality=${quality}`
+// This used to rewrite the URL to /storage/v1/render/image and let Supabase
+// resize on the fly (measured saving: a 1104×1472/84 kB cover → 37 kB on a
+// 375 px tile). But Supabase bills image transformations per *distinct origin
+// image* per cycle, Pro quota is 100, and this ran on every article-covers
+// object across every tile width — it was 1/3 of what pushed the org to
+// 1004/100 (995% from bizarriusz avatars, still climbing from this). article-
+// covers is 272 objects averaging 244 kB (max 3.46 MB) against a 250 GB/cycle
+// egress quota sitting at 10% used — serving originals costs egress headroom
+// that exists, not a quota that's already blown. So no more transforms:
+// `width`/`quality` are kept so the ~10 call sites need no edit, but both
+// just return the original URL now.
+export function coverUrl(src, _width, _quality) {
+  return src
 }
 
-// `sizes` tells the browser the slot is one CSS pixel wide per device pixel;
-// without it a 3× phone would still pick the smallest candidate.
-export function coverSrcSet(src, widths, quality = 60) {
-  if (!src || !src.includes(OBJECT)) return undefined
-  return widths.map(w => `${coverUrl(src, w, quality)} ${w}w`).join(', ')
+// No more resized variants to offer, so no srcSet — `sizes` on the <img>
+// becomes a no-op but callers can leave it, it's harmless without a srcSet.
+export function coverSrcSet(_src, _widths, _quality) {
+  return undefined
 }
