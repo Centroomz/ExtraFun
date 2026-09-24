@@ -28,6 +28,7 @@ const AUTHOR_AVATARS = {
   'Pola': '/authors/pola.jpg',
   'Krysia': '/authors/krysia.jpg',
   'Magda': '/authors/magda.jpg',
+  'Sławek': '/authors/slawek.jpg',
 }
 
 const SLUG_TO_DISPLAY = {
