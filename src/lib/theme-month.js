@@ -36,9 +36,8 @@ export const MONTH_THEMES = {
     label: 'Październik · Temat Miesiąca: Miłość, Zazdrość, Swing',
     title: 'Miłość, zazdrość, swing.',
     lead: 'Październik o tym, co się dzieje, gdy miłość przestaje być umową na wyłączność: reguły gry zamiast domysłów, kompersja zamiast zazdrości i rozmowy, które trzeba odbyć, zanim zrobi się o nich głośno.',
+    image: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/pola_partner_pazdziernik_flux.png',
     video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/Pola_pazdiernik_hero.mp4',
-    // image celowo puste — static cover (pola_partner_hero_pazdziernik_flux.png)
-    // jeszcze nie wgrany do Supabase bucketu. TODO patrz memory project_extrafun_october_hero_swap_todo.
     slugs: ['temat-miesiaca'],
   },
 }
