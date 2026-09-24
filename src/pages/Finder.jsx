@@ -11,13 +11,35 @@ const MODES = [
   { id: 'active', label: 'Aktywni' },
 ]
 
-function FinderAvatar({ url, name }) {
+const PAGE_SIZE = 24
+
+// Same deterministic gradient set as biz's Szukaj (seed = user id) — a
+// photoless card gets a colored tile instead of a flat gray box.
+const GRADIENTS = [
+  'linear-gradient(135deg,#ff6b6b,#ee5a9c)',
+  'linear-gradient(135deg,#f7971e,#ffd200)',
+  'linear-gradient(135deg,#11998e,#38ef7d)',
+  'linear-gradient(135deg,#396afc,#2948ff)',
+  'linear-gradient(135deg,#8e2de2,#4a00e0)',
+  'linear-gradient(135deg,#ff512f,#dd2476)',
+  'linear-gradient(135deg,#1fa2ff,#12d8fa)',
+  'linear-gradient(135deg,#f857a6,#ff5858)',
+]
+function gradientFor(seed) {
+  let hash = 0
+  for (let i = 0; i < seed.length; i++) hash = (hash * 31 + seed.charCodeAt(i)) | 0
+  return GRADIENTS[Math.abs(hash) % GRADIENTS.length]
+}
+
+function FinderAvatar({ id, url, name }) {
   const [ok, setOk] = useState(!!url)
   return url && ok
     ? <img src={url} alt="" onError={() => setOk(false)} className="w-full aspect-square object-cover" />
     : (
-      <div className="w-full aspect-square bg-surface-container flex items-center justify-center text-on-surface-variant font-display text-display-sm-mobile">
-        {name?.[0]?.toUpperCase() || '?'}
+      <div className="w-full aspect-square flex items-center justify-center" style={{ background: gradientFor(id) }}>
+        <span className="font-display text-display-sm-mobile font-bold" style={{ color: 'rgba(255,255,255,.92)', textShadow: '0 2px 8px rgba(0,0,0,.35)' }}>
+          {name?.[0]?.toUpperCase() || '?'}
+        </span>
       </div>
     )
 }
@@ -25,7 +47,7 @@ function FinderAvatar({ url, name }) {
 function FinderCard({ p, onOpen }) {
   return (
     <button onClick={onOpen} className="text-left border border-outline-variant/20 bg-surface-container-low hover:border-primary-container/40 transition-colors">
-      <FinderAvatar url={p.avatarUrl} name={p.displayName} />
+      <FinderAvatar id={p.id} url={p.avatarUrl} name={p.displayName} />
       <div className="p-3">
         <div className="font-body font-semibold text-body-md text-on-surface">
           {p.displayName}{p.age ? `, ${p.age}` : ''}
@@ -48,6 +70,11 @@ export function Finder({ user }) {
   const [mode, setMode] = useState('all')
   const [q, setQ] = useState('')
   const [selectedId, setSelectedId] = useState(null)
+  const [page, setPage] = useState(1)
+
+  // A filter change should always land back on page 1 — otherwise "page 5"
+  // of "Wszyscy" silently becomes an out-of-range page of "Ze zdjęciem".
+  useEffect(() => { setPage(1) }, [mode, q])
 
   // Opening a profile pushes a history entry so Back closes it instead of
   // leaving the page — same pattern as Ogloszenia's ad detail.
@@ -99,6 +126,10 @@ export function Finder({ user }) {
           </div>
         ) : (
           <>
+            <div className="font-body text-body-sm text-on-surface-variant mb-4">
+              {state.items.length} {state.items.length === 1 ? 'profil' : 'profili'}
+              {' · '}{state.items.filter(p => p.avatarUrl).length} ze zdjęciem
+            </div>
             <div className="flex flex-wrap items-center gap-4 mb-6">
               <input
                 value={q}
@@ -121,10 +152,36 @@ export function Finder({ user }) {
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {state.items.map(p => <FinderCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />)}
+              {state.items.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => (
+                <FinderCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />
+              ))}
             </div>
-            {state.items.length === 0 && (
+            {state.items.length === 0 ? (
               <p className="font-body text-body-md text-on-surface-variant">Brak wyników.</p>
+            ) : (
+              (() => {
+                const totalPages = Math.ceil(state.items.length / PAGE_SIZE)
+                if (totalPages <= 1) return null
+                return (
+                  <div className="flex items-center justify-center gap-4 mt-8">
+                    <button
+                      onClick={() => setPage(p => Math.max(1, p - 1))}
+                      disabled={page <= 1}
+                      className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface disabled:opacity-30"
+                    >
+                      ← Poprzednia
+                    </button>
+                    <span className="font-body text-body-sm text-on-surface-variant">{page} / {totalPages}</span>
+                    <button
+                      onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                      disabled={page >= totalPages}
+                      className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface disabled:opacity-30"
+                    >
+                      Następna →
+                    </button>
+                  </div>
+                )
+              })()
             )}
           </>
         )}
