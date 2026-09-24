@@ -34,8 +34,10 @@ export const MONTH_THEMES = {
   },
   10: {
     label: 'Październik · Temat Miesiąca: Miłość, Zazdrość, Swing',
-    title: 'Miłość, zazdrość, zgoda.',
-    lead: 'Październik o tym, co się dzieje z miłością, kiedy przestaje być umową na wyłączność: softcore swing, kompersja zamiast zazdrości, granice i rozmowy, które trzeba odbyć wcześniej niż myślisz.',
+    title: 'Miłość, zazdrość, swing.',
+    lead: 'Październik o tym, co się dzieje, gdy miłość przestaje być umową na wyłączność: reguły gry zamiast domysłów, kompersja zamiast zazdrości i rozmowy, które trzeba odbyć, zanim zrobi się o nich głośno.',
+    // image/video celowo puste — hero-para (ruda+blondyn, gramofon) jeszcze
+    // nie wgrana do Supabase bucketu. TODO patrz memory project_extrafun_october_hero_swap_todo.
     slugs: ['temat-miesiaca'],
   },
 }
