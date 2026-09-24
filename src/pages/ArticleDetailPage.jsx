@@ -29,6 +29,7 @@ const AUTHOR_AVATARS = {
   'Krysia': '/authors/krysia.jpg',
   'Magda': '/authors/magda.jpg',
   'Sławek': '/authors/slawek.jpg',
+  'Kicia Bradshaw': '/authors/kicia.jpg',
 }
 
 const SLUG_TO_DISPLAY = {
