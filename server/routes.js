@@ -566,8 +566,9 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
   // Idempotent: a unique PK on site_config.key means a second insert errors,
   // so a second click/retry is a safe no-op (409), never a double-send.
   const EXTRAFUN_FINDER_ANNOUNCE = `Cześć! 🖤
-Dział profili przenosimy z bizarriusz na extrafun.pl — Twój profil (nick, zdjęcie, „szukam") będzie tam widoczny. Logujesz się tym samym loginem i hasłem co na bizarriusz.pl.
-Nie chcesz? Wejdź w Profil → „Ukryj mnie w Szukaj na extrafun" i znikasz z listy. W każdej chwili wrócisz.`;
+Dział profili przenosimy z bizarriusz na extrafun.pl — Twój profil (nick, zdjęcie, „szukam") będzie tam widoczny. Logujesz się tym samym loginem i hasłem co na bizarriusz.pl. Chcesz zostać widoczny/a? Nie musisz nic robić.
+Wiadomości od zainteresowanych Twoim profilem będą przychodzić na Twoją skrzynkę — tak jak dotąd.
+Nie chcesz być widoczny/a na extrafun? Wejdź w Profil → „Ukryj mnie w Szukaj na extrafun" i znikasz z listy. W każdej chwili wrócisz.`;
 
   app.post('/api/admin/finder/broadcast', verifyJWT, isAdmin, async (_req, res) => {
     try {
