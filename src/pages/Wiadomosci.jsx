@@ -10,6 +10,17 @@ export function Wiadomosci({ user }) {
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
   const me = user?.id
+  // Deep link from a profile "Napisz" button (?to=<id>&name=<name>): opens
+  // an existing thread with that person if one exists, or a fresh compose
+  // view (no ad context — ad_id stays null) if it's a first message.
+  const [composeTo, setComposeTo] = useState(() => {
+    if (typeof window === 'undefined') return null
+    const params = new URLSearchParams(window.location.search)
+    const to = params.get('to')
+    return to ? { id: to, name: params.get('name') || '' } : null
+  })
+  const [composeText, setComposeText] = useState('')
+  const [composeSending, setComposeSending] = useState(false)
   // Inbox scroll position captured when opening a thread, restored on Back.
   const listScroll = useRef(null)
   const setScroll = (pc, win) => {
@@ -71,6 +82,27 @@ export function Wiadomosci({ user }) {
   )
   const current = list.find(t => t.key === active)
 
+  // A ?to= deep link into a partner we already have a thread with just opens
+  // that thread — no duplicate "fresh compose" UI for someone you've messaged before.
+  useEffect(() => {
+    if (!composeTo || loading) return
+    const existing = list.find(t => t.partner === composeTo.id)
+    if (existing) { setActive(existing.key); setComposeTo(null) }
+  }, [loading, composeTo, msgs])
+
+  async function sendCompose() {
+    if (!composeText.trim() || composeSending || !composeTo) return
+    setComposeSending(true)
+    try {
+      await apiFetch('/api/messages', { method: 'POST', body: { content: composeText.trim(), recipient_id: composeTo.id } })
+      setComposeText('')
+      await load()
+      setActive(`null:${composeTo.id}`)
+      setComposeTo(null)
+    } catch (e) { alert('Błąd: ' + (e.message || '')) }
+    setComposeSending(false)
+  }
+
   async function sendReply() {
     if (!reply.trim() || sending || !current) return
     setSending(true)
@@ -89,8 +121,10 @@ export function Wiadomosci({ user }) {
           /* ── Thread view ── */
           <>
             <button onClick={() => window.history.back()} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Wiadomości</button>
-            <h1 className="font-display italic font-semibold text-headline-md text-on-surface mb-1">{current.partnerName || 'Ogłoszeniodawca'}</h1>
-            <div className="font-body text-body-md text-on-surface-variant mb-8">{current.ad_title}</div>
+            <h1 className="font-display italic font-semibold text-headline-md text-on-surface mb-1">{current.partnerName || (current.ad_id ? 'Ogłoszeniodawca' : 'Rozmówca')}</h1>
+            {current.ad_title
+              ? <div className="font-body text-body-md text-on-surface-variant mb-8">{current.ad_title}</div>
+              : <div className="mb-6" />}
 
             <div className="space-y-4 mb-8">
               {current.items.map(m => {
@@ -108,6 +142,17 @@ export function Wiadomosci({ user }) {
               <textarea value={reply} onChange={e => setReply(e.target.value)} placeholder="Odpowiedz…"
                 className="w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50 min-h-[90px]" />
               <div><Button onClick={sendReply} disabled={!reply.trim() || sending}>{sending ? 'Wysyłam…' : 'Wyślij'}</Button></div>
+            </div>
+          </>
+        ) : composeTo && !loading ? (
+          /* ── New message (from a "Napisz" deep link, no thread yet) ── */
+          <>
+            <button onClick={() => setComposeTo(null)} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Wiadomości</button>
+            <h1 className="font-display italic font-semibold text-headline-md text-on-surface mb-8">{composeTo.name || 'Nowa wiadomość'}</h1>
+            <div className="flex flex-col gap-3">
+              <textarea value={composeText} onChange={e => setComposeText(e.target.value)} placeholder="Napisz wiadomość…"
+                className="w-full box-border bg-surface-container border border-outline-variant/30 px-4 py-3 text-on-surface font-body text-body-md outline-none focus:border-primary-container/50 min-h-[90px]" />
+              <div><Button onClick={sendCompose} disabled={!composeText.trim() || composeSending}>{composeSending ? 'Wysyłam…' : 'Wyślij'}</Button></div>
             </div>
           </>
         ) : (
@@ -134,12 +179,12 @@ export function Wiadomosci({ user }) {
                     }} className="group py-5 border-b border-outline-variant/15 cursor-pointer">
                       <div className="flex items-center justify-between gap-3">
                         <div className="font-display italic font-medium text-body-lg text-on-surface group-hover:text-primary-container transition-colors">
-                          {t.partnerName || 'Ogłoszeniodawca'}
+                          {t.partnerName || (t.ad_id ? 'Ogłoszeniodawca' : 'Rozmówca')}
                           {t.unread > 0 && <span className="ml-2 align-middle inline-block w-2 h-2 rounded-full bg-primary-container" />}
                         </div>
                         <span className="font-body text-label-caps uppercase text-outline flex-shrink-0">{new Date(last.created_at).toLocaleDateString('pl')}</span>
                       </div>
-                      <div className="font-body text-label-caps uppercase text-primary-container mt-1">{t.ad_title}</div>
+                      {t.ad_title && <div className="font-body text-label-caps uppercase text-primary-container mt-1">{t.ad_title}</div>}
                       <div className="font-body text-body-md text-on-surface-variant mt-1 line-clamp-1">{last.sender_id === me ? 'Ty: ' : ''}{last.content}</div>
                     </div>
                   )

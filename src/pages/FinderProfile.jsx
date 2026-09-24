@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useLocation } from 'wouter'
 import { apiFetch } from '../lib/api'
 import { Button } from '../components/nocturne'
 
 export function FinderProfile({ id, onBack, onBlocked }) {
+  const [, navigate] = useLocation()
   const [p, setP] = useState(null)
   const [notFound, setNotFound] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -89,6 +91,7 @@ export function FinderProfile({ id, onBack, onBlocked }) {
         )}
 
         <div className="flex items-center gap-6">
+          <Button onClick={() => navigate(`/wiadomosci?to=${id}&name=${encodeURIComponent(p.displayName)}`)}>Napisz</Button>
           <Button onClick={like} disabled={busy}>{p.likedByMe ? '💔 Cofnij polubienie' : '❤️ Lubię'}</Button>
           <button onClick={block} disabled={busy} className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zablokuj</button>
           <button onClick={report} disabled={busy} className="font-body text-label-caps uppercase text-on-surface-variant hover:text-on-surface">Zgłoś</button>
