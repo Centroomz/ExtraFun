@@ -27,6 +27,7 @@ const CATEGORY_COLORS = {
 const AUTHOR_AVATARS = {
   'Pola': '/authors/pola.jpg',
   'Krysia': '/authors/krysia.jpg',
+  'Magda': '/authors/magda.jpg',
 }
 
 const SLUG_TO_DISPLAY = {
