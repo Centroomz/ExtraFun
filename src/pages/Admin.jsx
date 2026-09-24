@@ -410,6 +410,48 @@ function ArticlesTab() {
 }
 
 // ── StatsTab (ruch) ───────────────────────────────────────────────────────────
+function FinderTab() {
+  const [busy, setBusy] = useState(false)
+  const [result, setResult] = useState(null)
+
+  async function send() {
+    if (busy) return
+    if (!confirm('Wysłać jednorazową zapowiedź DM do WSZYSTKICH kont (biz+extrafun)? Tego nie da się cofnąć.')) return
+    setBusy(true)
+    setResult(null)
+    try {
+      const d = await apiFetch('/api/admin/finder/broadcast', { method: 'POST' })
+      setResult({ ok: true, sent: d.sent })
+    } catch (e) {
+      setResult({ ok: false, message: e.message === '409' ? 'Zapowiedź już wysłana wcześniej.' : 'Błąd: ' + e.message })
+    }
+    setBusy(false)
+  }
+
+  return (
+    <div style={{ maxWidth: 520 }}>
+      <p style={{ color: 'rgba(232,230,252,0.82)', fontSize: 14, lineHeight: 1.6, marginBottom: 16 }}>
+        Wysyła jednorazowy DM (Wiadomości) do każdego konta w bazie (biz+extrafun) z
+        informacją, że dział profili przenosi się na extrafun.pl, i jak się ukryć.
+        Idempotentne — drugie kliknięcie zwróci błąd „już wysłana", nic nie wyśle ponownie.
+      </p>
+      <button onClick={send} disabled={busy}
+        style={{
+          background: 'linear-gradient(135deg,#f2ca50,#b8941f)', color: '#1a1400',
+          fontWeight: 700, fontSize: 14, padding: '10px 20px', borderRadius: 10,
+          border: 'none', cursor: busy ? 'default' : 'pointer', opacity: busy ? 0.6 : 1,
+        }}>
+        {busy ? 'Wysyłam…' : '📣 Wyślij zapowiedź Szukaj'}
+      </button>
+      {result && (
+        <p style={{ marginTop: 16, fontSize: 14, color: result.ok ? '#7ee787' : '#ff7b72' }}>
+          {result.ok ? `Wysłano do ${result.sent} osób.` : result.message}
+        </p>
+      )}
+    </div>
+  )
+}
+
 function StatsTab() {
   const [rows, setRows] = useState(null)
   const [days, setDays] = useState(30)
@@ -938,6 +980,7 @@ export function Admin() {
     { id: 'ogloszenia', label: '📋 Ogłoszenia' },
     { id: 'lokale', label: '🏠 Lokale' },
     { id: 'imprezy', label: '🎉 Imprezy' },
+    { id: 'szukaj', label: '🔍 Szukaj' },
   ]
 
   return (
@@ -969,6 +1012,7 @@ export function Admin() {
         {tab === 'ogloszenia' && <AdsTab />}
         {tab === 'lokale' && <VenuesTab />}
         {tab === 'imprezy' && <EventsTab />}
+        {tab === 'szukaj' && <FinderTab />}
       </div>
     </div>
   )

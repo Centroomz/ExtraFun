@@ -7,7 +7,7 @@ import { isFemaleNick, isTabooContent } from './chat-gender.js'
 // ONLY safe public fields — never email. Excludes hidden_from_search (biz opt-out)
 // AND hidden_from_extrafun (this portal's opt-out). Gated OFF (count-only) until
 // the consent DM goes out — see the broadcast endpoint / Phase 3.
-const FINDER_LIVE = false; // flip to true after the heads-up broadcast
+const FINDER_LIVE = true; // Phase 3: live — see POST /api/admin/finder/broadcast for the heads-up DM
 let _finderCache = null;   // { at, profiles }
 const FINDER_TTL_MS = 60_000;
 
@@ -556,6 +556,41 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
       const reason = String(req.body?.reason || '').trim().slice(0, 300) || null;
       await supabaseAdmin.from('profile_reports').insert({ reporter_id: reporterId, reported_id: reportedId, reason });
       res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  // One-time heads-up DM to everyone in the shared user pool (biz+EF), telling
+  // them their profile now also shows on extrafun and how to opt out.
+  // Idempotent: a unique PK on site_config.key means a second insert errors,
+  // so a second click/retry is a safe no-op (409), never a double-send.
+  const EXTRAFUN_FINDER_ANNOUNCE = `Cześć! 🖤
+Dział profili przenosimy z bizarriusz na extrafun.pl — Twój profil (nick, zdjęcie, „szukam") będzie tam widoczny. Logujesz się tym samym loginem i hasłem co na bizarriusz.pl.
+Nie chcesz? Wejdź w Profil → „Ukryj mnie w Szukaj na extrafun" i znikasz z listy. W każdej chwili wrócisz.`;
+
+  app.post('/api/admin/finder/broadcast', verifyJWT, isAdmin, async (_req, res) => {
+    try {
+      const { error: markerErr } = await supabaseAdmin.from('site_config')
+        .insert({ key: 'extrafun_finder_broadcast_sent', value: new Date().toISOString() });
+      if (markerErr) return res.status(409).json({ message: 'Zapowiedź już wysłana', alreadySent: true });
+
+      const ids = [];
+      for (let page = 1; page <= 50; page++) {
+        const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 200 });
+        if (error) throw error;
+        for (const u of data.users) ids.push(u.id);
+        if (data.users.length < 200) break;
+      }
+      const rows = ids.map(id => ({
+        sender_id: 'ef-finder-announce', sender_name: 'ExtraFun',
+        recipient_id: id, recipient_name: '',
+        content: EXTRAFUN_FINDER_ANNOUNCE, is_read: false, portal: 'extrafun',
+      }));
+      for (let i = 0; i < rows.length; i += 500) {
+        await supabaseAdmin.from('private_messages').insert(rows.slice(i, i + 500));
+      }
+      res.json({ sent: ids.length });
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
