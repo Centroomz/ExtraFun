@@ -216,6 +216,22 @@ function DesktopNav({ user, profile, onSignOut }) {
 
 /* ── Profile Page ── */
 function ProfilePage({ user, profile, onSignOut }) {
+  const [hiddenFromExtrafun, setHiddenFromExtrafun] = useState(null)
+
+  useEffect(() => {
+    apiFetch('/api/finder/me/visibility').then(d => setHiddenFromExtrafun(!!d.hiddenFromExtrafun)).catch(() => {})
+  }, [])
+
+  const toggleVisibility = async (checked) => {
+    setHiddenFromExtrafun(checked) // optimistic
+    try {
+      const d = await apiFetch('/api/finder/me/visibility', { method: 'POST', body: { hidden: checked } })
+      setHiddenFromExtrafun(!!d.hiddenFromExtrafun)
+    } catch {
+      setHiddenFromExtrafun(!checked) // revert on failure
+    }
+  }
+
   return (
     <div className="page-inner">
       <div className="page-header"><h1>Profil</h1></div>
@@ -240,6 +256,12 @@ function ProfilePage({ user, profile, onSignOut }) {
         )}
         {profile?.city && (
           <div className="text-body-md" style={{ color: 'var(--text-dim)', marginBottom: 16 }}>📍 {profile.city}</div>
+        )}
+        {hiddenFromExtrafun !== null && (
+          <label className="text-body-md" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-dim)', marginBottom: 16, cursor: 'pointer' }}>
+            <input type="checkbox" checked={hiddenFromExtrafun} onChange={e => toggleVisibility(e.target.checked)} />
+            Ukryj mnie w Szukaj na extrafun
+          </label>
         )}
         <button className="btn-ghost" style={{ width: '100%' }} onClick={onSignOut}>
           Wyloguj się

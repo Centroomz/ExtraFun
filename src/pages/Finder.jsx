@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { apiFetch } from '../lib/api'
 import { Button } from '../components/nocturne'
 import { useAuth } from '../hooks/useAuth'
+import { FinderProfile } from './FinderProfile'
 
 const MODES = [
   { id: 'all', label: 'Wszyscy' },
@@ -21,9 +22,9 @@ function FinderAvatar({ url, name }) {
     )
 }
 
-function FinderCard({ p }) {
+function FinderCard({ p, onOpen }) {
   return (
-    <div className="border border-outline-variant/20 bg-surface-container-low">
+    <button onClick={onOpen} className="text-left border border-outline-variant/20 bg-surface-container-low hover:border-primary-container/40 transition-colors">
       <FinderAvatar url={p.avatarUrl} name={p.displayName} />
       <div className="p-3">
         <div className="font-body font-semibold text-body-md text-on-surface">
@@ -33,7 +34,7 @@ function FinderCard({ p }) {
           <div className="font-body text-body-sm text-on-surface-variant mt-0.5 line-clamp-2">{p.lookingFor}</div>
         )}
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -46,6 +47,19 @@ export function Finder({ user }) {
   const [state, setState] = useState({ loading: true, locked: true, count: 0, items: [] })
   const [mode, setMode] = useState('all')
   const [q, setQ] = useState('')
+  const [selectedId, setSelectedId] = useState(null)
+
+  // Opening a profile pushes a history entry so Back closes it instead of
+  // leaving the page — same pattern as Ogloszenia's ad detail.
+  useEffect(() => {
+    if (selectedId == null) return
+    window.scrollTo(0, 0)
+    document.querySelector('.page-content')?.scrollTo(0, 0)
+    window.history.pushState({ efFinderDetail: true }, '')
+    const onPop = () => setSelectedId(null)
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [selectedId])
 
   useEffect(() => {
     let alive = true
@@ -57,6 +71,16 @@ export function Finder({ user }) {
       .catch(() => { if (alive) setState(s => ({ ...s, loading: false })) })
     return () => { alive = false }
   }, [mode, q])
+
+  if (selectedId) {
+    return (
+      <FinderProfile
+        id={selectedId}
+        onBack={() => window.history.back()}
+        onBlocked={() => window.history.back()}
+      />
+    )
+  }
 
   return (
     <div className="bg-background min-h-screen text-on-surface">
@@ -97,7 +121,7 @@ export function Finder({ user }) {
               </div>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {state.items.map(p => <FinderCard key={p.id} p={p} />)}
+              {state.items.map(p => <FinderCard key={p.id} p={p} onOpen={() => setSelectedId(p.id)} />)}
             </div>
             {state.items.length === 0 && (
               <p className="font-body text-body-md text-on-surface-variant">Brak wyników.</p>

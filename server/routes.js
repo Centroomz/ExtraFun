@@ -478,6 +478,89 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
     }
   });
 
+  // Like toggle. No push (extrafun has no VAPID configured) — a match surfaces
+  // via GET /api/finder/likes/me instead. Shared profile_likes table means a
+  // like here also shows on biz "kto Cię polubił" and vice versa.
+  app.post('/api/finder/:id/like', verifyJWT, async (req, res) => {
+    try {
+      if (!FINDER_LIVE) return res.status(404).json({ message: 'Nie znaleziono' });
+      const likedId = String(req.params.id), likerId = req.user.id;
+      if (likedId === likerId) return res.status(400).json({ message: 'Nie możesz polubić siebie' });
+      const { data: tu } = await supabaseAdmin.auth.admin.getUserById(likedId);
+      const tm = tu?.user?.user_metadata || {};
+      const tname = String(tm.full_name || tm.name || tm.display_name || '').trim();
+      if (!tu?.user || !tname || tm.hidden_from_search === true || tm.hidden_from_extrafun === true)
+        return res.status(404).json({ message: 'Nie znaleziono' });
+      const { data: blk } = await supabaseAdmin.from('profile_blocks').select('id').or(
+        `and(blocker_id.eq.${likerId},blocked_id.eq.${likedId}),and(blocker_id.eq.${likedId},blocked_id.eq.${likerId})`
+      ).limit(1);
+      if (blk && blk.length) return res.status(404).json({ message: 'Nie znaleziono' });
+      const { data: ex } = await supabaseAdmin.from('profile_likes').select('id')
+        .eq('liker_id', likerId).eq('liked_id', likedId).limit(1);
+      if (ex && ex.length) {
+        await supabaseAdmin.from('profile_likes').delete().eq('id', ex[0].id);
+        return res.json({ liked: false });
+      }
+      const { error } = await supabaseAdmin.from('profile_likes').insert({ liker_id: likerId, liked_id: likedId });
+      if (error) return res.status(500).json({ message: error.message });
+      res.json({ liked: true });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  app.get('/api/finder/likes/me', verifyJWT, async (req, res) => {
+    try {
+      const me = req.user.id;
+      const { data: likes } = await supabaseAdmin.from('profile_likes')
+        .select('liker_id, created_at').eq('liked_id', me)
+        .order('created_at', { ascending: false }).limit(200);
+      const visible = await loadVisibleProfiles();
+      const byId = new Map(visible.map(p => [p.id, p]));
+      const items = (likes || []).map(l => {
+        const p = byId.get(l.liker_id);
+        return p ? { id: p.id, displayName: p.displayName, age: p.age, avatarUrl: p.avatarUrl, createdAt: l.created_at }
+                 : { id: null, displayName: 'Ktoś', age: null, avatarUrl: null, createdAt: l.created_at };
+      });
+      res.json({ count: items.length, items });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  // Bidirectional block — clears any existing likes between the pair.
+  app.post('/api/finder/:id/block', verifyJWT, async (req, res) => {
+    try {
+      const blockedId = String(req.params.id), blockerId = req.user.id;
+      if (blockedId === blockerId) return res.status(400).json({ message: 'Nie możesz zablokować siebie' });
+      const { data: ex } = await supabaseAdmin.from('profile_blocks').select('id')
+        .eq('blocker_id', blockerId).eq('blocked_id', blockedId).limit(1);
+      if (ex && ex.length) {
+        await supabaseAdmin.from('profile_blocks').delete().eq('id', ex[0].id);
+        return res.json({ blocked: false });
+      }
+      await supabaseAdmin.from('profile_blocks').insert({ blocker_id: blockerId, blocked_id: blockedId });
+      await supabaseAdmin.from('profile_likes').delete().or(
+        `and(liker_id.eq.${blockerId},liked_id.eq.${blockedId}),and(liker_id.eq.${blockedId},liked_id.eq.${blockerId})`
+      );
+      res.json({ blocked: true });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
+  app.post('/api/finder/:id/report', verifyJWT, async (req, res) => {
+    try {
+      const reportedId = String(req.params.id), reporterId = req.user.id;
+      if (reportedId === reporterId) return res.status(400).json({ message: 'Nie możesz zgłosić siebie' });
+      const reason = String(req.body?.reason || '').trim().slice(0, 300) || null;
+      await supabaseAdmin.from('profile_reports').insert({ reporter_id: reporterId, reported_id: reportedId, reason });
+      res.json({ ok: true });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  });
+
   // === PRIVATE MESSAGES (DM ogłoszeniodawca ↔ zainteresowany) ===
   // Send a DM about an ad. Recipient = ad.author_uuid.
   //
