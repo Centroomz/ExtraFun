@@ -16,6 +16,7 @@ const Przewodnik = lazy(() => import('./pages/Przewodnik').then(m => ({ default:
 const Czat = lazy(() => import('./pages/Czat').then(m => ({ default: m.Czat })))
 const Ogloszenia = lazy(() => import('./pages/Ogloszenia').then(m => ({ default: m.Ogloszenia })))
 const Finder = lazy(() => import('./pages/Finder').then(m => ({ default: m.Finder })))
+const Profil = lazy(() => import('./pages/Profil').then(m => ({ default: m.Profil })))
 const LoginPage = lazy(() => import('./auth/LoginPage').then(m => ({ default: m.LoginPage })))
 const SignupPage = lazy(() => import('./auth/SignupPage').then(m => ({ default: m.SignupPage })))
 const ForgotPasswordPage = lazy(() => import('./auth/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })))
@@ -214,78 +215,6 @@ function DesktopNav({ user, profile, onSignOut }) {
   )
 }
 
-/* ── Profile Page ── */
-function ProfilePage({ user, profile, onSignOut }) {
-  const [hiddenFromExtrafun, setHiddenFromExtrafun] = useState(null)
-
-  useEffect(() => {
-    apiFetch('/api/finder/me/visibility').then(d => setHiddenFromExtrafun(!!d.hiddenFromExtrafun)).catch(() => {})
-  }, [])
-
-  const toggleVisibility = async (checked) => {
-    setHiddenFromExtrafun(checked) // optimistic
-    try {
-      const d = await apiFetch('/api/finder/me/visibility', { method: 'POST', body: { hidden: checked } })
-      setHiddenFromExtrafun(!!d.hiddenFromExtrafun)
-    } catch {
-      setHiddenFromExtrafun(!checked) // revert on failure
-    }
-  }
-
-  return (
-    <div className="page-inner">
-      <div className="page-header"><h1>Profil</h1></div>
-      <div style={{ maxWidth: 520, padding: '0 16px 80px' }}>
-        <div className="profile-header">
-          <div className="profile-avatar">
-            {profile?.display_name?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || '?'}
-          </div>
-          <div className="profile-info">
-            <div className="profile-name">
-              {profile?.display_name || profile?.username || 'Użytkownik'}
-              {profile?.verified && <span className="verified-badge">✓</span>}
-            </div>
-            <div className="profile-username">@{profile?.username || '---'}</div>
-            <div className="text-body-md" style={{ color: 'var(--text-dim)', marginTop: 4 }}>{user?.email}</div>
-          </div>
-        </div>
-        {profile?.bio && (
-          <div className="glass-card" style={{ padding: 16, margin: '0 0 16px' }}>
-            <p className="text-body-md" style={{ color: 'var(--text-dim)', lineHeight: 1.7 }}>{profile.bio}</p>
-          </div>
-        )}
-        {profile?.city && (
-          <div className="text-body-md" style={{ color: 'var(--text-dim)', marginBottom: 16 }}>📍 {profile.city}</div>
-        )}
-        {hiddenFromExtrafun !== null && (
-          <label className="text-body-md" style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-dim)', marginBottom: 16, cursor: 'pointer' }}>
-            <input type="checkbox" checked={hiddenFromExtrafun} onChange={e => toggleVisibility(e.target.checked)} />
-            Ukryj mnie w Szukaj na extrafun
-          </label>
-        )}
-        <button className="btn-ghost" style={{ width: '100%' }} onClick={onSignOut}>
-          Wyloguj się
-        </button>
-        <button
-          className="btn-ghost"
-          style={{ width: '100%', marginTop: 8, color: '#e5484d', borderColor: '#e5484d' }}
-          onClick={async () => {
-            if (!window.confirm('Na pewno chcesz usunąć konto? To nieodwracalne — kasuje profil, wiadomości, ulubione i ogłoszenia na wszystkich portalach (extrafun.pl, gay.pl, bizarriusz.pl).')) return
-            if (!window.confirm('Ostatnie potwierdzenie: usuwamy konto na stałe. Kontynuować?')) return
-            try {
-              await apiFetch('/api/account', { method: 'DELETE' })
-              await onSignOut()
-            } catch (e) {
-              alert('Nie udało się usunąć konta. Spróbuj ponownie lub napisz do nas.')
-            }
-          }}
-        >
-          Usuń konto na stałe
-        </button>
-      </div>
-    </div>
-  )
-}
 
 /* ── App Inner ── */
 function AppInner() {
@@ -440,7 +369,7 @@ function AppInner() {
             <Route path="/forgot-password" component={ForgotPasswordPage} />
             <Route path="/reset-password">{() => <ResetPasswordPage onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/profil">{() => user
-              ? <ProfilePage user={user} profile={profile} onSignOut={handleSignOut} />
+              ? <Profil user={user} onSignOut={handleSignOut} />
               : (() => { navigate('/login'); return null })()
             }</Route>
             <Route path="/admin">{() => isAdmin(user?.email)

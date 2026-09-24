@@ -1,6 +1,7 @@
 import { supabaseAdmin } from './supabase.js'
 import { verifyJWT, optionalAuth, isAdmin, isAdminEmail } from './auth.js'
 import { isFemaleNick, isTabooContent } from './chat-gender.js'
+import { sanitizePrompts } from '../src/lib/prompts.js'
 
 // --- FINDER (member catalog) -------------------------------------------------
 // Profiles live in Supabase auth user_metadata (shared across portals). Project
@@ -160,6 +161,37 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
       username: username || null,
       display_name: display_name || username || null,
     }, { onConflict: 'user_id' })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
+  // === USER GALLERY (shared table, up to 5 photos, avatars bucket) ===
+  app.get('/api/gallery', verifyJWT, async (req, res) => {
+    const { data, error } = await supabaseAdmin.from('user_gallery')
+      .select('id, user_id, image_url, created_at')
+      .eq('user_id', req.user.id).order('created_at', { ascending: true })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data || [])
+  })
+
+  app.post('/api/gallery', verifyJWT, async (req, res) => {
+    const imageUrl = req.body?.imageUrl
+    if (!imageUrl) return res.status(400).json({ message: 'imageUrl jest wymagany' })
+    const { count } = await supabaseAdmin.from('user_gallery')
+      .select('id', { count: 'exact', head: true }).eq('user_id', req.user.id)
+    if ((count || 0) >= 5) return res.status(400).json({ message: 'Maksymalnie 5 zdjęć w galerii' })
+    const { data, error } = await supabaseAdmin.from('user_gallery')
+      .insert({ user_id: req.user.id, image_url: imageUrl }).select().single()
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json(data)
+  })
+
+  app.delete('/api/gallery/:id', verifyJWT, async (req, res) => {
+    const { data: photo } = await supabaseAdmin.from('user_gallery')
+      .select('id, user_id').eq('id', req.params.id).single()
+    if (!photo) return res.status(404).json({ message: 'Nie znaleziono' })
+    if (photo.user_id !== req.user.id) return res.status(403).json({ message: 'Brak dostępu' })
+    const { error } = await supabaseAdmin.from('user_gallery').delete().eq('id', req.params.id)
     if (error) return res.status(500).json({ message: error.message })
     res.json({ ok: true })
   })
@@ -472,10 +504,7 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
         likedByMe = !!(mine && mine.length);
         likesMe = !!(theirs && theirs.length);
       }
-      const prompts = Array.isArray(m.prompts)
-        ? m.prompts.filter(p => p && typeof p.q === 'string' && typeof p.a === 'string')
-            .slice(0, 5).map(p => ({ q: String(p.q).slice(0, 80), a: String(p.a).slice(0, 300) }))
-        : [];
+      const prompts = sanitizePrompts(m.prompts);
       res.json({
         id,
         displayName: name.slice(0, 50),
