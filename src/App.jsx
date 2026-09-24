@@ -15,6 +15,7 @@ const Aktualnosci = lazy(() => import('./pages/Aktualnosci').then(m => ({ defaul
 const Przewodnik = lazy(() => import('./pages/Przewodnik').then(m => ({ default: m.Przewodnik })))
 const Czat = lazy(() => import('./pages/Czat').then(m => ({ default: m.Czat })))
 const Ogloszenia = lazy(() => import('./pages/Ogloszenia').then(m => ({ default: m.Ogloszenia })))
+const Finder = lazy(() => import('./pages/Finder').then(m => ({ default: m.Finder })))
 const LoginPage = lazy(() => import('./auth/LoginPage').then(m => ({ default: m.LoginPage })))
 const SignupPage = lazy(() => import('./auth/SignupPage').then(m => ({ default: m.SignupPage })))
 const ForgotPasswordPage = lazy(() => import('./auth/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })))
@@ -112,6 +113,14 @@ const NAV_ITEMS = [
       </svg>
     )
   },
+  {
+    id: 'szukaj', label: 'Szukaj', href: '/szukaj',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />
+      </svg>
+    )
+  },
 ]
 
 /* ── Desktop Sidebar Nav ── */
@@ -126,6 +135,7 @@ function DesktopNav({ user, profile, onSignOut }) {
     : location.startsWith('/czat') ? 'czat'
     : location.startsWith('/slownik') ? 'slownik'
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
+    : location.startsWith('/szukaj') ? 'szukaj'
     : location.startsWith('/wiadomosci') ? 'wiadomosci'
     : location.startsWith('/admin') ? 'admin'
     : location.startsWith('/profil') ? 'profil'
@@ -401,6 +411,7 @@ function AppInner() {
             <Route path="/plaze" component={Plaze} />
             <Route path="/czat">{() => <Czat user={user} />}</Route>
             <Route path="/ogloszenia">{() => <Ogloszenia user={user} />}</Route>
+            <Route path="/szukaj">{() => <Finder user={user} />}</Route>
             <Route path="/wiadomosci">{() => <Wiadomosci user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/signup">{() => <SignupPage onSwitch={() => navigate('/login')} onSuccess={() => navigate('/magazyn')} />}</Route>
@@ -434,9 +445,10 @@ function AppInner() {
           : location.startsWith('/czat') ? 'czat'
           : location.startsWith('/slownik') ? 'slownik'
           : location.startsWith('/ogloszenia') ? 'ogloszenia'
+          : location.startsWith('/szukaj') ? 'szukaj'
           : 'magazyn'
         } onNavigate={(id) => {
-          const map = { magazyn: '/magazyn', aktualnosci: '/aktualnosci', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia' }
+          const map = { magazyn: '/magazyn', aktualnosci: '/aktualnosci', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia', szukaj: '/szukaj' }
           navigate(map[id] || '/magazyn')
         }} />
 
