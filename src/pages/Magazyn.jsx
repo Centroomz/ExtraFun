@@ -190,6 +190,10 @@ export function Magazyn() {
   const heroTitle = theme?.title || newest?.title || 'Magazyn'
   const heroLead  = theme?.lead  || newest?.description || ''
 
+  // "Najnowsze" nad rubrykami potrzebne tylko gdy najnowszy tekst NIE jest
+  // z Tematu Miesiąca — bo wtedy i tak jest już na górze (secTemat[0]).
+  const showNajnowsze = !!(newest && !themeSlugs.includes(newest.category_slug))
+
   // Archiwum = wszystko POZA tym, co już pokazane w blokach wyżej (bez dubli).
   const shownIds = new Set([
     ...secTemat.slice(0, 12),
@@ -288,15 +292,14 @@ export function Magazyn() {
 
         {/* DESKTOP — magazyn sekcyjny */}
         <div className="hidden lg:block">
-        {/* Najnowsze — jeden świeży tekst nad rubrykami. Teksty wchodzą
-            codziennie poza niedzielą, więc karta zmienia się co dobę; sobotnia
-            wisi do poniedziałku. Bez `onMore` (nie ma rubryki "najnowsze").
-            Ten sam artykuł zostaje też w swoim bloku niżej — rubryki nie tracą
-            świeżej pozycji, a rytm tygodnia zostaje nienaruszony. */}
-        <RubrykaSection
-          id="sec-najnowsze" label="Najnowsze" articles={newest ? [newest] : []}
-          onOpen={openArticle} layout="wide" limit={1}
-        />
+        {/* Najnowsze — tylko gdy najnowszy tekst jest spoza Tematu Miesiąca,
+            bo inaczej i tak już jest na górze jako secTemat[0]. */}
+        {showNajnowsze && (
+          <RubrykaSection
+            id="sec-najnowsze" label="Najnowsze" articles={[newest]}
+            onOpen={openArticle} layout="wide" limit={1}
+          />
+        )}
         {/* Bloki per rubryka — kolejność = rytm tygodnia. Puste znikają. */}
         <RubrykaSection
           id="sec-temat"
