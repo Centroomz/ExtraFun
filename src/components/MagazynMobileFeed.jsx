@@ -96,6 +96,8 @@ export function Cover({ image, video, position = 'center' }) {
   const videoReady = useDeferredVideo(video ? image : null, !!video)
   const ref = useRef(null)
   const near = useNearViewport(ref)
+  // Autoplay requires muted; sound is opt-in via the button below.
+  const [unmuted, setUnmuted] = useState(false)
   return (
     <div ref={ref} className="absolute inset-0">
       {/* With a clip: the poster <img> is painted first (it is the LCP) and the
@@ -104,12 +106,22 @@ export function Cover({ image, video, position = 'center' }) {
       {video
         ? <>
             {image && <img src={coverUrl(image, 750)} srcSet={coverSrcSet(image, TILE_WIDTHS)} sizes="100vw" alt="" fetchPriority="high" className="w-full h-full object-cover" />}
-            {videoReady && near && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline poster={coverUrl(image, 750) || undefined} src={video} />}
+            {videoReady && near && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted={!unmuted} loop playsInline poster={coverUrl(image, 750) || undefined} src={video} />}
           </>
         : image
           ? <img src={near ? coverUrl(image, 750) : undefined} srcSet={near ? coverSrcSet(image, TILE_WIDTHS) : undefined} sizes="100vw" alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
           : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}
       <div className="absolute inset-0" style={{ background: SCRIM }} />
+      {video && videoReady && near && (
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setUnmuted(u => !u) }}
+          aria-label={unmuted ? 'Wycisz' : 'Włącz dźwięk'}
+          className="absolute top-4 right-margin-mobile z-20 w-16 h-16 rounded-full bg-black/60 backdrop-blur border border-white/25 flex items-center justify-center text-3xl active:scale-95 transition-transform"
+        >
+          {unmuted ? '🔊' : '🔇'}
+        </button>
+      )}
     </div>
   )
 }
