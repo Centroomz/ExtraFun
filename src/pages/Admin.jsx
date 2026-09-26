@@ -208,7 +208,7 @@ function ArticlesTab() {
   const [mode, setMode] = useState(null) // null | 'add' | { article }
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
-  const [filter, setFilter] = useState('all') // 'all' | 'published' | 'scheduled' | 'draft'
+  const [filter, setFilter] = useState('published') // 'all' | 'published' | 'scheduled' | 'draft'
 
   const load = async () => {
     setLoading(true)
