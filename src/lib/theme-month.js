@@ -42,8 +42,20 @@ export const MONTH_THEMES = {
   },
 }
 
+// Editorial early-start: unveil next month's theme before the calendar does.
+// null = no override, follow the real date. Set to a MONTH_THEMES key to force
+// it as "current" everywhere (hero, rail history, mobile swipe) — the retired
+// month automatically becomes "Zeszły Temat Miesiąca". Clear it once the real
+// calendar catches up (harmless to leave — same result either way past that
+// point, but a stale override reads as a bug to the next person editing this).
+const ACTIVE_MONTH_OVERRIDE = 10
+
+function activeMonth(date) {
+  return ACTIVE_MONTH_OVERRIDE || (date.getMonth() + 1)
+}
+
 export function getMonthTheme(date = new Date()) {
-  return MONTH_THEMES[date.getMonth() + 1] || null
+  return MONTH_THEMES[activeMonth(date)] || null
 }
 
 // Past themes, most recent first, stopping at the first gap in the config
@@ -54,7 +66,7 @@ export function getLastMonthTheme(date = new Date()) {
 }
 
 export function getPastThemes(date = new Date(), max = 6) {
-  const currentMonth = date.getMonth() + 1
+  const currentMonth = activeMonth(date)
   const out = []
   for (let i = 1; i <= max; i++) {
     const m = ((currentMonth - 1 - i) % 12 + 12) % 12 + 1
