@@ -177,11 +177,15 @@ export function Dots({ count, active }) {
   )
 }
 
-/* ── Theme tile: hero slide + theme articles to the right ── */
-function ThemeTile({ theme, articles, themeSlug }) {
+/* ── Theme tile: hero slide + theme articles to the right, then (if
+   configured) the previous month's theme + its articles at the very end.
+   The past-month cards get a gold ring so a swipe past the current month
+   reads as "new theme", not a continuation. ── */
+function ThemeTile({ theme, articles, themeSlug, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles = [] }) {
   const ref = useRef(null)
   const [active, setActive] = useState(0)
-  const slides = 1 + articles.length
+  const hasLast = !!(lastTheme && lastThemeSlug)
+  const slides = 1 + articles.length + (hasLast ? 1 + lastThemeArticles.length : 0)
   const onScroll = () => {
     const el = ref.current
     if (el) setActive(Math.round(el.scrollLeft / el.clientWidth))
@@ -203,6 +207,19 @@ function ThemeTile({ theme, articles, themeSlug }) {
         </Link>
         {articles.map(a => (
           <ArticleTile key={a.id} article={a} label="Temat Miesiąca" className="shrink-0 snap-start" />
+        ))}
+        {hasLast && (
+          <Link href={`/magazyn/rubryka/${lastThemeSlug}`} className="relative block shrink-0 w-full h-full snap-start no-underline ring-4 ring-inset ring-primary-container/40">
+            <Cover image={lastTheme.image} position="center 38%" />
+            <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
+              <span className="font-body text-label-caps uppercase text-primary-container block mb-2">Zeszły Temat Miesiąca →</span>
+              <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-3">{lastThemeName}</h1>
+              {lastTheme.lead && <p className="font-body text-body-lg text-on-surface-variant leading-snug line-clamp-4">{lastTheme.lead}</p>}
+            </div>
+          </Link>
+        )}
+        {lastThemeArticles.map(a => (
+          <ArticleTile key={`last-${a.id}`} article={a} label={`Zeszły Temat · ${lastThemeName}`} className="shrink-0 snap-start ring-4 ring-inset ring-primary-container/40" />
         ))}
       </div>
     </div>
@@ -254,15 +271,21 @@ function PopularTile({ items }) {
 }
 
 /**
- * @param theme         getMonthTheme() result or null
- * @param themeArticles theme's articles, newest first
- * @param articles      all articles, newest first (each with firstParagraph)
- * @param popular       top 5 by views
+ * @param theme             getMonthTheme() result or null
+ * @param themeArticles     theme's articles, newest first
+ * @param lastTheme         getLastMonthTheme() result or null — appended after
+ *                          the current theme's cards in the same swipe track
+ * @param lastThemeArticles previous theme's articles, newest first
+ * @param articles          all articles, newest first (each with firstParagraph)
+ * @param popular           top 5 by views
  */
-export function MagazynMobileFeed({ theme, themeSlug, themeArticles, articles, popular, quizDone, onStartQuiz }) {
+export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, articles, popular, quizDone, onStartQuiz }) {
   useHtmlSnap(true)
   const tiles = []
-  if (theme) tiles.push(<ThemeTile key="theme" theme={theme} articles={themeArticles} themeSlug={themeSlug} />)
+  if (theme) tiles.push(
+    <ThemeTile key="theme" theme={theme} articles={themeArticles} themeSlug={themeSlug}
+      lastTheme={lastTheme} lastThemeSlug={lastThemeSlug} lastThemeName={lastThemeName} lastThemeArticles={lastThemeArticles} />
+  )
   articles.forEach((a, i) => {
     tiles.push(<ArticleTile key={a.id} article={a} />)
     if (i === 1 && !quizDone) tiles.push(<QuizTile key="quiz" onStart={onStartQuiz} />)

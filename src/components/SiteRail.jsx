@@ -5,7 +5,7 @@ import { apiFetch, apiFetchShared } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
 import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
-import { MONTH_THEMES } from '../lib/theme-month'
+import { getPastThemes } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from './CardStatBadge'
@@ -77,25 +77,42 @@ function TodayEventsModule() {
   )
 }
 
-/* ── Zeszły Temat Miesiąca — previous month's umbrella, if configured ── */
+/* ── Zeszły Temat Miesiąca — past months' umbrellas, if configured.
+   Only the most recent past month gets the hero-style image box; older
+   ones are text-only links, so the rail doesn't grow into a wall of covers. ── */
 function LastThemeModule() {
-  const m = new Date().getMonth() // getMonth() is 0-based → this IS last month's 1-based key
-  const theme = MONTH_THEMES[m === 0 ? 12 : m]
-  if (!theme || !theme.slugs?.length) return null
-  const slug = theme.slugs[0]
-  const name = SLUG_TO_DISPLAY[slug] || slug
+  const past = getPastThemes()
+  if (!past.length) return null
+  const [latest, ...older] = past
+  const latestSlug = latest.slugs[0]
+  const latestName = SLUG_TO_DISPLAY[latestSlug] || latestSlug
   return (
     <section>
       <h3 className={railLabel}>Zeszły Temat Miesiąca</h3>
-      <Link href={`/magazyn/rubryka/${slug}`} className="group block no-underline">
-        {theme.image && (
+      <Link href={`/magazyn/rubryka/${latestSlug}`} className="group block no-underline">
+        {latest.image && (
           <div className="aspect-[16/9] overflow-hidden bg-surface-container mb-3">
-            <img src={coverUrl(theme.image, 800)} alt="" loading="lazy" className="w-full h-full object-cover" />
+            <img src={coverUrl(latest.image, 800)} alt="" loading="lazy" className="w-full h-full object-cover" />
           </div>
         )}
-        <div className="font-display italic font-medium text-headline-sm text-on-surface leading-tight group-hover:text-primary-container transition-colors">{name}</div>
-        <p className="font-body text-body-sm text-on-surface-variant mt-1 line-clamp-2">{theme.lead}</p>
+        <div className="font-display italic font-medium text-headline-sm text-on-surface leading-tight group-hover:text-primary-container transition-colors">{latestName}</div>
+        <p className="font-body text-body-sm text-on-surface-variant mt-1 line-clamp-2">{latest.lead}</p>
       </Link>
+      {older.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {older.map(t => {
+            const slug = t.slugs[0]
+            const name = SLUG_TO_DISPLAY[slug] || slug
+            return (
+              <li key={slug}>
+                <Link href={`/magazyn/rubryka/${slug}`} className="font-body text-body-sm text-on-surface-variant hover:text-on-surface no-underline">
+                  {name}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </section>
   )
 }

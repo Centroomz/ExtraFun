@@ -10,7 +10,7 @@ import { RubrykaSection } from '../components/RubrykaSection'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { MagazynMobileFeed, firstParagraph } from '../components/MagazynMobileFeed'
 import { Hero } from '../components/nocturne'
-import { getMonthTheme } from '../lib/theme-month'
+import { getMonthTheme, getLastMonthTheme } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const BASE_URL = 'https://www.extrafun.pl'
@@ -173,6 +173,13 @@ export function Magazyn() {
   const themeSlugs = theme?.slugs || []
   const themeName = SLUG_TO_DISPLAY[themeSlugs[0]] || ''
 
+  // Previous month's theme — mobile swipes into it after the current month's
+  // cards (desktop shows it in the rail instead, see SiteRail).
+  const lastTheme = getLastMonthTheme()
+  const lastThemeSlugs = lastTheme?.slugs || []
+  const lastThemeName = SLUG_TO_DISPLAY[lastThemeSlugs[0]] || ''
+  const secLastTemat = bySlugs(lastThemeSlugs)
+
   // Backbone rubrics (newest first). Empty ones render nothing (RubrykaSection).
   const secTemat  = bySlugs(themeSlugs)
   const secPierw  = bySlugs(['pierwszy-raz'])
@@ -284,6 +291,10 @@ export function Magazyn() {
           theme={theme}
           themeSlug={themeSlugs[0] || 'temat'}
           themeArticles={secTemat}
+          lastTheme={lastTheme}
+          lastThemeSlug={lastThemeSlugs[0] || null}
+          lastThemeName={lastThemeName}
+          lastThemeArticles={secLastTemat}
           articles={byDate(allArticles)}
           popular={[...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5)}
           quizDone={quizDone}

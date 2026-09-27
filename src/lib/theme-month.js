@@ -45,3 +45,22 @@ export const MONTH_THEMES = {
 export function getMonthTheme(date = new Date()) {
   return MONTH_THEMES[date.getMonth() + 1] || null
 }
+
+// Past themes, most recent first, stopping at the first gap in the config
+// (a month with no MONTH_THEMES entry). Used by the rail's history module:
+// the newest past month gets the hero-style box, older ones are text-only.
+export function getLastMonthTheme(date = new Date()) {
+  return getPastThemes(date, 1)[0] || null
+}
+
+export function getPastThemes(date = new Date(), max = 6) {
+  const currentMonth = date.getMonth() + 1
+  const out = []
+  for (let i = 1; i <= max; i++) {
+    const m = ((currentMonth - 1 - i) % 12 + 12) % 12 + 1
+    const theme = MONTH_THEMES[m]
+    if (!theme) break
+    out.push(theme)
+  }
+  return out
+}
