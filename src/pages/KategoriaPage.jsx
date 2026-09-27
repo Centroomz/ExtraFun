@@ -22,7 +22,7 @@ function resolveRubryka(param) {
     const theme = getMonthTheme()
     const slugs = theme?.slugs || []
     const name = SLUG_TO_DISPLAY[slugs[0]] || ''
-    return { label: name ? `Temat Miesiąca · ${name}` : 'Temat Miesiąca', slugs }
+    return { label: name && name !== 'Temat Miesiąca' ? `Temat Miesiąca · ${name}` : 'Temat Miesiąca', slugs }
   }
   if (RUBRYKA_GROUPS[param]) return RUBRYKA_GROUPS[param]
   return { label: SLUG_TO_DISPLAY[param] || param, slugs: [param] }

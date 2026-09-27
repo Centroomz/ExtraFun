@@ -314,7 +314,7 @@ export function Magazyn() {
         {/* Bloki per rubryka — kolejność = rytm tygodnia. Puste znikają. */}
         <RubrykaSection
           id="sec-temat"
-          label={themeName ? `Temat Miesiąca · ${themeName}` : 'Temat Miesiąca'}
+          label={themeName && themeName !== 'Temat Miesiąca' ? `Temat Miesiąca · ${themeName}` : 'Temat Miesiąca'}
           articles={secTemat}
           onOpen={openArticle}
           onMore={() => goRubryka('temat')}
