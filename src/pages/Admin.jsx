@@ -11,6 +11,7 @@ const CATEGORIES = [
   { slug: 'slownik',       name: 'Słownik' },
   { slug: 'tam-i-tam',     name: 'Tam i Tam' },
   { slug: 'temat-miesiaca',name: 'Temat Miesiąca' },
+  { slug: 'temat-2026-10', name: 'Temat Miesiąca · Październik 2026' },
   { slug: 'plazing',       name: 'Plażing' },
   { slug: 'dogging',       name: 'Dogging' },
   { slug: 'naga-sroda',    name: 'Naga Środa' },
