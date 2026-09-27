@@ -7,6 +7,7 @@ export const SLUG_TO_DISPLAY = {
   'tam-i-tam':      'Tam i Tam',
   'slownik':        'Słownik',
   'temat-miesiaca': 'Temat Miesiąca',
+  'temat-2026-10':  'Temat Miesiąca',
   'felieton':       'Felieton',
   'plazing':        'Plażing',
   'dogging':        'Dogging',
