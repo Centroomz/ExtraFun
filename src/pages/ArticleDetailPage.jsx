@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth'
 import { SiteRail } from '../components/SiteRail'
 import { coverUrl, coverSrcSet } from '../lib/images'
 import { useDeferredVideo } from '../lib/useDeferredVideo'
+import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 
@@ -30,18 +31,6 @@ const AUTHOR_AVATARS = {
   'Magda': '/authors/magda.jpg',
   'Sławek': '/authors/slawek.jpg',
   'Kicia Bradshaw': '/authors/kicia.jpg',
-}
-
-const SLUG_TO_DISPLAY = {
-  'cnm-101':        'CNM 101',
-  'pierwszy-raz':   'Pierwszy Raz',
-  'bez-osadu':      'Bez Osądu',
-  'tam-i-tam':      'Tam i Tam',
-  'slownik':        'Słownik',
-  'temat-miesiaca': 'Temat Miesiąca',
-  'plazing':        'Plażing',
-  'dogging':        'Dogging',
-  'naga-sroda':     'Naga Środa',
 }
 
 // Inline parser: supports **bold** and [label](url) in any nesting order.
