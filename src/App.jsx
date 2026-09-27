@@ -139,6 +139,7 @@ function DesktopNav({ user, profile, onSignOut }) {
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
     : location.startsWith('/szukaj') ? 'szukaj'
     : location.startsWith('/wiadomosci') ? 'wiadomosci'
+    : location.startsWith('/kontakt') ? 'kontakt'
     : location.startsWith('/admin') ? 'admin'
     : location.startsWith('/profil') ? 'profil'
     : 'magazyn'
@@ -161,6 +162,17 @@ function DesktopNav({ user, profile, onSignOut }) {
       </div>
 
       <div className="desktop-nav-footer">
+        <Link href="/kontakt">
+          <button className={`desktop-nav-item ${active === 'kontakt' ? 'active' : ''}`}>
+            <span className="desktop-nav-item-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+              </svg>
+            </span>
+            <span className="desktop-nav-item-label">Kontakt</span>
+          </button>
+        </Link>
         {user && (
           <Link href="/wiadomosci">
             <button className={`desktop-nav-item ${active === 'wiadomosci' ? 'active' : ''}`}>
