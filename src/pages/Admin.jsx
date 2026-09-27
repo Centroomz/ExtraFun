@@ -1,25 +1,11 @@
 import { useState, useEffect } from 'react'
 import { apiFetch } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
+import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
 
-const CATEGORIES = [
-  { slug: 'cnm-101',       name: 'CNM 101' },
-  { slug: 'bez-osadu',     name: 'Bez Osądu' },
-  { slug: 'pierwszy-raz',  name: 'Pierwszy Raz' },
-  { slug: 'slownik',       name: 'Słownik' },
-  { slug: 'tam-i-tam',     name: 'Tam i Tam' },
-  { slug: 'temat-miesiaca',name: 'Temat Miesiąca' },
-  { slug: 'temat-2026-10', name: 'Temat Miesiąca · Październik 2026' },
-  { slug: 'plazing',       name: 'Plażing' },
-  { slug: 'dogging',       name: 'Dogging' },
-  { slug: 'naga-sroda',    name: 'Naga Środa' },
-  { slug: 'felieton',      name: 'Felieton' },
-  { slug: 'kultura',       name: 'Kultura' },
-  { slug: 'wellness',      name: 'Wellness' },
-  { slug: 'miejsca',       name: 'Miejsca & Ranking' },
-]
+const CATEGORIES = Object.entries(SLUG_TO_DISPLAY).map(([slug, name]) => ({ slug, name }))
 
 function slugify(text) {
   return text.toLowerCase()

@@ -1,17 +1,23 @@
-// Shared rubric taxonomy for the magazine (used by Magazyn front + KategoriaPage).
+// Shared rubric taxonomy for the magazine — SINGLE SOURCE OF TRUTH.
+// Used by Magazyn front, KategoriaPage, ArticleDetailPage (public) and
+// Admin (category picker). Add a new month's slug here ONCE; every consumer
+// picks it up automatically. Names here match the DB `article_categories`
+// table (public.article_categories.name) where a row exists.
 
 export const SLUG_TO_DISPLAY = {
   'cnm-101':        'CNM 101',
-  'pierwszy-raz':   'Pierwszy Raz',
   'bez-osadu':      'Bez Osądu',
-  'tam-i-tam':      'Tam i Tam',
+  'pierwszy-raz':   'Pierwszy Raz',
   'slownik':        'Słownik',
+  'tam-i-tam':      'Tam i Tam',
   'temat-miesiaca': 'Temat Miesiąca',
   'temat-2026-10':  'Temat Miesiąca',
-  'felieton':       'Felieton',
   'plazing':        'Plażing',
   'dogging':        'Dogging',
   'naga-sroda':     'Naga Środa',
+  'felieton':       'Felieton',
+  'kultura':        'Kultura',
+  'wellness':       'Zdrowie i wellness',
   'miejsca':        'Miejsca',
 }
 
