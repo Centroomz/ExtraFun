@@ -83,9 +83,18 @@ function TodayEventsModule() {
 function LastThemeModule() {
   const past = getPastThemes()
   if (!past.length) return null
-  const [latest, ...older] = past
+  const [latest, ...rest] = past
   const latestSlug = latest.slugs[0]
   const latestName = SLUG_TO_DISPLAY[latestSlug] || latestSlug
+  // Two consecutive months can share one theme (e.g. Lipiec+Sierpień both
+  // Plażing) — same slug, same link, so only list it once.
+  const seen = new Set([latestSlug])
+  const older = rest.filter(t => {
+    const slug = t.slugs[0]
+    if (seen.has(slug)) return false
+    seen.add(slug)
+    return true
+  })
   return (
     <section>
       <h3 className={railLabel}>Zeszły Temat Miesiąca</h3>

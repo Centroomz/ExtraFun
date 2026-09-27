@@ -58,8 +58,12 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
         </div>
         {aside && <div className="hidden md:block shrink-0 w-[320px]">{aside}</div>}
       </div>
+      {/* No own background here on purpose — the image scrim above is already
+          ~95% opaque at this edge (gradient stop at 5%). Stacking a second
+          dark layer on top of that doubled up into a flat black bar that read
+          as "cropped image" rather than legible text over a photo. */}
       {footer && (
-        <div className="relative z-10 border-t border-outline-variant/30" style={{ background: 'rgba(18,20,20,0.55)', backdropFilter: 'blur(4px)' }}>
+        <div className="relative z-10 border-t border-outline-variant/30">
           {footer}
         </div>
       )}
