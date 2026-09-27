@@ -28,6 +28,7 @@ const Slownik = lazy(() => import('./pages/Slownik').then(m => ({ default: m.Slo
 const SlownikTerm = lazy(() => import('./pages/SlownikTerm').then(m => ({ default: m.SlownikTerm })))
 const Plaze = lazy(() => import('./pages/Plaze').then(m => ({ default: m.Plaze })))
 const Wiadomosci = lazy(() => import('./pages/Wiadomosci').then(m => ({ default: m.Wiadomosci })))
+const Kontakt = lazy(() => import('./pages/Kontakt').then(m => ({ default: m.Kontakt })))
 import { PWAInstallBanner } from './components/PWAInstallBanner'
 
 // Raised on browser back/forward, consumed by the scroll effect in App and by
@@ -364,6 +365,7 @@ function AppInner() {
             <Route path="/ogloszenia">{() => <Ogloszenia user={user} />}</Route>
             <Route path="/szukaj">{() => <Finder user={user} />}</Route>
             <Route path="/wiadomosci">{() => <Wiadomosci user={user} />}</Route>
+            <Route path="/kontakt">{() => <Kontakt user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/signup">{() => <SignupPage onSwitch={() => navigate('/login')} onSuccess={() => navigate('/magazyn')} />}</Route>
             <Route path="/forgot-password" component={ForgotPasswordPage} />

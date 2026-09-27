@@ -676,6 +676,51 @@ Nie chcesz być widoczny/a na extrafun? Wejdź w Profil → „Ukryj mnie w Szuk
     res.status(201).json({ ok: true })
   })
 
+  // Guest contact form (Kontakt page, not logged in). No auth — anyone can
+  // reach the editor without an account. EF has no "self-thread" persona
+  // account of its own, so this relays as "Pola · ExtraFun" with
+  // sender_id === recipient_id === the shared admin account (same pattern
+  // gay.pl uses for Lui). Honeypot + a small in-memory per-IP rate limit.
+  const EDITOR_ID = '84a5a947-c586-4097-9a26-8f358865e96c' // pinksservice, shared across portals
+  const contactGuestHits = new Map()
+  const CONTACT_GUEST_LIMIT = 3
+  const CONTACT_GUEST_WINDOW_MS = 60 * 60 * 1000 // 1h
+
+  app.post('/api/contact-guest', async (req, res) => {
+    const { message, nick, contact, website } = req.body || {}
+    if (typeof website === 'string' && website.trim()) {
+      // Honeypot tripped — pretend success, drop silently.
+      return res.status(201).json({ ok: true })
+    }
+    const text = typeof message === 'string' ? message.trim() : ''
+    if (text.length < 5 || text.length > 2000) {
+      return res.status(400).json({ message: 'Wiadomość musi mieć 5–2000 znaków.' })
+    }
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown').split(',')[0].trim()
+    const now = Date.now()
+    const hits = (contactGuestHits.get(ip) || []).filter(t => now - t < CONTACT_GUEST_WINDOW_MS)
+    if (hits.length >= CONTACT_GUEST_LIMIT) {
+      return res.status(429).json({ message: 'Zbyt wiele wiadomości. Spróbuj później.' })
+    }
+    hits.push(now)
+    contactGuestHits.set(ip, hits)
+
+    const nickClean = typeof nick === 'string' ? nick.trim().slice(0, 60) : ''
+    const contactClean = typeof contact === 'string' ? contact.trim().slice(0, 200) : ''
+    const parts = [`[Gość z formularza${nickClean ? ' — ' + nickClean : ''}]`]
+    if (contactClean) parts.push(`Kontakt zwrotny: ${contactClean}`)
+    parts.push(text)
+
+    const { error } = await supabaseAdmin.from('private_messages').insert({
+      content: parts.join('\n'),
+      sender_id: EDITOR_ID, sender_name: 'Pola · ExtraFun',
+      recipient_id: EDITOR_ID, recipient_name: '', is_read: false,
+      portal: 'extrafun',
+    })
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json({ ok: true })
+  })
+
   // My inbox: all DMs where I am sender or recipient (grouped client-side).
   app.get('/api/messages', verifyJWT, async (req, res) => {
     const me = req.user.id
