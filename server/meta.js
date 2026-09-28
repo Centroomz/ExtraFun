@@ -3,6 +3,7 @@ import { join } from 'path'
 import { supabaseAdmin } from './supabase.js'
 import { DICTIONARY_TERMS } from '../src/lib/dictionary.js'
 import { getMonthTheme } from '../src/lib/theme-month.js'
+import { SLUG_TO_DISPLAY, RUBRYKA_GROUPS } from '../src/lib/rubryki.js'
 
 function esc(s = '') {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -39,6 +40,12 @@ export async function sendSitemap(_req, res) {
   add('/slownik', 'weekly', '0.6')
   add('/ogloszenia', 'daily', '0.6')
   add('/czat', 'weekly', '0.4')
+  add('/aktualnosci', 'daily', '0.7')
+  for (const slug of Object.keys(SLUG_TO_DISPLAY)) {
+    if (slug === 'temat-miesiaca' || slug.startsWith('temat-')) continue // dynamic monthly theme, no stable label
+    add(`/magazyn/rubryka/${slug}`, 'weekly', '0.5')
+  }
+  for (const slug of Object.keys(RUBRYKA_GROUPS)) add(`/magazyn/rubryka/${slug}`, 'weekly', '0.5')
 
   try {
     const { data: articles } = await supabaseAdmin.from('articles')
@@ -307,4 +314,26 @@ export function sendDictTermHtml(req, res, dist) {
   } catch {
     res.send(html)
   }
+}
+
+// Mirror of resolveRubryka() in src/pages/KategoriaPage.jsx, minus the 'temat'
+// (monthly-theme) case — that one keeps changing labels and isn't worth a
+// distinct indexable URL, so it falls through to the generic SPA title.
+function resolveRubrykaLabel(param) {
+  if (param === 'temat') return null
+  if (RUBRYKA_GROUPS[param]) return RUBRYKA_GROUPS[param].label
+  return SLUG_TO_DISPLAY[param] || null
+}
+
+// /magazyn/rubryka/:slug had NO server-side meta at all (not even the
+// generic list-page fallback) — every category fed Google the homepage's
+// title/canonical, same duplicate-content problem sendListPageHtml fixed
+// for /imprezy, /plaze, /slownik, /miejsca, /szukaj.
+export function sendKategoriaHtml(req, res, dist) {
+  const label = resolveRubrykaLabel(req.params.slug)
+  if (!label) return res.sendFile(join(dist, 'index.html'))
+  return sendListPageHtml(req, res, dist, {
+    title: `${label} – artykuły | ExtraFun`,
+    desc: `Artykuły z rubryki ${label} na ExtraFun — magazynie o CNM, poliamorii, swingu i lifestyle.`,
+  })
 }

@@ -3,6 +3,7 @@
 // id, no per-session rows. An impression = card ≥50% visible for ≥1s, counted
 // once per card per browser session. Events are batched and sent as a beacon.
 import { useEffect, useRef } from 'react'
+import { isOwnerTraffic } from './ownerFlag'
 
 const queue = []
 let flushTimer = null
@@ -40,6 +41,7 @@ if (typeof window !== 'undefined') {
 }
 
 export function trackImpression(kind, id) {
+  if (isOwnerTraffic()) return
   const key = `${kind}:${id}`
   if (seen.has(key)) return
   seen.add(key); persistSeen()
@@ -47,6 +49,7 @@ export function trackImpression(kind, id) {
 }
 
 export function trackClick(kind, id) {
+  if (isOwnerTraffic()) return
   enqueue({ kind, id: String(id), ev: 'click' })
   flush() // a click usually navigates away — don't wait for the timer
 }

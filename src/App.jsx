@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense } from 'react'
 import { Switch, Route, useLocation, Link } from 'wouter'
 import { apiFetch } from './lib/api'
+import { isOwnerTraffic } from './lib/ownerFlag'
 import { AuthProvider, useAuth } from './hooks/useAuth'
 import { AgeGate } from './components/AgeGate'
 import { BottomNav } from './components/BottomNav'
@@ -286,7 +287,7 @@ function AppInner() {
 
   // First-party analytics: one page-view per route change (fire-and-forget).
   useEffect(() => {
-    if (isBot) return
+    if (isBot || isOwnerTraffic()) return
     try {
       // localStorage (persists across visits) so returning visitors keep the same
       // id — sessionStorage reset every visit and made ~100% of traffic look "new".

@@ -2,7 +2,7 @@ import express from 'express'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { registerRoutes } from './routes.js'
-import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendListPageHtml } from './meta.js'
+import { sendArticleHtml, sendDictTermHtml, sendHomeHtml, sendVenueHtml, sendListPageHtml, sendKategoriaHtml } from './meta.js'
 import { supabaseAdmin } from './supabase.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -53,7 +53,21 @@ registerRoutes(app)
 
 // Per-page meta + JSON-LD injection for crawlers (before static/SPA fallback)
 app.get('/', (req, res) => sendHomeHtml(req, res, DIST))
+// /magazyn is the same feed as '/' (see App.jsx routes) but previously had no
+// route of its own here, so it inherited '/'s title/canonical from the SPA
+// fallback — Google saw it as a duplicate of the homepage despite Magazyn.jsx's
+// own <Helmet> tags (client-rendered tags arrive too late/unreliably, same
+// reason the other list pages below needed server-side injection).
+app.get('/magazyn', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Magazyn – CNM, Poliamoria, Swing, Fetysz | ExtraFun',
+  desc: 'Artykuły o konsensualnej niemonogamii, poliamorii, swingu, BDSM i fetyszu — magazyn ExtraFun dla świadomych dorosłych.',
+}))
+app.get('/magazyn/rubryka/:slug', (req, res) => sendKategoriaHtml(req, res, DIST))
 app.get('/magazyn/:slug', (req, res) => sendArticleHtml(req, res, DIST))
+app.get('/aktualnosci', (req, res) => sendListPageHtml(req, res, DIST, {
+  title: 'Aktualności – swing, poliamoria, fetysz | ExtraFun',
+  desc: 'Najnowsze newsy ze świata CNM, poliamorii, swingu i lifestyle w Polsce i na świecie.',
+}))
 app.get('/slownik/:slug', (req, res) => sendDictTermHtml(req, res, DIST))
 // Venue deep-link: only id-prefixed slugs (123-...) are real venue pages; the
 // bare /miejsca list + city slugs (warszawa) fall through to the SPA.
