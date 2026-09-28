@@ -671,6 +671,7 @@ Nie chcesz być widoczny/a na extrafun? Wejdź w Profil → „Ukryj mnie w Szuk
       ad_id: ad_id || null, ad_title: adTitle, content: content.trim(),
       sender_id: req.user.id, sender_name: senderName,
       recipient_id: recipient, recipient_name: '', is_read: false,
+      portal: 'extrafun',
     })
     if (error) return res.status(500).json({ message: error.message })
     res.status(201).json({ ok: true })
