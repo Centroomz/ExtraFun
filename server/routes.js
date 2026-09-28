@@ -1129,12 +1129,23 @@ ${termLines}
     const staticUrls = [
       { loc: 'https://www.extrafun.pl/', priority: '1.0' },
       { loc: 'https://www.extrafun.pl/magazyn', priority: '0.9' },
+      { loc: 'https://www.extrafun.pl/aktualnosci', priority: '0.7' },
       { loc: 'https://www.extrafun.pl/slownik', priority: '0.9' },
       { loc: 'https://www.extrafun.pl/miejsca', priority: '0.7' },
       { loc: 'https://www.extrafun.pl/imprezy', priority: '0.7' },
+      { loc: 'https://www.extrafun.pl/plaze', priority: '0.6' },
       { loc: 'https://www.extrafun.pl/czat', priority: '0.5' },
       { loc: 'https://www.extrafun.pl/ogloszenia', priority: '0.6' },
     ]
+    // Category hub pages (/magazyn/rubryka/:slug) — had no server-side meta and
+    // weren't in the sitemap at all, despite carrying real article listings.
+    // 'temat*' skipped: monthly theme, no stable label/URL to index.
+    let rubrykaUrls = []
+    try {
+      const { SLUG_TO_DISPLAY, RUBRYKA_GROUPS } = await import('../src/lib/rubryki.js')
+      const slugs = [...Object.keys(SLUG_TO_DISPLAY).filter(s => !s.startsWith('temat')), ...Object.keys(RUBRYKA_GROUPS)]
+      rubrykaUrls = slugs.map(s => ({ loc: `https://www.extrafun.pl/magazyn/rubryka/${s}`, priority: '0.5' }))
+    } catch {}
     const articleUrls = (data || []).map(a => ({
       loc: `https://www.extrafun.pl/magazyn/${a.slug}`, priority: '0.8',
       lastmod: a.publish_date ? new Date(a.publish_date).toISOString().slice(0, 10) : undefined,
@@ -1158,7 +1169,7 @@ ${termLines}
         priority: '0.6',
       }))
     } catch {}
-    const urls = [...staticUrls, ...articleUrls, ...dictUrls, ...venueUrls]
+    const urls = [...staticUrls, ...rubrykaUrls, ...articleUrls, ...dictUrls, ...venueUrls]
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.map(u => `  <url><loc>${u.loc}</loc><priority>${u.priority}</priority>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')}
