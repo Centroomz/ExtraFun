@@ -6,7 +6,7 @@ import { apiFetchShared } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { SiteRail } from '../components/SiteRail'
 import { RubrykaSection } from '../components/RubrykaSection'
-import { MagCard, MagSectionHeader } from '../components/MagCard'
+import { MagCard } from '../components/MagCard'
 import { MagazynMobileFeed, firstParagraph } from '../components/MagazynMobileFeed'
 import { Hero } from '../components/nocturne'
 import { getMonthTheme, getLastMonthTheme, getPastThemes } from '../lib/theme-month'
@@ -91,7 +91,6 @@ function QuizView({ quiz, onBack, firstAnswer = null }) {
 /* ─── Magazyn Main ────────────────────────────────────────────── */
 export function Magazyn() {
   const [, navigate] = useLocation()
-  const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const quiz = getMonthQuiz()
   // Past quizzes (Plażowicz, Dogging…) — woven into the mobile feed same as
   // olderThemes, dedup by slug (two months can share one quiz, like themes).
@@ -238,25 +237,6 @@ export function Magazyn() {
   // z Tematu Miesiąca — bo wtedy i tak jest już na górze (secTemat[0]).
   const showNajnowsze = !!(newest && !themeSlugs.includes(newest.category_slug))
 
-  // Archiwum = wszystko POZA tym, co już pokazane w blokach wyżej (bez dubli).
-  // Rubryki z WŁASNYM blokiem na tej stronie (Pierwszy Raz, Naga Środa, Tam i
-  // Tam, Felieton, Wiedza=CNM101+Bez Osądu) nie mają co robić w Archiwum jako
-  // osobny tab — nawet 4.+ artykuł z tej rubryki należy do "Więcej →" w jej
-  // sekcji, nie do archiwum. Zeszłe Tematy Miesiąca (Dogging, Plażing, CNM
-  // 101…) są w całości w prawej kolumnie (SiteRail → Zeszły Temat Miesiąca).
-  const coveredSlugs = new Set([
-    ...themeSlugs, 'pierwszy-raz', 'naga-sroda', 'tam-i-tam', 'felieton', 'cnm-101', 'bez-osadu',
-    ...getPastThemes().flatMap(t => t.slugs),
-  ])
-  const archPool = allArticles.filter(a => !coveredSlugs.has(a.category_slug))
-
-  // Filtr z kategorii realnie obecnych w archiwum — bez pustych tabów.
-  const presentCats = Array.from(new Set(archPool.map(a => a.category))).sort((a, b) => a.localeCompare(b, 'pl'))
-  const archCategories = ['Wszystkie', ...presentCats]
-  const archFiltered = activeCategory === 'Wszystkie'
-    ? byDate(archPool)
-    : byDate(archPool.filter(a => a.category === activeCategory))
-
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
 
@@ -390,48 +370,6 @@ export function Magazyn() {
           id="sec-wiedza" label="Wiedza · CNM 101 · Bez Osądu"
           articles={secWiedza} onOpen={openArticle} onMore={() => goRubryka('wiedza')} limit={3}
         />
-
-        {/* Archiwum — cały katalog z filtrem (kategorie realnie obecne) */}
-        <section id="archiwum" className="scroll-mt-24 mt-8">
-          <MagSectionHeader label="Więcej / Archiwum" />
-          <div className="flex flex-wrap gap-x-7 gap-y-3 mb-12">
-            {archCategories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`font-body text-label-caps uppercase pb-1 border-b-2 transition-colors ${
-                  activeCategory === cat
-                    ? 'border-primary-container text-primary-container'
-                    : 'border-transparent text-on-surface-variant hover:text-on-surface'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-          {archFiltered.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-12">
-              {archFiltered.map(article => (
-                <MagCard
-                  key={article.id}
-                  id={article.id}
-                  image={article.cover_image}
-                  tag={article.category}
-                  title={article.title}
-                  lead={article.description}
-                  meta={`${article.reading_time} min`}
-                  size="sm"
-                  onClick={() => openArticle(article)}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="py-24 text-center">
-              <div className="font-display text-headline-sm text-on-surface mb-2">Brak artykułów</div>
-              <div className="font-body text-body-md text-on-surface-variant">W tej kategorii nie ma jeszcze żadnych artykułów.</div>
-            </div>
-          )}
-        </section>
         </div>{/* /desktop magazyn */}
 
           </div>{/* /content col */}
