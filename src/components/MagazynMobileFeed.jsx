@@ -226,6 +226,22 @@ function ThemeTile({ theme, articles, themeSlug, lastTheme, lastThemeSlug, lastT
   )
 }
 
+/* ── Older past-theme tile (Plażing, CNM 101…): woven into the vertical
+   feed so scrolling down surfaces them — the horizontal swipe only carries
+   the single most recent past theme (see ThemeTile's `lastTheme`). ── */
+function PastThemeTile({ slug, name, theme }) {
+  return (
+    <Link href={`/magazyn/rubryka/${slug}`} className={`relative block w-full ${TILE_H} snap-start overflow-hidden no-underline ring-4 ring-inset ring-primary-container/40`}>
+      <Cover image={theme.image} position="center 38%" />
+      <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
+        <span className="font-body text-label-caps uppercase text-primary-container block mb-2">Zeszły Temat Miesiąca →</span>
+        <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-3">{name}</h1>
+        {theme.lead && <p className="font-body text-body-lg text-on-surface-variant leading-snug line-clamp-4">{theme.lead}</p>}
+      </div>
+    </Link>
+  )
+}
+
 /* ── Quiz tile: question 1 answered right here (IG-poll style); tapping an
    option opens the quiz on question 2 with that answer counted. ── */
 function QuizTile({ onStart }) {
@@ -278,18 +294,30 @@ function PopularTile({ items }) {
  * @param lastThemeArticles previous theme's articles, newest first
  * @param articles          all articles, newest first (each with firstParagraph)
  * @param popular           top 5 by views
+ * @param olderThemes       past themes beyond `lastTheme` (e.g. Plażing, CNM 101) —
+ *                          [{slug, name, theme}], woven into the down-scroll feed
  */
-export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, articles, popular, quizDone, onStartQuiz }) {
+export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, olderThemes = [], articles, popular, quizDone, onStartQuiz }) {
   useHtmlSnap(true)
   const tiles = []
   if (theme) tiles.push(
     <ThemeTile key="theme" theme={theme} articles={themeArticles} themeSlug={themeSlug}
       lastTheme={lastTheme} lastThemeSlug={lastThemeSlug} lastThemeName={lastThemeName} lastThemeArticles={lastThemeArticles} />
   )
+  let pastIdx = 0
+  const nextPastTheme = () => olderThemes[pastIdx++]
   articles.forEach((a, i) => {
     tiles.push(<ArticleTile key={a.id} article={a} />)
     if (i === 1 && !quizDone) tiles.push(<QuizTile key="quiz" onStart={onStartQuiz} />)
+    if (i === 3 && pastIdx < olderThemes.length) { const t = nextPastTheme(); tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />) }
     if (i === 4) tiles.push(<PopularTile key="popular" items={popular} />)
+    if (i === 8 && pastIdx < olderThemes.length) { const t = nextPastTheme(); tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />) }
   })
+  // Any remaining older themes (more than 2 down the line) — tack on at the end
+  // rather than drop them; fine while the list is short.
+  while (pastIdx < olderThemes.length) {
+    const t = nextPastTheme()
+    tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />)
+  }
   return <div className="lg:hidden -mx-6">{tiles}</div>
 }

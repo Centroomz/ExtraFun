@@ -180,6 +180,20 @@ export function Magazyn() {
   const lastThemeName = SLUG_TO_DISPLAY[lastThemeSlugs[0]] || ''
   const secLastTemat = bySlugs(lastThemeSlugs)
 
+  // Older past themes (Plażing, CNM 101…) — NOT in the horizontal swipe (that's
+  // only the most recent one, `lastTheme`), woven into the vertical feed
+  // instead so scrolling down actually surfaces them (spec: swipe discovery
+  // was too easy to miss). Desktop shows all of them in the rail (SiteRail).
+  const olderThemesSeen = new Set(lastThemeSlugs)
+  const olderThemes = getPastThemes().slice(1)
+    .filter(t => {
+      const slug = t.slugs[0]
+      if (olderThemesSeen.has(slug)) return false
+      olderThemesSeen.add(slug)
+      return true
+    })
+    .map(t => ({ slug: t.slugs[0], name: SLUG_TO_DISPLAY[t.slugs[0]] || t.slugs[0], theme: t }))
+
   // Backbone rubrics (newest first). Empty ones render nothing (RubrykaSection).
   const secTemat  = bySlugs(themeSlugs)
   const secPierw  = bySlugs(['pierwszy-raz'])
@@ -296,6 +310,7 @@ export function Magazyn() {
           lastThemeSlug={lastThemeSlugs[0] || null}
           lastThemeName={lastThemeName}
           lastThemeArticles={secLastTemat}
+          olderThemes={olderThemes}
           articles={byDate(allArticles)}
           popular={[...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5)}
           quizDone={quizDone}
