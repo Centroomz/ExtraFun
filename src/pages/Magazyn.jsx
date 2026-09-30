@@ -10,7 +10,7 @@ import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { MagazynMobileFeed, firstParagraph } from '../components/MagazynMobileFeed'
 import { Hero } from '../components/nocturne'
 import { getMonthTheme, getLastMonthTheme, getPastThemes } from '../lib/theme-month'
-import { getMonthQuiz, quizDoneKey } from '../lib/quiz-month'
+import { getMonthQuiz, getPastQuizzes, quizDoneKey } from '../lib/quiz-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const BASE_URL = 'https://www.extrafun.pl'
@@ -93,18 +93,39 @@ export function Magazyn() {
   const [, navigate] = useLocation()
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
   const quiz = getMonthQuiz()
-  const [showQuiz, setShowQuiz] = useState(false)
+  // Past quizzes (Plażowicz, Dogging…) — woven into the mobile feed same as
+  // olderThemes, dedup by slug (two months can share one quiz, like themes).
+  const pastQuizzesSeen = new Set(quiz ? [quiz.slug] : [])
+  const pastQuizzesAll = getPastQuizzes().filter(q => {
+    if (pastQuizzesSeen.has(q.slug)) return false
+    pastQuizzesSeen.add(q.slug)
+    return true
+  })
+  const [activeQuiz, setActiveQuiz] = useState(null)
   const [quizFirstAnswer, setQuizFirstAnswer] = useState(null)
   const [dbArticles, setDbArticles] = useState(null)
-  const [quizDone, setQuizDone] = useState(() => {
-    if (!quiz) return true
-    try { return localStorage.getItem(quizDoneKey(quiz)) === '1' } catch { return false }
+  // Per-quiz completion — was one shared boolean keyed to whichever quiz was
+  // "current" at the time, so finishing one silently marked every future
+  // quiz done too. Now a set of finished slugs, checked per quiz.
+  const [doneSlugs, setDoneSlugs] = useState(() => {
+    const s = new Set()
+    for (const q of [quiz, ...pastQuizzesAll].filter(Boolean)) {
+      try { if (localStorage.getItem(quizDoneKey(q)) === '1') s.add(q.slug) } catch {}
+    }
+    return s
   })
+  const quizDone = !quiz || doneSlugs.has(quiz.slug)
+  const pastQuizzes = pastQuizzesAll.filter(q => !doneSlugs.has(q.slug))
+  const startQuiz = (q, firstAnswer = null) => {
+    if (!q) return
+    setQuizFirstAnswer(typeof firstAnswer === 'number' ? firstAnswer : null)
+    setActiveQuiz(q)
+  }
 
   // SiteRail on other pages links here with ?quiz=1 → open the quiz right away.
   useEffect(() => {
     if (quiz && new URLSearchParams(window.location.search).get('quiz') === '1') {
-      setShowQuiz(true)
+      startQuiz(quiz)
       window.history.replaceState(null, '', '/magazyn')
     }
   }, [])
@@ -239,10 +260,15 @@ export function Magazyn() {
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
 
-  if (showQuiz && quiz) return <QuizView quiz={quiz} firstAnswer={quizFirstAnswer} onBack={() => {
-    setShowQuiz(false)
+  if (activeQuiz) return <QuizView quiz={activeQuiz} firstAnswer={quizFirstAnswer} onBack={() => {
+    const finished = activeQuiz
+    setActiveQuiz(null)
     setQuizFirstAnswer(null)
-    try { setQuizDone(localStorage.getItem(quizDoneKey(quiz)) === '1') } catch {}
+    try {
+      if (localStorage.getItem(quizDoneKey(finished)) === '1') {
+        setDoneSlugs(prev => new Set(prev).add(finished.slug))
+      }
+    } catch {}
   }} />
 
   return (
@@ -317,7 +343,9 @@ export function Magazyn() {
           popular={[...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5)}
           quiz={quiz}
           quizDone={quizDone}
-          onStartQuiz={(firstAnswer = null) => { setQuizFirstAnswer(typeof firstAnswer === 'number' ? firstAnswer : null); setShowQuiz(true) }}
+          pastQuizzes={pastQuizzes}
+          onStartQuiz={(firstAnswer = null) => startQuiz(quiz, firstAnswer)}
+          onStartPastQuiz={(q) => startQuiz(q)}
         />
 
         {/* DESKTOP — magazyn sekcyjny */}
@@ -413,7 +441,7 @@ export function Magazyn() {
               full-res thumbnails — 2185 px of off-screen column. */}
           <aside className="hidden lg:block mt-16 lg:mt-0 lg:col-span-4">
             <div>
-              <SiteRail onStartQuiz={() => setShowQuiz(true)} quizDone={quizDone} />
+              <SiteRail onStartQuiz={() => startQuiz(quiz)} quizDone={quizDone} />
             </div>
           </aside>
         </div>{/* /magazyn grid */}

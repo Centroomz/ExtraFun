@@ -264,6 +264,25 @@ function QuizTile({ quiz, onStart }) {
   )
 }
 
+/* ── Past-quiz tile (Plażowicz, Dogging…): same gold-ring treatment as
+   PastThemeTile, woven into the vertical feed. No inline question-1 teaser
+   like the current month's QuizTile — just a start button straight into
+   question 1 of that quiz. ── */
+function PastQuizTile({ quiz, onStart }) {
+  return (
+    <div className={`relative w-full ${TILE_H} snap-start px-margin-mobile flex flex-col justify-center ring-4 ring-inset ring-primary-container/40`}
+      style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.14), rgba(212,175,55,0.03))' }}>
+      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Zeszły Quiz Miesiąca · {quiz.questions.length} pytań</span>
+      <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-4">{quiz.title}</h2>
+      <p className="font-body text-body-lg text-on-surface-variant leading-snug mb-6">{quiz.intro}</p>
+      <button onClick={() => onStart(quiz)}
+        className="w-full text-left font-body text-label-caps uppercase text-primary-container px-4 py-3 border border-primary-container/30 bg-surface/40 active:bg-primary-container/15 transition-colors">
+        Rozwiąż quiz →
+      </button>
+    </div>
+  )
+}
+
 /* ── Popular tile: "Najczęściej czytane" as a tile with cover thumbnails ── */
 function PopularTile({ items }) {
   if (!items.length) return null
@@ -296,8 +315,11 @@ function PopularTile({ items }) {
  * @param olderThemes       past themes beyond `lastTheme` (e.g. Plażing, CNM 101) —
  *                          [{slug, name, theme}], woven into the down-scroll feed
  * @param quiz              getMonthQuiz() result or null — no quiz tile if null
+ * @param pastQuizzes       past quizzes (e.g. Plażowicz, Dogging), already
+ *                          filtered to not-yet-done — woven into the down-scroll feed
+ * @param onStartPastQuiz   (quiz) => void — starts a specific past quiz from question 1
  */
-export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, olderThemes = [], articles, popular, quiz, quizDone, onStartQuiz }) {
+export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, olderThemes = [], articles, popular, quiz, quizDone, onStartQuiz, pastQuizzes = [], onStartPastQuiz }) {
   useHtmlSnap(true)
   const tiles = []
   if (theme) tiles.push(
@@ -306,18 +328,26 @@ export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, 
   )
   let pastIdx = 0
   const nextPastTheme = () => olderThemes[pastIdx++]
+  let pastQuizIdx = 0
+  const nextPastQuiz = () => pastQuizzes[pastQuizIdx++]
   articles.forEach((a, i) => {
     tiles.push(<ArticleTile key={a.id} article={a} />)
     if (i === 1 && quiz && !quizDone) tiles.push(<QuizTile key="quiz" quiz={quiz} onStart={onStartQuiz} />)
     if (i === 3 && pastIdx < olderThemes.length) { const t = nextPastTheme(); tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />) }
     if (i === 4) tiles.push(<PopularTile key="popular" items={popular} />)
+    if (i === 6 && pastQuizIdx < pastQuizzes.length) { const q = nextPastQuiz(); tiles.push(<PastQuizTile key={`pastquiz-${q.slug}`} quiz={q} onStart={onStartPastQuiz} />) }
     if (i === 8 && pastIdx < olderThemes.length) { const t = nextPastTheme(); tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />) }
+    if (i === 12 && pastQuizIdx < pastQuizzes.length) { const q = nextPastQuiz(); tiles.push(<PastQuizTile key={`pastquiz-${q.slug}`} quiz={q} onStart={onStartPastQuiz} />) }
   })
-  // Any remaining older themes (more than 2 down the line) — tack on at the end
-  // rather than drop them; fine while the list is short.
+  // Any remaining older themes/quizzes (more than fit the fixed slots above)
+  // — tack on at the end rather than drop them; fine while the lists are short.
   while (pastIdx < olderThemes.length) {
     const t = nextPastTheme()
     tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />)
+  }
+  while (pastQuizIdx < pastQuizzes.length) {
+    const q = nextPastQuiz()
+    tiles.push(<PastQuizTile key={`pastquiz-${q.slug}`} quiz={q} onStart={onStartPastQuiz} />)
   }
   return <div className="lg:hidden -mx-6">{tiles}</div>
 }
