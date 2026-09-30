@@ -10,7 +10,7 @@ import { RubrykaSection } from '../components/RubrykaSection'
 import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { MagazynMobileFeed, firstParagraph } from '../components/MagazynMobileFeed'
 import { Hero } from '../components/nocturne'
-import { getMonthTheme, getLastMonthTheme } from '../lib/theme-month'
+import { getMonthTheme, getLastMonthTheme, getPastThemes } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const BASE_URL = 'https://www.extrafun.pl'
@@ -202,15 +202,16 @@ export function Magazyn() {
   const showNajnowsze = !!(newest && !themeSlugs.includes(newest.category_slug))
 
   // Archiwum = wszystko POZA tym, co już pokazane w blokach wyżej (bez dubli).
-  const shownIds = new Set([
-    ...secTemat.slice(0, 12),
-    ...secPierw.slice(0, 3),
-    ...secNaga.slice(0, 3),
-    ...secTam.slice(0, 3),
-    ...secFel.slice(0, 3),
-    ...secWiedza.slice(0, 3),
-  ].map(a => a.id))
-  const archPool = allArticles.filter(a => !shownIds.has(a.id))
+  // Rubryki z WŁASNYM blokiem na tej stronie (Pierwszy Raz, Naga Środa, Tam i
+  // Tam, Felieton, Wiedza=CNM101+Bez Osądu) nie mają co robić w Archiwum jako
+  // osobny tab — nawet 4.+ artykuł z tej rubryki należy do "Więcej →" w jej
+  // sekcji, nie do archiwum. Zeszłe Tematy Miesiąca (Dogging, Plażing, CNM
+  // 101…) są w całości w prawej kolumnie (SiteRail → Zeszły Temat Miesiąca).
+  const coveredSlugs = new Set([
+    ...themeSlugs, 'pierwszy-raz', 'naga-sroda', 'tam-i-tam', 'felieton', 'cnm-101', 'bez-osadu',
+    ...getPastThemes().flatMap(t => t.slugs),
+  ])
+  const archPool = allArticles.filter(a => !coveredSlugs.has(a.category_slug))
 
   // Filtr z kategorii realnie obecnych w archiwum — bez pustych tabów.
   const presentCats = Array.from(new Set(archPool.map(a => a.category))).sort((a, b) => a.localeCompare(b, 'pl'))
