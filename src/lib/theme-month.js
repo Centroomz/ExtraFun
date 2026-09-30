@@ -57,7 +57,10 @@ export const MONTH_THEMES = {
 // point, but a stale override reads as a bug to the next person editing this).
 const ACTIVE_MONTH_OVERRIDE = 10
 
-function activeMonth(date) {
+// Exported so quiz-month.js (and anything else keyed by editorial month)
+// shares the exact same "what month is it" logic — no separate override to
+// drift out of sync with this one.
+export function activeMonth(date) {
   return ACTIVE_MONTH_OVERRIDE || (date.getMonth() + 1)
 }
 

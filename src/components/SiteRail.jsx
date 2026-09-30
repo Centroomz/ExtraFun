@@ -4,7 +4,7 @@ import { getWordOfTheDay } from '../lib/dictionary'
 import { apiFetch, apiFetchShared } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { sortByDistance, formatDistance } from '../lib/geo'
-import { QUIZ_TITLE, QUIZ_INTRO } from '../lib/quiz-dogging'
+import { getMonthQuiz, quizDoneKey } from '../lib/quiz-month'
 import { getPastThemes } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 import { useImpression, trackClick } from '../lib/cardStats'
@@ -136,7 +136,9 @@ function WordModule() {
    (onStartQuiz); elsewhere the button routes to /magazyn?quiz=1. ── */
 function QuizModule({ onStartQuiz, quizDone }) {
   const [, navigate] = useLocation()
-  const done = quizDone ?? (() => { try { return localStorage.getItem('ef_quiz_dogging_done') === '1' } catch { return false } })()
+  const quiz = getMonthQuiz()
+  if (!quiz) return null
+  const done = quizDone ?? (() => { try { return localStorage.getItem(quizDoneKey(quiz)) === '1' } catch { return false } })()
   if (done) return null
   const start = onStartQuiz || (() => navigate('/magazyn?quiz=1'))
   return (
@@ -146,8 +148,8 @@ function QuizModule({ onStartQuiz, quizDone }) {
       style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.12), rgba(212,175,55,0.03))' }}
     >
       <div className={railLabel}>Quiz miesiąca</div>
-      <div className="font-display text-headline-sm text-on-surface mb-2 leading-tight">{QUIZ_TITLE}</div>
-      <p className="font-body text-body-sm text-on-surface-variant mb-4">{QUIZ_INTRO}</p>
+      <div className="font-display text-headline-sm text-on-surface mb-2 leading-tight">{quiz.title}</div>
+      <p className="font-body text-body-sm text-on-surface-variant mb-4">{quiz.intro}</p>
       <span className="font-body text-label-caps uppercase text-primary-container group-hover:translate-x-1 transition-transform inline-block">Zacznij →</span>
     </button>
   )

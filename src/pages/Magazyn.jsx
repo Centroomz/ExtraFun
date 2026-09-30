@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'wouter'
 import { Helmet } from 'react-helmet-async'
 import { ARTICLES as FALLBACK_ARTICLES } from '../lib/articles'
-import { QUIZ_QUESTIONS, interpretQuizResult, QUIZ_TITLE } from '../lib/quiz-dogging'
 import { apiFetchShared } from '../lib/api'
 import { CalendarWidget } from '../components/CalendarWidget'
 import { SiteRail } from '../components/SiteRail'
@@ -11,6 +10,7 @@ import { MagCard, MagSectionHeader } from '../components/MagCard'
 import { MagazynMobileFeed, firstParagraph } from '../components/MagazynMobileFeed'
 import { Hero } from '../components/nocturne'
 import { getMonthTheme, getLastMonthTheme, getPastThemes } from '../lib/theme-month'
+import { getMonthQuiz, quizDoneKey } from '../lib/quiz-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const BASE_URL = 'https://www.extrafun.pl'
@@ -22,23 +22,23 @@ function estimateReadingTime(content) {
 /* ─── Quiz View (inline, no URL needed) ──────────────────────── */
 // `firstAnswer` = option index already picked on the mobile quiz tile (question 1
 // answered in the feed) — the view then opens straight on question 2.
-function QuizView({ onBack, firstAnswer = null }) {
+function QuizView({ quiz, onBack, firstAnswer = null }) {
   const [current, setCurrent] = useState(firstAnswer == null ? 0 : 1)
   const [scores, setScores] = useState(() => [0, 0, 0, 0].map((_, i) => (i === firstAnswer ? 1 : 0)))
   const [selected, setSelected] = useState(null)
   const [done, setDone] = useState(false)
   const [result, setResult] = useState(null)
 
-  const q = QUIZ_QUESTIONS[current]
-  const total = QUIZ_QUESTIONS.length
+  const q = quiz.questions[current]
+  const total = quiz.questions.length
 
   const handleNext = () => {
     const next = scores.map((s, i) => (i === selected ? s + 1 : s))
     if (current + 1 < total) {
       setScores(next); setCurrent(current + 1); setSelected(null)
     } else {
-      try { localStorage.setItem('ef_quiz_dogging_done', '1') } catch {}
-      setResult(interpretQuizResult(next)); setDone(true)
+      try { localStorage.setItem(quizDoneKey(quiz), '1') } catch {}
+      setResult(quiz.interpretResult(next)); setDone(true)
     }
   }
 
@@ -92,16 +92,18 @@ function QuizView({ onBack, firstAnswer = null }) {
 export function Magazyn() {
   const [, navigate] = useLocation()
   const [activeCategory, setActiveCategory] = useState('Wszystkie')
+  const quiz = getMonthQuiz()
   const [showQuiz, setShowQuiz] = useState(false)
   const [quizFirstAnswer, setQuizFirstAnswer] = useState(null)
   const [dbArticles, setDbArticles] = useState(null)
   const [quizDone, setQuizDone] = useState(() => {
-    try { return localStorage.getItem('ef_quiz_dogging_done') === '1' } catch { return false }
+    if (!quiz) return true
+    try { return localStorage.getItem(quizDoneKey(quiz)) === '1' } catch { return false }
   })
 
   // SiteRail on other pages links here with ?quiz=1 → open the quiz right away.
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('quiz') === '1') {
+    if (quiz && new URLSearchParams(window.location.search).get('quiz') === '1') {
       setShowQuiz(true)
       window.history.replaceState(null, '', '/magazyn')
     }
@@ -237,10 +239,10 @@ export function Magazyn() {
   const openArticle = (a) => navigate(`/magazyn/${a.slug}`)
   const goRubryka = (slug) => navigate(`/magazyn/rubryka/${slug}`)
 
-  if (showQuiz) return <QuizView firstAnswer={quizFirstAnswer} onBack={() => {
+  if (showQuiz && quiz) return <QuizView quiz={quiz} firstAnswer={quizFirstAnswer} onBack={() => {
     setShowQuiz(false)
     setQuizFirstAnswer(null)
-    try { setQuizDone(localStorage.getItem('ef_quiz_dogging_done') === '1') } catch {}
+    try { setQuizDone(localStorage.getItem(quizDoneKey(quiz)) === '1') } catch {}
   }} />
 
   return (
@@ -313,6 +315,7 @@ export function Magazyn() {
           olderThemes={olderThemes}
           articles={byDate(allArticles)}
           popular={[...allArticles].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5)}
+          quiz={quiz}
           quizDone={quizDone}
           onStartQuiz={(firstAnswer = null) => { setQuizFirstAnswer(typeof firstAnswer === 'number' ? firstAnswer : null); setShowQuiz(true) }}
         />

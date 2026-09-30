@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'wouter'
-import { QUIZ_TITLE, QUIZ_QUESTIONS } from '../lib/quiz-dogging'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from './CardStatBadge'
 import { useDeferredVideo } from '../lib/useDeferredVideo'
@@ -244,13 +243,13 @@ function PastThemeTile({ slug, name, theme }) {
 
 /* ── Quiz tile: question 1 answered right here (IG-poll style); tapping an
    option opens the quiz on question 2 with that answer counted. ── */
-function QuizTile({ onStart }) {
-  const q = QUIZ_QUESTIONS[0]
+function QuizTile({ quiz, onStart }) {
+  const q = quiz.questions[0]
   return (
     <div className={`relative w-full ${TILE_H} snap-start px-margin-mobile flex flex-col justify-center`}
       style={{ background: 'linear-gradient(135deg, rgba(212,175,55,0.14), rgba(212,175,55,0.03))' }}>
-      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Quiz miesiąca · {QUIZ_QUESTIONS.length} pytań</span>
-      <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-6">{QUIZ_TITLE}</h2>
+      <span className="font-body text-label-caps uppercase text-primary-container block mb-3">Quiz miesiąca · {quiz.questions.length} pytań</span>
+      <h2 className="font-display font-semibold text-headline-md text-on-surface leading-tight mb-6">{quiz.title}</h2>
       <span className="font-body text-label-caps uppercase text-on-surface-variant block mb-2">Pytanie 1</span>
       <p className="font-body text-body-lg text-on-surface leading-snug mb-5">{q.question}</p>
       <div className="flex flex-col gap-2">
@@ -296,8 +295,9 @@ function PopularTile({ items }) {
  * @param popular           top 5 by views
  * @param olderThemes       past themes beyond `lastTheme` (e.g. Plażing, CNM 101) —
  *                          [{slug, name, theme}], woven into the down-scroll feed
+ * @param quiz              getMonthQuiz() result or null — no quiz tile if null
  */
-export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, olderThemes = [], articles, popular, quizDone, onStartQuiz }) {
+export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, lastThemeSlug, lastThemeName, lastThemeArticles, olderThemes = [], articles, popular, quiz, quizDone, onStartQuiz }) {
   useHtmlSnap(true)
   const tiles = []
   if (theme) tiles.push(
@@ -308,7 +308,7 @@ export function MagazynMobileFeed({ theme, themeSlug, themeArticles, lastTheme, 
   const nextPastTheme = () => olderThemes[pastIdx++]
   articles.forEach((a, i) => {
     tiles.push(<ArticleTile key={a.id} article={a} />)
-    if (i === 1 && !quizDone) tiles.push(<QuizTile key="quiz" onStart={onStartQuiz} />)
+    if (i === 1 && quiz && !quizDone) tiles.push(<QuizTile key="quiz" quiz={quiz} onStart={onStartQuiz} />)
     if (i === 3 && pastIdx < olderThemes.length) { const t = nextPastTheme(); tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />) }
     if (i === 4) tiles.push(<PopularTile key="popular" items={popular} />)
     if (i === 8 && pastIdx < olderThemes.length) { const t = nextPastTheme(); tiles.push(<PastThemeTile key={`past-${t.slug}`} {...t} />) }

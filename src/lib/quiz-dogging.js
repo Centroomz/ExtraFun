@@ -160,3 +160,12 @@ export function interpretQuizResult(scores) {
   const winnerIdx = scores.indexOf(Math.max(...scores))
   return RESULTS[TYPE_MAP[winnerIdx]]
 }
+
+// Consolidated shape for quiz-month.js's MONTH_QUIZZES registry.
+export const QUIZ = {
+  slug: 'dogging',
+  title: QUIZ_TITLE,
+  intro: QUIZ_INTRO,
+  questions: QUIZ_QUESTIONS,
+  interpretResult: interpretQuizResult,
+}
