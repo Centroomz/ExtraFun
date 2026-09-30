@@ -78,18 +78,16 @@ function TodayEventsModule() {
 }
 
 /* ── Zeszły Temat Miesiąca — past months' umbrellas, if configured.
-   Only the most recent past month gets the hero-style image box; older
-   ones are text-only links, so the rail doesn't grow into a wall of covers. ── */
+   Each gets its own cover, same treatment as the current hero, while the
+   list is short. Once there are many months, switch older ones to
+   text-only links instead of growing a wall of covers. ── */
 function LastThemeModule() {
   const past = getPastThemes()
   if (!past.length) return null
-  const [latest, ...rest] = past
-  const latestSlug = latest.slugs[0]
-  const latestName = SLUG_TO_DISPLAY[latestSlug] || latestSlug
   // Two consecutive months can share one theme (e.g. Lipiec+Sierpień both
   // Plażing) — same slug, same link, so only list it once.
-  const seen = new Set([latestSlug])
-  const older = rest.filter(t => {
+  const seen = new Set()
+  const themes = past.filter(t => {
     const slug = t.slugs[0]
     if (seen.has(slug)) return false
     seen.add(slug)
@@ -98,30 +96,23 @@ function LastThemeModule() {
   return (
     <section>
       <h3 className={railLabel}>Zeszły Temat Miesiąca</h3>
-      <Link href={`/magazyn/rubryka/${latestSlug}`} className="group block no-underline">
-        {latest.image && (
-          <div className="aspect-[16/9] overflow-hidden bg-surface-container mb-3">
-            <img src={coverUrl(latest.image, 800)} alt="" loading="lazy" className="w-full h-full object-cover" />
-          </div>
-        )}
-        <div className="font-display italic font-medium text-headline-sm text-on-surface leading-tight group-hover:text-primary-container transition-colors">{latestName}</div>
-        <p className="font-body text-body-sm text-on-surface-variant mt-1 line-clamp-2">{latest.lead}</p>
-      </Link>
-      {older.length > 0 && (
-        <ul className="mt-4 space-y-2">
-          {older.map(t => {
-            const slug = t.slugs[0]
-            const name = SLUG_TO_DISPLAY[slug] || slug
-            return (
-              <li key={slug}>
-                <Link href={`/magazyn/rubryka/${slug}`} className="font-body text-body-sm text-on-surface-variant hover:text-on-surface no-underline">
-                  {name}
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      )}
+      <div className="space-y-6">
+        {themes.map(t => {
+          const slug = t.slugs[0]
+          const name = SLUG_TO_DISPLAY[slug] || slug
+          return (
+            <Link key={slug} href={`/magazyn/rubryka/${slug}`} className="group block no-underline">
+              {t.image && (
+                <div className="aspect-[16/9] overflow-hidden bg-surface-container mb-3">
+                  <img src={coverUrl(t.image, 800)} alt="" loading="lazy" className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="font-display italic font-medium text-headline-sm text-on-surface leading-tight group-hover:text-primary-container transition-colors">{name}</div>
+              <p className="font-body text-body-sm text-on-surface-variant mt-1 line-clamp-2">{t.lead}</p>
+            </Link>
+          )
+        })}
+      </div>
     </section>
   )
 }

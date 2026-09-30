@@ -14,7 +14,7 @@ export const MONTH_THEMES = {
     label: 'Czerwiec · Temat Miesiąca: CNM 101',
     title: 'ABC niemonogamii.',
     lead: 'Czerwiec od podstaw: co to CNM, czym różni się poliamoria od swingu i otwartego związku, i dlaczego zazdrość nie jest wrogiem.',
-    image: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/28-1790808328907.webp',
+    image: '/editorial/hero-cnm101.jpg',
     slugs: ['cnm-101'],
   },
   7: {
