@@ -445,7 +445,7 @@ function FinderTab() {
 
 function StatsTab() {
   const [stats, setStats] = useState(null)
-  const [days, setDays] = useState(30)
+  const [days, setDays] = useState(7)
   const [metric, setMetric] = useState('sessions') // 'sessions' = Odwiedziny (domyślnie), 'views' = Odsłony
   const [loading, setLoading] = useState(true)
 
