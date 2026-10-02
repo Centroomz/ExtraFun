@@ -170,12 +170,3 @@ export const QUIZ = {
   questions: QUIZ_QUESTIONS,
   interpretResult: interpretQuizResult,
 }
-
-// Consolidated shape for quiz-month.js's MONTH_QUIZZES registry.
-export const QUIZ = {
-  slug: 'swing',
-  title: QUIZ_TITLE,
-  intro: QUIZ_INTRO,
-  questions: QUIZ_QUESTIONS,
-  interpretResult: interpretQuizResult,
-}
