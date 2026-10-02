@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { apiFetch } from '../lib/api'
 import { useAuth } from '../hooks/useAuth'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
@@ -196,21 +196,25 @@ function ArticlesTab() {
   const [saving, setSaving] = useState(false)
   const [msg, setMsg] = useState('')
   const [filter, setFilter] = useState('published') // 'all' | 'published' | 'scheduled' | 'draft'
+  const mountedRef = useRef(true)
 
   const load = async () => {
     setLoading(true)
-    try { setArticles(await apiFetch('/api/admin/articles')) } catch { setArticles([]) }
-    setLoading(false)
+    try { const data = await apiFetch('/api/admin/articles'); if (mountedRef.current) setArticles(data) } catch { if (mountedRef.current) setArticles([]) }
+    if (mountedRef.current) setLoading(false)
   }
 
   useEffect(() => {
+    mountedRef.current = true
     load()
     // Views increment server-side on each article visit; re-fetch when the
     // admin tab regains focus so counts reflect reality instead of a stale
-    // load-time snapshot.
-    const onFocus = () => load()
+    // load-time snapshot. Guarded by mountedRef — switching admin tabs can
+    // steal window focus right as this unmounts, which fired a redundant
+    // request a moment before cleanup removed the listener.
+    const onFocus = () => { if (mountedRef.current) load() }
     window.addEventListener('focus', onFocus)
-    return () => window.removeEventListener('focus', onFocus)
+    return () => { mountedRef.current = false; window.removeEventListener('focus', onFocus) }
   }, [])
 
   const handleSave = async (form) => {
