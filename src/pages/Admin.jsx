@@ -440,7 +440,7 @@ function FinderTab() {
 }
 
 function StatsTab() {
-  const [rows, setRows] = useState(null)
+  const [stats, setStats] = useState(null)
   const [days, setDays] = useState(30)
   const [metric, setMetric] = useState('sessions') // 'sessions' = Odwiedziny (domyślnie), 'views' = Odsłony
   const [loading, setLoading] = useState(true)
@@ -449,36 +449,21 @@ function StatsTab() {
 
   async function load() {
     setLoading(true)
-    try { setRows(await apiFetch(`/api/admin/page-views?days=${days}`)) } catch { setRows([]) }
+    try { setStats(await apiFetch(`/api/admin/page-views?days=${days}`)) } catch { setStats(null) }
     setLoading(false)
   }
 
   if (loading) return <div style={{ textAlign: 'center', padding: 40, color: 'rgba(232,230,252,0.8)' }}>Ładowanie…</div>
-  if (!rows) return null
+  if (!stats) return null
 
-  // Split real vs bot — bots are stored but excluded from the headline numbers so a
-  // crawler burst doesn't read as growth. Bot totals shown separately below.
-  const realRows = rows.filter(r => !r.is_bot)
-  const botRows = rows.filter(r => r.is_bot)
-  const totalViews = realRows.length
-  const totalSessions = new Set(realRows.map(r => r.session_id)).size
-  const totalBotViews = botRows.length
-  const totalBotSessions = new Set(botRows.map(r => r.session_id)).size
-  const byDay = {}, byPath = {}, byRef = {}, byDev = {}
-  for (const r of realRows) {
-    const d = (r.created_at || '').slice(0, 10)
-    const day = (byDay[d] = byDay[d] || { views: 0, sess: new Set() })
-    day.views++; if (r.session_id) day.sess.add(r.session_id)
-    const pp = (byPath[r.path] = byPath[r.path] || { views: 0, sess: new Set() })
-    pp.views++; if (r.session_id) pp.sess.add(r.session_id)
-    byRef[r.referrer || 'direct'] = (byRef[r.referrer || 'direct'] || 0) + 1
-    byDev[r.device || '?'] = (byDev[r.device || '?'] || 0) + 1
-  }
-  const metricOf = o => metric === 'views' ? o.views : o.sess.size // odsłony vs odwiedziny
+  // Aggregation now happens in Postgres (get_pageview_stats RPC) — bots already
+  // excluded from the headline numbers there so a crawler burst doesn't read as growth.
+  const { totalViews, totalSessions, totalBotViews, totalBotSessions, byDay, byPath, byRef, byDev } = stats
+  const metricOf = o => metric === 'views' ? o.views : o.sessions // odsłony vs odwiedziny
   const metricLabel = metric === 'views' ? 'Odsłony' : 'Odwiedziny'
   const dailyAsc = Object.entries(byDay).map(([day, o]) => [day, metricOf(o)]).sort((a, b) => a[0].localeCompare(b[0]))
   const maxV = Math.max(1, ...dailyAsc.map(([, v]) => v))
-  const topPaths = Object.entries(byPath).map(([p, o]) => [p, metricOf(o), o.views, o.sess.size]).sort((a, b) => b[1] - a[1]).slice(0, 15)
+  const topPaths = Object.entries(byPath).map(([p, o]) => [p, metricOf(o), o.views, o.sessions]).sort((a, b) => b[1] - a[1]).slice(0, 15)
   const top = (o, n = 15) => Object.entries(o).sort((a, b) => b[1] - a[1]).slice(0, n)
 
   const card = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: 16 }

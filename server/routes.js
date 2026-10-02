@@ -807,25 +807,15 @@ Nie chcesz być widoczny/a na extrafun? Wejdź w Profil → „Ukryj mnie w Szuk
     res.status(204).end()
   })
 
+  // Aggregated server-side (Postgres GROUP BY via RPC) — avoids pulling tens of
+  // thousands of raw rows over REST just to count them in Node (was 19 sequential
+  // paginated round-trips at 18k+ rows/30d, ~6-15s).
   app.get('/api/admin/page-views', verifyJWT, isAdmin, async (req, res) => {
     const days = Math.min(parseInt(req.query.days) || 30, 365)
     const since = new Date(Date.now() - days * 86400000).toISOString()
-    // Supabase caps single-query results at 1000 rows — fetch in pages to get real count
-    let allRows = []
-    let from = 0
-    const PAGE = 1000
-    while (true) {
-      const { data, error } = await supabaseAdmin.from('page_views')
-        .select('path, referrer, device, session_id, created_at, is_bot')
-        .eq('site', 'extrafun').gte('created_at', since)
-        .order('created_at', { ascending: false })
-        .range(from, from + PAGE - 1)
-      if (error) return res.status(500).json({ message: error.message })
-      allRows = allRows.concat(data || [])
-      if (!data || data.length < PAGE) break
-      from += PAGE
-    }
-    res.json(allRows)
+    const { data, error } = await supabaseAdmin.rpc('get_pageview_stats', { p_site: 'extrafun', p_since: since })
+    if (error) return res.status(500).json({ message: error.message })
+    res.json(data)
   })
 
   // Admin: per-card impressions/clicks over the last N days → { 'kind:id': {imp, clicks} }
