@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import { useLocation } from 'wouter'
+import { useLocation, Link } from 'wouter'
 import { Helmet } from 'react-helmet-async'
-import { apiFetch } from '../lib/api'
+import { apiFetch, apiFetchShared } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
 import { calculateDistance, formatDistance } from '../lib/geo'
 import { Hero, Button } from '../components/nocturne'
@@ -9,6 +9,7 @@ import { PageWithRail } from '../components/PageWithRail'
 import { SiteRail } from '../components/SiteRail'
 import { MiejscaMobileFeed } from '../components/MiejscaMobileFeed'
 import { slugify, venueSlug } from '../lib/venueSlug'
+import { coverUrl } from '../lib/images'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from '../components/CardStatBadge'
 
@@ -63,58 +64,6 @@ const ARTICLES = [
       { p: 'Jeden z działających klubów praskich, w dzielnicy Vršovice. Vršovické nám. 1012/4, 102 00 Praga 10.' },
       { h: '#10 – Le Duquesnoy (Bruksela, Belgia)' },
       { p: 'Klub w centrum Brukseli, blisko głównego dworca. 12 Rue Duquesnoy, Bruksela.' },
-    ],
-  },
-  {
-    id: 'mapa-polski-bialych-plam',
-    emoji: '🇵🇱',
-    tag: 'Polska',
-    tagColor: '#E63946',
-    title: 'Mapa Polski, na której nie ma białych plam. Prawie',
-    lead: 'Nie objechałyśmy żadnego z jedenastu klubów. Usiadłyśmy nad arkuszem i policzyłyśmy, co o nich mówią inni — gwiazdki, opinie i to, co ludzie napisali w ostatnim kwartale.',
-    city: 'Polska',
-    readTime: '7 min',
-    content: [
-      { p: 'Zacznijmy od wyznania, bo inaczej ten tekst byłby ściemą. Nie byłyśmy tam. Żadna z nas nie przekroczyła w tym kwartale progu jedenastu klubów, o których zaraz przeczytacie. Nie ma tu wrażeń z parkietu, zapachu z szatni ani pani z recepcji widzianej na własne oczy. Jest arkusz kalkulacyjny, jedenaście kolumn i redakcyjne liczydło, które przemieliło wszystko, co ludzie napisali publicznie w Google. To nie jest reportaż. To jest rachunek.' },
-      { p: 'Jest taka teoria, że w klubie liczą się ludzie, nie ściany. Że atmosferę robi towarzystwo, a nie jacuzzi. Piękna teoria. Powtarzają ją wszyscy właściciele, zwłaszcza ci, którzy oszczędzili na wentylacji. Otóż nie do końca.' },
-      { p: 'Bo ktoś w końcu zrobił to, czego nie robi się w tej branży — policzył. Wziął jedenaście polskich klubów, ich oceny w Google, liczbę opinii, świeżość tych opinii i to, co ludzie naprawdę napisali w ostatnich trzech miesiącach. Nie legendę sprzed dekady. To, co było w czerwcu. Wyszła liczba od 0 do 100. I wyszła prawda, która czasem gryzie. Zaczynamy od góry.' },
-      { h: 'Podium — czyli gdzie liczby wypadły najlepiej' },
-      { p: 'Elysium, Warszawa — 87,4 pkt (4,9★, 19 opinii). Najmłodszy i najbardziej rozpieszczony przez recenzentów klub. "Czysto tak, że można jeść z podłogi" — pisze ktoś w czerwcu. Nota 4,9 to prawie podejrzane, więc uczciwie: dziewiętnaście opinii to nie jest tłum, to sala kameralna. Ta sama recenzentka dodaje: "co prawda jeszcze trochę mało gości". Piękne, świeże, puste-ale-pełne-obietnicy.' },
-      { p: 'PurPur, Łódź — 84,4 pkt (4,7★, 128 opinii). PurPur to nie klub — to kino dla dorosłych, inny gatunek. Nota wysoka, opinii sto dwadzieścia osiem, obsługa chwalona. Ale w grudniu ktoś zauważył coś, czego w tej branży nie wybacza się: "naliczać podwójną opłatę za wiek powyżej 26 roku życia u panów. Wiek weryfikować za pomocą dokumentu". Dokumentem. W miejscu, którego całą walutą jest anonimowość.' },
-      { p: 'Gravitacja, Wodzisław Śląski — 71,5 pkt (4,6★, 88 opinii). Klub, o którym pół Polski nie słyszało, z sentymentem świeższych opinii na poziomie 4,83 — najwyższym realnym w stawce. "Wspaniała atmosfera, przemili właściciele" — lipiec. Dark room, dwa glory hole, jacuzzi, sauna fińska, pokój w stylu Greya. Cały katalog fantazji w mieście, które kojarzy się z kopalnią.' },
-      { h: 'Środek stawki — legendy i ich kłopoty' },
-      { p: 'Jacuzzi Club, Chwaszczyno — 66,7 pkt (4,6★, 26 opinii). Święty Graal polskiego swingu. Na forach od lat to samo nabożne westchnienie: "bezkonkurencyjny", "najlepszy klub w jakim byłem". A w Google? Dwadzieścia sześć opinii. Bo do Jacuzzi nie wchodzi się z ulicy — wchodzi się z zaproszeniem, po egzaminie z regulaminu. Klub tak ekskluzywny, że sam siebie ukrywa przed statystyką.' },
-      { p: 'Origami, Wrocław — 65,7 pkt (4,6★, 94 opinie). I tu kalkulator zaczyna kłamać. Nota 4,6 wygląda ślicznie, dopóki nie przeczytasz lutego: "totalnie pusto... smród zgnilizny i wilgoci, okropny brud, szkło i niezmienione prześcieradła". I czerwca: "obsługa nieprzyjemna, zapach stęchlizny, nigdy więcej". Sześćset metrów kwadratowych azjatyckiego luksusu — na papierze. Gwiazdki są stare. Zapach jest nowy.' },
-      { p: 'Prive, Lubliniec — 52,6 pkt (4,5★, 126 opinii). Duma polskiego swingu, na forach stawiana obok najlepszych klubów Europy. "Najbardziej rozbudowany, największe możliwości" — piszą weterani z rozmarzeniem. A w najnowszej opinii, z 24 lipca: "uważajcie tam na siebie naprawdę!!! reszty nie możemy napisać, od razu blokowane". Sentyment świeżych opinii — 3,38, najniższy z całego podium reputacji.' },
-      { h: 'Dół tabeli — czyli gdzie robi się smutno' },
-      { p: 'Ray Club, Poznań — 47,5 pkt (4,4★, 64 opinie). Klub z potencjałem i z grzechem, który boli najbardziej — nierówne traktowanie. Para na imprezie "urodziny Kobiety": "od razu było widać, iż stali bywalcy zostali wpuszczeni" mimo dress code\'u. Zaraz obok singiel, debiut w urodziny: "dwie najlepsze imprezy". Ray to loteria.' },
-      { p: 'Lava, Warszawa — 34,7 pkt (4,2★, 18 opinii). Tu wzorzec jest zbyt spójny, by ironizować: "wyrzuciła nas z klubu tylko dlatego, że mówimy w innym języku", "pani w okularach... nie miła i opryskliwa od wejścia", "obskurna buda śmierdząca szambem". Trzy różne osoby, trzy różne wieczory, jedna diagnoza.' },
-      { p: 'Bordeaux (Łódź, 26,9 pkt) i Red Fox (Czeladź, 23,0 pkt) — dwa kluby, które zamierają na naszych oczach. Po dwie świeże opinie na kwartał. "Impreza miała trwać 5 godzin, po 2 przyszły 3 osoby". "Przyjeżdżamy 24:30, nie wpuszczają, mówią że zamknięte". To nie recenzje. To nekrolog pisany ratami.' },
-      { h: 'Na koniec' },
-      { p: 'Gwiazdka to przeszłość, a sentyment to teraźniejszość. Najlepsze kluby chowają się przed statystyką, a najgorsze mają świetne noty sprzed remontu. Możesz mieć sześćset metrów i glory hole w dwóch wersjach, a i tak wszystko rozbije się o to, czy pani z recepcji ma dobry dzień. Ludzie robią klimat. To akurat prawda. Szkoda tylko, że czasem tymi ludźmi jest obsługa.' },
-      { p: 'Metodologia: oceny i opinie z Google Maps (zebrane 27.07.2026), okno świeżości 90 dni. Wynik = ocena ważona liczbą opinii (50%) + tempo świeżych opinii (30%) + sentyment treści z ostatnich 90 dni (20%). Żadnej z opisanych wizyt nie odbyła redakcja — wszystkie cytaty pochodzą z publicznych opinii.' },
-    ],
-  },
-  {
-    id: 'berlin-guide',
-    emoji: '🇩🇪',
-    tag: 'Europa',
-    tagColor: '#d4af37',
-    title: 'Berlin: Stolica Swingingu Europy',
-    lead: 'Ponad 20 klubów, darkroomy, fetysz i wolność – dlaczego Berlin przyciąga co roku tysiące swingersów z całego świata.',
-    city: 'Berlin',
-    readTime: '4 min',
-    content: [
-      { h: 'Dlaczego Berlin?' },
-      { p: 'Liberalne prawo, otwarta kultura i ogromna społeczność – Berlin od lat 90. jest europejskim centrum sceny lifestyle i fetyszu. Tylko tutaj znajdziesz tak gęstą koncentrację miejsc na km².' },
-      { h: 'KitKatClub – legenda w akcji' },
-      { p: 'Sobotnia impreza Carneball Bizarre to jedno z najsłynniejszych wydarzeń fetyszowych na świecie. Dress code absolutnie egzekwowany, darkroom na 3 poziomach, pełna swoboda.' },
-      { h: 'Lab.oratory (Berghain)' },
-      { p: 'Piwnica Berghainu to Lab.oratory – otwarty w weekendy dla miłośników fetyszu i hard play. Jedno z najbardziej selekcjonowanych miejsc na Ziemi.' },
-      { h: 'Reszta sceny: FM, SchwuZ, Insomnia' },
-      { p: 'Fetisch Melanege (FM) to comiesięczne imprezy tematyczne. SchwuZ – queerowa przestrzeń z playrooms. Insomnia – prywatne imprezy dla par, bardzo eleganckie.' },
-      { h: 'Jak się przygotować?' },
-      { p: 'Berlińskie kluby są surowe w kwestii dress code. Skóra, lateks, mundury, nagie ciało – tak. Jeansy i podkoszulek – nie. Sprawdź zasady każdego miejsca przed wyjazdem.' },
     ],
   },
 ]
@@ -305,6 +254,48 @@ function ArticleCard({ article, hero, onClick }) {
       </div>
       <p className="font-body text-body-md text-on-surface-variant leading-relaxed">{article.lead.slice(0, 80)}…</p>
     </div>
+  )
+}
+
+// ─── TAM I TAM (right column) ─────────────────────────────────────────────────
+// Newest Tam i Tam article as a cover hero, earlier ones as plain titles.
+// Hides itself when the rubric has no published articles — never a placeholder.
+function TamITamBlock() {
+  const [items, setItems] = useState(null)
+  useEffect(() => {
+    apiFetchShared('/api/articles')
+      .then(data => setItems((data || [])
+        .filter(a => a.category_slug === 'tam-i-tam' && a.slug)
+        .sort((a, b) => new Date(b.publish_date || b.created_at || 0) - new Date(a.publish_date || a.created_at || 0))
+        .slice(0, 4)))
+      .catch(() => setItems([]))
+  }, [])
+  if (!items || !items.length) return null
+  const [latest, ...earlier] = items
+  return (
+    <section className="border border-outline-variant/20">
+      <Link href={`/magazyn/${latest.slug}`} className="group block no-underline">
+        {latest.cover_image && (
+          <div className="aspect-video overflow-hidden bg-surface-container">
+            <img src={coverUrl(latest.cover_image, 750)} alt="" loading="lazy" className="w-full h-full object-cover" />
+          </div>
+        )}
+        <div className="p-6">
+          <div className="font-body text-label-caps uppercase text-primary-container mb-2">Tam i Tam</div>
+          <div className="font-display italic font-semibold text-headline-md text-on-surface leading-tight group-hover:text-primary-container transition-colors">{latest.title}</div>
+        </div>
+      </Link>
+      {earlier.length > 0 && (
+        <ul className="border-t border-outline-variant/20 px-6 py-4 space-y-3">
+          {earlier.map(a => (
+            <li key={a.slug}>
+              <Link href={`/magazyn/${a.slug}`} className="font-body text-body-md text-on-surface leading-snug no-underline hover:text-primary-container transition-colors">{a.title}</Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link href="/magazyn/rubryka/tam-i-tam" className="block border-t border-outline-variant/20 px-6 py-4 font-body text-label-caps uppercase text-primary-container no-underline hover:opacity-80">Wszystkie →</Link>
+    </section>
   )
 }
 
@@ -729,10 +720,10 @@ export function Przewodnik({ city: cityParam }) {
                 )}
               </div>
 
-              {/* RIGHT — editorial: ranking on top, then city guides, then Plaże */}
+              {/* RIGHT — editorial: ranking on top, then Tam i Tam, then Plaże */}
               <aside className="md:col-span-5 flex flex-col gap-8">
                 <ArticleCard article={ARTICLES[0]} hero onClick={() => { listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }; setSelectedArticle(ARTICLES[0]) }} />
-                {ARTICLES.slice(1).map(a => <ArticleCard key={a.id} article={a} onClick={() => { listScroll.current = { pc: document.querySelector('.page-content')?.scrollTop || 0, win: window.scrollY || 0 }; setSelectedArticle(a) }} />)}
+                <TamITamBlock />
 
                 <div onClick={() => navigate('/plaze')}
                   className="group flex items-center gap-4 p-6 border border-outline-variant/20 cursor-pointer hover:border-primary-container/40 transition-colors">
