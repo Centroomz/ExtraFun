@@ -314,6 +314,18 @@ function AppInner() {
     } catch {}
   }, [location])
 
+  // Vanessa (czat-bot.pl): widżet ładujemy dopiero po potwierdzeniu 18+, nie dla robotów.
+  useEffect(() => {
+    if (!ageConfirmed || isBot) return
+    if (document.getElementById('vanessa-widget')) return
+    const s = document.createElement('script')
+    s.id = 'vanessa-widget'
+    s.src = 'https://czat-bot.pl/w.js'
+    s.async = true
+    s.dataset.id = 'vanessa-ef'
+    document.body.appendChild(s)
+  }, [ageConfirmed])
+
   if (loading) {
     return (
       <div className="loading-screen">
