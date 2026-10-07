@@ -32,6 +32,7 @@ const AUTHOR_AVATARS = {
   'Magda': '/authors/magda.jpg',
   'Sławek': '/authors/slawek.jpg',
   'Kicia Bradshaw': '/authors/kicia.jpg',
+  'Klaudia': '/authors/klaudia.jpg',
 }
 
 // Inline parser: supports **bold** and [label](url) in any nesting order.
