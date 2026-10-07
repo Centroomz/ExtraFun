@@ -15,6 +15,7 @@ export const SLUG_TO_DISPLAY = {
   'plazing':        'Plażing',
   'dogging':        'Dogging',
   'naga-sroda':     'Naga Środa',
+  'bezpieczenstwo': 'Bezpieczeństwo',
   'felieton':       'Felieton',
   'fetysz':         'Fetysz',
   'kultura':        'Kultura',

@@ -23,6 +23,7 @@ const CATEGORY_COLORS = {
   'Plażing':        { bg: 'rgba(255,160,0,0.12)',   color: '#FFA000', border: 'rgba(255,160,0,0.3)' },
   'Dogging':        { bg: 'rgba(229,57,53,0.12)',   color: '#E53935', border: 'rgba(229,57,53,0.3)' },
   'Naga Środa':     { bg: 'rgba(20,241,217,0.12)',  color: '#14F1D9', border: 'rgba(20,241,217,0.3)' },
+  'Bezpieczeństwo': { bg: 'rgba(20,241,217,0.12)',  color: '#14F1D9', border: 'rgba(20,241,217,0.3)' },
 }
 
 const AUTHOR_AVATARS = {

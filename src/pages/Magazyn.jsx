@@ -219,7 +219,7 @@ export function Magazyn() {
   // Backbone rubrics (newest first). Empty ones render nothing (RubrykaSection).
   const secTemat  = bySlugs(themeSlugs)
   const secPierw  = bySlugs(['pierwszy-raz'])
-  const secNaga   = bySlugs(['naga-sroda'])
+  const secBezp   = bySlugs(['bezpieczenstwo'])
   const secTam    = bySlugs(['tam-i-tam'])
   const secFel    = bySlugs(['felieton'])
   const secWiedza = bySlugs(['cnm-101', 'bez-osadu'])
@@ -285,7 +285,7 @@ export function Magazyn() {
                 {[
                   ['Pon · Pt', 'Temat Miesiąca', 'temat'],
                   ['Wtorek', 'Tam i Tam', 'tam-i-tam'],
-                  ['Środa', 'Naga Środa', 'naga-sroda'],
+                  ['Środa', 'Bezpieczeństwo', 'bezpieczenstwo'],
                   ['Czwartek', 'Pierwszy Raz', 'pierwszy-raz'],
                   ['Sobota', 'Felieton', 'felieton'],
                 ].map(([day, nm, rslug], i) => (
@@ -354,8 +354,8 @@ export function Magazyn() {
           onOpen={openArticle} onMore={() => goRubryka('pierwszy-raz')} limit={3}
         />
         <RubrykaSection
-          id="sec-naga" label="Naga Środa" articles={secNaga}
-          onOpen={openArticle} onMore={() => goRubryka('naga-sroda')} limit={3}
+          id="sec-bezpieczenstwo" label="Bezpieczeństwo" articles={secBezp}
+          onOpen={openArticle} onMore={() => goRubryka('bezpieczenstwo')} limit={3}
         />
         <RubrykaSection
           id="sec-tam" label="Tam i Tam" articles={secTam}
