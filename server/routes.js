@@ -982,8 +982,9 @@ Nie chcesz być widoczny/a na extrafun? Wejdź w Profil → „Ukryj mnie w Szuk
     // Dated swing events live in one_time_events (venue_events is the gay.pl-shared
     // table and holds no swing dates). Alias external_link -> event_url for the
     // frontend's EventCard.
+    const EVENT_COLS = 'id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url:external_link, description, cover_image, is_external'
     let q = supabaseAdmin.from('one_time_events')
-      .select('id, venue_id, event_date, event_name, start_time, end_time, price, location_name, location_address, organizer, event_url:external_link, description, cover_image, is_external')
+      .select(EVENT_COLS)
       .in('venue_id', venue_id ? [Number(venue_id)] : allowIds)
       .gte('event_date', from || today)
       .order('event_date', { ascending: true })
@@ -992,7 +993,27 @@ Nie chcesz być widoczny/a na extrafun? Wejdź w Profil → „Ukryj mnie w Szuk
     if (to) q = q.lte('event_date', to)
     const { data, error } = await q
     if (error) return res.status(500).json({ message: error.message })
-    res.json(await attachVenueInfo(data || []))
+    let rows = data || []
+    // External swing events without a venue row (e.g. a one-off multi-club party in a
+    // club we don't list). Gated on the 'swing' tag so gay external events
+    // (venue_id NULL too, e.g. Hustlaball) don't leak onto extrafun.
+    if (!venue_id) {
+      let q2 = supabaseAdmin.from('one_time_events')
+        .select(EVENT_COLS)
+        .is('venue_id', null)
+        .eq('is_external', true)
+        .contains('tags', ['swing'])
+        .gte('event_date', from || today)
+        .order('event_date', { ascending: true })
+        .limit(200)
+      if (to) q2 = q2.lte('event_date', to)
+      const { data: ext, error: extErr } = await q2
+      if (extErr) return res.status(500).json({ message: extErr.message })
+      rows = [...rows, ...(ext || [])].sort((a, b) =>
+        String(a.event_date).localeCompare(String(b.event_date)) ||
+        String(a.start_time || '').localeCompare(String(b.start_time || '')))
+    }
+    res.json(await attachVenueInfo(rows))
   })
 
   // === CALENDAR EVENTS ===
