@@ -47,6 +47,14 @@ export const MONTH_THEMES = {
     video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/Pola_pazdiernik_hero.mp4',
     slugs: ['temat-2026-10'],
   },
+  11: {
+    label: 'Listopad · Temat Miesiąca: Bi Curious',
+    title: 'Bi curious. Ciekawość bez etykiety.',
+    lead: 'Listopad o ciekawości, która nie musi od razu mieć nazwy: czym różni się ciekawość od orientacji, jak wygląda bi w lifestyle i w związku, i jak o tym rozmawiać bez szufladek.',
+    image: '/editorial/hero-bi-curious.jpg',
+    imageMobile: '/editorial/hero-bi-curious-mobile.jpg',
+    slugs: ['temat-2026-11'],
+  },
 }
 
 // Editorial early-start: unveil next month's theme before the calendar does.
@@ -55,7 +63,7 @@ export const MONTH_THEMES = {
 // month automatically becomes "Zeszły Temat Miesiąca". Clear it once the real
 // calendar catches up (harmless to leave — same result either way past that
 // point, but a stale override reads as a bug to the next person editing this).
-const ACTIVE_MONTH_OVERRIDE = 10
+const ACTIVE_MONTH_OVERRIDE = null // 21.10: wyczyszczone, od 01.11 hero = Listopad (Bi Curious) sam z kalendarza
 
 // Exported so quiz-month.js (and anything else keyed by editorial month)
 // shares the exact same "what month is it" logic — no separate override to

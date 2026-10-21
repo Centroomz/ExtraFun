@@ -194,7 +194,7 @@ function ThemeTile({ theme, articles, themeSlug, lastTheme, lastThemeSlug, lastT
       <Dots count={slides} active={active} />
       <div ref={ref} onScroll={onScroll} className="flex w-full h-full overflow-x-auto snap-x snap-mandatory scrollbar-none">
         <Link href={`/magazyn/rubryka/${themeSlug}`} className="relative block shrink-0 w-full h-full snap-start no-underline">
-          <Cover image={theme.image} video={theme.video} position="center 38%" />
+          <Cover image={theme.imageMobile || theme.image} video={theme.video} position="center 38%" />
           <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
             <span className="font-body text-label-caps uppercase text-primary-container block mb-2">{theme.label} →</span>
             <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-3">{theme.title}</h1>
@@ -209,7 +209,7 @@ function ThemeTile({ theme, articles, themeSlug, lastTheme, lastThemeSlug, lastT
         ))}
         {hasLast && (
           <Link href={`/magazyn/rubryka/${lastThemeSlug}`} className="relative block shrink-0 w-full h-full snap-start no-underline ring-4 ring-inset ring-primary-container/40">
-            <Cover image={lastTheme.image} position="center 38%" />
+            <Cover image={lastTheme.imageMobile || lastTheme.image} position="center 38%" />
             <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
               <span className="font-body text-label-caps uppercase text-primary-container block mb-2">Zeszły Temat Miesiąca →</span>
               <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-3">{lastThemeName}</h1>
@@ -231,7 +231,7 @@ function ThemeTile({ theme, articles, themeSlug, lastTheme, lastThemeSlug, lastT
 function PastThemeTile({ slug, name, theme }) {
   return (
     <Link href={`/magazyn/rubryka/${slug}`} className={`relative block w-full ${TILE_H} snap-start overflow-hidden no-underline ring-4 ring-inset ring-primary-container/40`}>
-      <Cover image={theme.image} position="center 38%" />
+      <Cover image={theme.imageMobile || theme.image} position="center 38%" />
       <div className="absolute inset-x-0 bottom-0 px-margin-mobile pb-6">
         <span className="font-body text-label-caps uppercase text-primary-container block mb-2">Zeszły Temat Miesiąca →</span>
         <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-none mb-3">{name}</h1>

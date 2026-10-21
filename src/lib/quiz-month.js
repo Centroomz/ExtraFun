@@ -9,6 +9,7 @@
 import { QUIZ as PLAZOWICZ_QUIZ } from './quiz-plazowicz'
 import { QUIZ as DOGGING_QUIZ } from './quiz-dogging'
 import { QUIZ as SWING_QUIZ } from './quiz-swing'
+import { QUIZ as BI_CURIOUS_QUIZ } from './quiz-bi-curious'
 import { activeMonth } from './theme-month'
 
 export const MONTH_QUIZZES = {
@@ -16,6 +17,7 @@ export const MONTH_QUIZZES = {
   8: PLAZOWICZ_QUIZ,
   9: DOGGING_QUIZ,
   10: SWING_QUIZ,
+  11: BI_CURIOUS_QUIZ,
 }
 
 export function getMonthQuiz(date = new Date()) {
