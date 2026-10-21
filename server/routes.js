@@ -69,7 +69,9 @@ async function finderBlockedSet(me) {
 }
 
 export function registerRoutes(app) {
-  app.get('/api/health', (_req, res) => res.json({ ok: true }))
+  // `commit` lets the deploy workflow confirm that the NEW version is live
+  // (Railway injects RAILWAY_GIT_COMMIT_SHA for GitHub-sourced deploys).
+  app.get('/api/health', (_req, res) => res.json({ ok: true, commit: process.env.RAILWAY_GIT_COMMIT_SHA || null }))
 
   // === MIEJSCA (swingers venues directory) ===
   app.get('/api/places', async (_req, res) => {
