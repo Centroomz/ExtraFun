@@ -5,6 +5,7 @@ import { apiFetch, apiFetchShared } from '../lib/api'
 import { ARTICLES } from '../lib/articles'
 import { useAuth } from '../hooks/useAuth'
 import { SiteRail } from '../components/SiteRail'
+import { ArticleComments } from '../components/ArticleComments'
 import { coverUrl, coverSrcSet } from '../lib/images'
 import { useDeferredVideo } from '../lib/useDeferredVideo'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
@@ -349,6 +350,8 @@ export function ArticleDetailPage() {
             ))}
           </div>
         )}
+
+        {article.id && <ArticleComments articleId={article.id} />}
 
         {related.length > 0 && (
           <section className="mt-16">

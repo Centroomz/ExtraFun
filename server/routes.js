@@ -248,6 +248,75 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
     res.json(data)
   })
 
+  // === ARTICLE COMMENTS (shared table `article_comments`, same as gay.pl) ===
+  // Only articles of THIS site are commentable (article ids are global across
+  // portals, so the site check keeps gay.pl threads out of EF and vice versa).
+  async function efArticleExists(id) {
+    if (!Number.isInteger(id)) return false
+    const { data } = await supabaseAdmin.from('articles').select('id')
+      .eq('id', id).eq('site', 'extrafun').eq('status', 'published').maybeSingle()
+    return !!data
+  }
+
+  app.get('/api/articles/:id/comments', optionalAuth, async (req, res) => {
+    const articleId = parseInt(req.params.id)
+    if (!(await efArticleExists(articleId))) return res.status(404).json({ message: 'Not found' })
+    const { data, error } = await supabaseAdmin.from('article_comments')
+      .select('id, user_id, username, content, created_at')
+      .eq('article_id', articleId).order('created_at', { ascending: true }).limit(200)
+    if (error) return res.status(500).json({ message: error.message })
+    const admin = isAdminEmail(req.user?.email)
+    // Privacy (as in /api/shoutbox): logged-out visitors get only the initial
+    // so a scraper can't harvest a nick list; user_id is never sent, only `mine`.
+    res.json((data || []).map(c => ({
+      id: c.id,
+      username: req.user
+        ? c.username
+        : ((c.username || '').trim() ? c.username.trim()[0].toUpperCase() + '.' : 'Gość'),
+      content: c.content,
+      created_at: c.created_at,
+      mine: !!req.user && c.user_id === req.user.id,
+      canDelete: !!req.user && (c.user_id === req.user.id || admin),
+    })))
+  })
+
+  app.post('/api/articles/:id/comments', verifyJWT, async (req, res) => {
+    const articleId = parseInt(req.params.id)
+    if (!(await efArticleExists(articleId))) return res.status(404).json({ message: 'Not found' })
+    const content = String(req.body?.content || '').trim()
+    if (!content || content.length > 1000) return res.status(400).json({ message: 'Komentarz: 1–1000 znaków' })
+    // No links in comments (spam / outing vector); admins may post them.
+    if (!isAdminEmail(req.user.email) && /https?:\/\/|www\.|\b[a-z0-9-]+\.(com|pl|net|org|io|eu|ru|xyz|info)\b/i.test(content))
+      return res.status(400).json({ message: 'Linki w komentarzach są wyłączone' })
+    // Throttle: max 5 comments per minute per user.
+    const since = new Date(Date.now() - 60_000).toISOString()
+    const { count } = await supabaseAdmin.from('article_comments')
+      .select('id', { count: 'exact', head: true }).eq('user_id', req.user.id).gte('created_at', since)
+    if ((count || 0) >= 5) return res.status(429).json({ message: 'Za szybko, spróbuj za chwilę' })
+    const meta = req.user.meta || {}
+    const username = meta.display_name || meta.full_name || meta.name || meta.username || 'Użytkownik'
+    const { data, error } = await supabaseAdmin.from('article_comments')
+      .insert({ article_id: articleId, user_id: req.user.id, username, content })
+      .select('id, username, content, created_at').single()
+    if (error) return res.status(500).json({ message: error.message })
+    res.status(201).json({ ...data, mine: true, canDelete: true })
+  })
+
+  app.delete('/api/articles/comments/:id', verifyJWT, async (req, res) => {
+    const id = parseInt(req.params.id)
+    if (!Number.isInteger(id)) return res.status(400).json({ message: 'Bad id' })
+    const { data: c } = await supabaseAdmin.from('article_comments')
+      .select('id, user_id, article_id').eq('id', id).maybeSingle()
+    if (!c) return res.status(404).json({ message: 'Komentarz nie istnieje' })
+    if (c.user_id !== req.user.id && !isAdminEmail(req.user.email))
+      return res.status(403).json({ message: 'Brak uprawnień' })
+    // Never touch another portal's comments through this site's API.
+    if (!(await efArticleExists(c.article_id))) return res.status(403).json({ message: 'Brak uprawnień' })
+    const { error } = await supabaseAdmin.from('article_comments').delete().eq('id', id)
+    if (error) return res.status(500).json({ message: error.message })
+    res.json({ ok: true })
+  })
+
   // === AKTUALNOŚCI (news) ===
   // Items are ingested by the gay.pl server's news fetcher (single shared workflow)
   // and tagged site='extrafun'. Here we only read the extrafun slice.
