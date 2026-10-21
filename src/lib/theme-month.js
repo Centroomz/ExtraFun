@@ -53,6 +53,7 @@ export const MONTH_THEMES = {
     lead: 'Listopad o ciekawości, która nie musi od razu mieć nazwy: czym różni się ciekawość od orientacji, jak wygląda bi w lifestyle i w związku, i jak o tym rozmawiać bez szufladek.',
     image: '/editorial/hero-bi-curious.jpg',
     imageMobile: '/editorial/hero-bi-curious-mobile.jpg',
+    video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/hero-pola-bicurious-540.mp4',
     slugs: ['temat-2026-11'],
   },
 }
