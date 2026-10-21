@@ -1,8 +1,8 @@
-// Quiz miesiąca — Listopad 2026: "Jaka ciekawość w tobie siedzi?"
+// Quiz miesiąca — Listopad 2026: "Czy jesteś bi curious?"
 // Silnik typowy (4 typy). Każda odpowiedź punktuje jeden typ wg indeksu.
 // To zabawa o stylu ciekawości, nie test orientacji i nie diagnoza.
 
-export const QUIZ_TITLE = 'Jaka ciekawość w tobie siedzi?'
+export const QUIZ_TITLE = 'Czy jesteś bi curious?'
 export const QUIZ_INTRO = 'Temat miesiąca: Bi Curious. 12 pytań, 4 style ciekawości. To zabawa, nie test orientacji: sprawdź, jak obchodzisz się z pytaniami, na które nie musisz mieć jeszcze odpowiedzi.'
 
 export const QUIZ_QUESTIONS = [
