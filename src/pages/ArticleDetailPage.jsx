@@ -8,6 +8,7 @@ import { SiteRail } from '../components/SiteRail'
 import { ArticleComments } from '../components/ArticleComments'
 import { coverUrl, coverSrcSet } from '../lib/images'
 import { useDeferredVideo } from '../lib/useDeferredVideo'
+import { prefersReducedMotion } from '../lib/motion'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
 
 const ADMIN_EMAILS = ['pinksservice@gmail.com', 'kingaa.kaczynska@gmail.com']
@@ -136,6 +137,8 @@ function CtaBox({ categorySlug }) {
 function CoverVideo({ src, poster, title }) {
   const ref = useRef(null)
   const [muted, setMuted] = useState(true)
+  // Pauza = odmontowanie <video>: zostaje plakat (klatka startowa), wznowienie od początku.
+  const [paused, setPaused] = useState(() => prefersReducedMotion())
   const ready = useDeferredVideo(poster, true)
   const toggle = () => {
     const v = ref.current
@@ -147,14 +150,18 @@ function CoverVideo({ src, poster, title }) {
   }
   return (
     <div className="relative w-full">
-      {ready
+      {ready && !paused
         ? <video ref={ref} src={src} poster={poster} preload="none" autoPlay muted loop playsInline
             aria-label={title} className="w-full h-auto max-h-[60vh] object-cover" />
         : <img src={coverUrl(poster, 750)} srcSet={coverSrcSet(poster, [420, 750, 1080])} sizes="(min-width: 1024px) 896px, 100vw"
             alt={title} className="w-full h-auto max-h-[60vh] object-cover" />}
-      {ready && <button onClick={toggle} aria-label={muted ? 'Włącz dźwięk' : 'Wycisz'}
+      {ready && !paused && <button onClick={toggle} aria-label={muted ? 'Włącz dźwięk' : 'Wycisz'}
         className="absolute bottom-3 right-3 flex items-center gap-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-2 backdrop-blur transition">
         <span aria-hidden>{muted ? '🔊' : '🔇'}</span> {muted ? 'Posłuchaj' : 'Wycisz'}
+      </button>}
+      {ready && <button onClick={() => { setPaused(p => !p); setMuted(true) }} aria-label={paused ? 'Odtwórz film' : 'Zatrzymaj film'} aria-pressed={paused}
+        className="absolute bottom-3 left-3 flex items-center gap-2 rounded-full bg-black/60 hover:bg-black/80 text-white text-sm px-3 py-2 backdrop-blur transition">
+        <span aria-hidden>{paused ? '▶' : '⏸'}</span> {paused ? 'Odtwórz' : 'Pauza'}
       </button>}
     </div>
   )

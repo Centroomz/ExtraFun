@@ -3,6 +3,7 @@ import { Link } from 'wouter'
 import { useImpression, trackClick } from '../lib/cardStats'
 import { CardStatBadge } from './CardStatBadge'
 import { useDeferredVideo } from '../lib/useDeferredVideo'
+import { prefersReducedMotion } from '../lib/motion'
 import { coverUrl, coverSrcSet } from '../lib/images'
 
 // Mobile /magazyn = full-screen tiles, Instagram/Reels logic (spec 2026-09-17,
@@ -99,7 +100,7 @@ export function Cover({ image, video, position = 'center' }) {
   const [unmuted, setUnmuted] = useState(false)
   // Pauza = odmontowanie <video>: zostaje plakat (wybrana klatka) i nie ciągniemy klipu,
   // wznowienie startuje od początku.
-  const [paused, setPaused] = useState(false)
+  const [paused, setPaused] = useState(() => prefersReducedMotion())
   return (
     <div ref={ref} className="absolute inset-0">
       {/* With a clip: the poster <img> is painted first (it is the LCP) and the

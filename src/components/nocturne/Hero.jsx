@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Button } from './Button'
 import { useDeferredVideo } from '../../lib/useDeferredVideo'
+import { prefersReducedMotion } from '../../lib/motion'
 
 // Full-bleed editorial hero spread: moody image + vignette + left-aligned Bodoni headline.
 // Optional `aside` renders a panel on the right (desktop) — hidden on mobile.
@@ -10,6 +11,8 @@ import { useDeferredVideo } from '../../lib/useDeferredVideo'
 export function Hero({ image, video, imagePosition = 'center', label, onLabel, title, lead, ctaLabel, onCta, aside, footer, italic = true, mobileCompact = false }) {
   const videoRef = useRef(null)
   const [muted, setMuted] = useState(true)
+  // Pauza = odmontowanie <video>: zostaje obraz-plakat (klatka startowa), wznowienie od początku.
+  const [paused, setPaused] = useState(() => prefersReducedMotion())
   const videoReady = useDeferredVideo(image, !!video)
   const toggleSound = () => {
     const v = videoRef.current
@@ -23,7 +26,7 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
       <div className="absolute inset-0">
         {/* Clip is deferred (useDeferredVideo) and layered over the still image,
             which stays underneath so the LCP is the image, not the clip's first frame. */}
-        {video && videoReady && (
+        {video && videoReady && !paused && (
           <video
             ref={videoRef}
             className="lg:hidden absolute inset-0 w-full h-full object-cover"
@@ -37,7 +40,7 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
           : <div className={`${video ? 'hidden lg:block ' : ''}w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest`} />}
         <div className="absolute inset-0" style={{ background: 'linear-gradient(0deg, rgba(18,20,20,.95) 5%, rgba(18,20,20,.4) 45%, rgba(18,20,20,.2) 100%)' }} />
       </div>
-      {video && (
+      {video && !paused && (
         <button
           onClick={toggleSound}
           aria-label={muted ? 'Włącz dźwięk' : 'Wycisz'}
@@ -45,6 +48,17 @@ export function Hero({ image, video, imagePosition = 'center', label, onLabel, t
           style={{ background: 'rgba(18,20,20,0.55)', backdropFilter: 'blur(4px)' }}
         >
           <span className="text-xl leading-none">{muted ? '🔇' : '🔊'}</span>
+        </button>
+      )}
+      {video && (
+        <button
+          onClick={() => { setPaused(p => !p); setMuted(true) }}
+          aria-label={paused ? 'Odtwórz film' : 'Zatrzymaj film'}
+          aria-pressed={paused}
+          className={`lg:hidden absolute ${paused ? 'top-4' : 'top-[4.5rem]'} right-4 z-20 w-11 h-11 rounded-full flex items-center justify-center border border-white/20`}
+          style={{ background: 'rgba(18,20,20,0.55)', backdropFilter: 'blur(4px)' }}
+        >
+          <span className="text-xl leading-none">{paused ? '▶' : '⏸'}</span>
         </button>
       )}
       <div className={`relative z-10 px-6 md:px-16 ${footer ? 'pb-8' : (mobileCompact ? 'pb-6 md:pb-16' : 'pb-16')} ${aside ? 'flex flex-col md:flex-row md:items-end md:justify-between gap-8' : ''}`}>
