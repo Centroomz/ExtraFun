@@ -97,6 +97,9 @@ export function Cover({ image, video, position = 'center' }) {
   const near = useNearViewport(ref)
   // Autoplay requires muted; sound is opt-in via the button below.
   const [unmuted, setUnmuted] = useState(false)
+  // Pauza = odmontowanie <video>: zostaje plakat (wybrana klatka) i nie ciągniemy klipu,
+  // wznowienie startuje od początku.
+  const [paused, setPaused] = useState(false)
   return (
     <div ref={ref} className="absolute inset-0">
       {/* With a clip: the poster <img> is painted first (it is the LCP) and the
@@ -105,13 +108,13 @@ export function Cover({ image, video, position = 'center' }) {
       {video
         ? <>
             {image && <img src={coverUrl(image, 750)} srcSet={coverSrcSet(image, TILE_WIDTHS)} sizes="100vw" alt="" fetchPriority="high" className="w-full h-full object-cover" />}
-            {videoReady && near && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted={!unmuted} loop playsInline poster={coverUrl(image, 750) || undefined} src={video} />}
+            {videoReady && near && !paused && <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted={!unmuted} loop playsInline poster={coverUrl(image, 750) || undefined} src={video} />}
           </>
         : image
           ? <img src={near ? coverUrl(image, 750) : undefined} srcSet={near ? coverSrcSet(image, TILE_WIDTHS) : undefined} sizes="100vw" alt="" loading="lazy" className="w-full h-full object-cover" style={{ objectPosition: position }} />
           : <div className="w-full h-full bg-gradient-to-br from-surface-container-high to-surface-container-lowest" />}
       <div className="absolute inset-0" style={{ background: SCRIM }} />
-      {video && videoReady && near && (
+      {video && videoReady && near && !paused && (
         <button
           type="button"
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setUnmuted(u => !u) }}
@@ -119,6 +122,16 @@ export function Cover({ image, video, position = 'center' }) {
           className="absolute top-4 right-margin-mobile z-20 w-16 h-16 rounded-full bg-black/60 backdrop-blur border border-white/25 flex items-center justify-center text-3xl active:scale-95 transition-transform"
         >
           {unmuted ? '🔊' : '🔇'}
+        </button>
+      )}
+      {video && videoReady && near && (
+        <button
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPaused(p => !p); setUnmuted(false) }}
+          aria-label={paused ? 'Odtwórz film' : 'Zatrzymaj film'}
+          className={`absolute ${paused ? 'top-4' : 'top-24'} right-margin-mobile z-20 w-16 h-16 rounded-full bg-black/60 backdrop-blur border border-white/25 flex items-center justify-center text-3xl active:scale-95 transition-transform`}
+        >
+          {paused ? '▶' : '⏸'}
         </button>
       )}
     </div>

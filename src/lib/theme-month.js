@@ -55,6 +55,12 @@ export const MONTH_THEMES = {
     imageMobile: '/editorial/hero-bi-curious-mobile.jpg',
     video: 'https://lvxaycjuhchoqhnttyjj.supabase.co/storage/v1/object/public/article-covers/hero-pola-bicurious-540.mp4',
     slugs: ['temat-2026-11'],
+    // Druga połowa miesiąca: blondynka -> brunet (user 21.10). Od `from` pola z `swap`
+    // nadpisują bazowe. Brak pola = zostaje bazowe (np. mobile czeka na pionowy kadr z bruneta).
+    swap: {
+      from: '2026-11-16T00:00:00',
+      image: '/editorial/hero-bi-curious-brunet.jpg',
+    },
   },
 }
 
@@ -74,7 +80,12 @@ export function activeMonth(date) {
 }
 
 export function getMonthTheme(date = new Date()) {
-  return MONTH_THEMES[activeMonth(date)] || null
+  const theme = MONTH_THEMES[activeMonth(date)] || null
+  if (theme?.swap && date >= new Date(theme.swap.from)) {
+    const { from, ...over } = theme.swap
+    return { ...theme, ...over }
+  }
+  return theme
 }
 
 // Past themes, most recent first, stopping at the first gap in the config
