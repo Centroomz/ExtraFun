@@ -17,6 +17,7 @@ const Przewodnik = lazy(() => import('./pages/Przewodnik').then(m => ({ default:
 const Czat = lazy(() => import('./pages/Czat').then(m => ({ default: m.Czat })))
 const Ogloszenia = lazy(() => import('./pages/Ogloszenia').then(m => ({ default: m.Ogloszenia })))
 const Finder = lazy(() => import('./pages/Finder').then(m => ({ default: m.Finder })))
+const Szukaj = lazy(() => import('./pages/Szukaj').then(m => ({ default: m.Szukaj })))
 const Profil = lazy(() => import('./pages/Profil').then(m => ({ default: m.Profil })))
 const LoginPage = lazy(() => import('./auth/LoginPage').then(m => ({ default: m.LoginPage })))
 const SignupPage = lazy(() => import('./auth/SignupPage').then(m => ({ default: m.SignupPage })))
@@ -117,6 +118,14 @@ const NAV_ITEMS = [
     )
   },
   {
+    id: 'profile', label: 'Profile', href: '/profile',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    )
+  },
+  {
     id: 'szukaj', label: 'Szukaj', href: '/szukaj',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -138,6 +147,7 @@ function DesktopNav({ user, profile, onSignOut }) {
     : location.startsWith('/czat') ? 'czat'
     : location.startsWith('/slownik') ? 'slownik'
     : location.startsWith('/ogloszenia') ? 'ogloszenia'
+    : location.startsWith('/profile') ? 'profile'
     : location.startsWith('/szukaj') ? 'szukaj'
     : location.startsWith('/wiadomosci') ? 'wiadomosci'
     : location.startsWith('/kontakt') ? 'kontakt'
@@ -388,7 +398,8 @@ function AppInner() {
             <Route path="/plaze" component={Plaze} />
             <Route path="/czat">{() => <Czat user={user} />}</Route>
             <Route path="/ogloszenia">{() => <Ogloszenia user={user} />}</Route>
-            <Route path="/szukaj">{() => <Finder user={user} />}</Route>
+            <Route path="/profile">{() => <Finder user={user} />}</Route>
+            <Route path="/szukaj" component={Szukaj} />
             <Route path="/wiadomosci">{() => <Wiadomosci user={user} />}</Route>
             <Route path="/kontakt">{() => <Kontakt user={user} />}</Route>
             <Route path="/login">{() => <LoginPage onSwitch={() => navigate('/signup')} onSuccess={() => navigate('/magazyn')} />}</Route>
@@ -423,10 +434,11 @@ function AppInner() {
           : location.startsWith('/czat') ? 'czat'
           : location.startsWith('/slownik') ? 'slownik'
           : location.startsWith('/ogloszenia') ? 'ogloszenia'
+          : location.startsWith('/profile') ? 'profile'
           : location.startsWith('/szukaj') ? 'szukaj'
           : 'magazyn'
         } onNavigate={(id) => {
-          const map = { magazyn: '/magazyn', aktualnosci: '/aktualnosci', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia', szukaj: '/szukaj' }
+          const map = { magazyn: '/magazyn', aktualnosci: '/aktualnosci', imprezy: '/imprezy', przewodnik: '/miejsca', czat: '/czat', slownik: '/slownik', ogloszenia: '/ogloszenia', profile: '/profile', szukaj: '/szukaj' }
           navigate(map[id] || '/magazyn')
         }} />
 

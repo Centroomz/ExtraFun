@@ -113,7 +113,7 @@ export function Finder({ user }) {
   return (
     <div className="bg-background min-h-screen text-on-surface">
       <main className="max-w-5xl mx-auto px-6 md:px-16 pt-8 pb-24">
-        <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-tight mb-6">Szukaj</h1>
+        <h1 className="font-display font-semibold text-display-lg-mobile text-on-surface leading-tight mb-6">Profile</h1>
 
         {state.loading ? (
           <p className="font-body text-body-md text-on-surface-variant">Ładowanie…</p>

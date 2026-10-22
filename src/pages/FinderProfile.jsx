@@ -43,7 +43,7 @@ export function FinderProfile({ id, onBack, onBlocked }) {
     return (
       <div className="bg-background min-h-screen text-on-surface">
         <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
-          <button onClick={onBack} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Szukaj</button>
+          <button onClick={onBack} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Profile</button>
           <p className="font-body text-body-md text-on-surface-variant">Nie znaleziono profilu.</p>
         </main>
       </div>
@@ -54,7 +54,7 @@ export function FinderProfile({ id, onBack, onBlocked }) {
   return (
     <div className="bg-background min-h-screen text-on-surface">
       <main className="max-w-2xl mx-auto px-6 md:px-16 pt-12 pb-24">
-        <button onClick={onBack} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Szukaj</button>
+        <button onClick={onBack} className="font-body text-label-caps uppercase text-primary-container mb-6 inline-block hover:opacity-80">← Profile</button>
 
         <div className="flex items-center gap-4 mb-6">
           {p.avatarUrl

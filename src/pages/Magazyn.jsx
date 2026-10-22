@@ -219,6 +219,13 @@ export function Magazyn() {
   // Backbone rubrics (newest first). Empty ones render nothing (RubrykaSection).
   const secTemat  = bySlugs(themeSlugs)
   const secPierw  = bySlugs(['pierwszy-raz'])
+  // "Pierwszy raz? Zacznij tu" — 4 teksty wybrane ręcznie (kolejność = kolejność
+  // czytania nowicjusza). Zniknie w całości, jeśli któregoś slugu brak w bazie.
+  const FIRST_TIME = [
+    'ef-pierwszy-raz-jak-wejsc-samemu', 'ef-pierwszy-raz-co-zabrac-prawie-nic',
+    'pierwszy-raz-singiel-na-imprezie-swingerskiej', 'pierwszy-raz-kino-dla-doroslych-przewodnik',
+  ]
+  const secStart = FIRST_TIME.map(s => allArticles.find(a => a.slug === s)).filter(Boolean)
   const secBezp   = bySlugs(['bezpieczenstwo'])
   const secTam    = bySlugs(['tam-i-tam'])
   const secFel    = bySlugs(['felieton'])
@@ -306,6 +313,14 @@ export function Magazyn() {
 
       <main className="max-w-container-max mx-auto px-6 md:px-16 pb-24">
 
+        <Link
+          href="/szukaj"
+          className="mt-6 mb-2 flex items-center gap-3 w-full max-w-md border border-outline-variant/20 rounded-full px-5 py-3 no-underline font-body text-body-md text-on-surface-variant hover:border-primary-container/50 transition-colors"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" /></svg>
+          Szukaj w ExtraFun…
+        </Link>
+
         <div className="lg:grid lg:grid-cols-12 lg:gap-x-12">
           <div className="lg:col-span-8">
 
@@ -336,6 +351,13 @@ export function Magazyn() {
           <RubrykaSection
             id="sec-najnowsze" label="Najnowsze" articles={[newest]}
             onOpen={openArticle} layout="wide" limit={1}
+          />
+        )}
+        {secStart.length === FIRST_TIME.length && (
+          <RubrykaSection
+            id="sec-zacznij-tu" label="Pierwszy raz? Zacznij tu" articles={secStart}
+            onOpen={openArticle} onMore={() => goRubryka('pierwszy-raz')} moreLabel="Wszystkie →"
+            layout="feature" limit={4}
           />
         )}
         {/* Bloki per rubryka — kolejność = rytm tygodnia. Puste znikają. */}

@@ -60,6 +60,15 @@ const NAV_ITEMS = [
     )
   },
   {
+    id: 'profile',
+    label: 'Profile',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
+      </svg>
+    )
+  },
+  {
     id: 'szukaj',
     label: 'Szukaj',
     icon: (
@@ -70,11 +79,17 @@ const NAV_ITEMS = [
   },
 ]
 
+// Kolejność wg logów page_views (30 dni): Ogłoszenia i Czat ciągną najwięcej ruchu
+// po Magazynie. Słownik zdjęty z paska (dostępny przez Szukaj) — zrobił miejsce
+// na Profile i Szukaj.
+const BAR_ORDER = ['magazyn', 'ogloszenia', 'czat', 'przewodnik', 'imprezy', 'profile', 'szukaj']
+const BAR_ITEMS = BAR_ORDER.map(id => NAV_ITEMS.find(i => i.id === id))
+
 export function BottomNav({ active, onNavigate }) {
   return (
     <nav className="bottom-nav">
       <div className="bottom-nav-inner">
-        {NAV_ITEMS.map(({ id, label, icon }) => (
+        {BAR_ITEMS.map(({ id, label, icon }) => (
           <button
             key={id}
             className={`nav-item ${active === id ? 'active' : ''}`}
