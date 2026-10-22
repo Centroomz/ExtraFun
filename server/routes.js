@@ -460,6 +460,57 @@ const BOT_UA = /bot|crawl|spider|slurp|headless|phantom|puppeteer|playwright|pyt
     }))
   })
 
+  // === Prawa kolumna (SiteRail): ogłoszenia, czat, najczęściej czytane ===
+  // Najczęściej czytane liczone z page_views BEZ ruchu z banera (utm_source) i
+  // botów — baner bizarriusz daje ~94% sesji jednego artykułu, `articles.views`
+  // go zawyża. Cache 10 min: agregacja idzie w JS po max 20k wierszach.
+  let railCache = { at: 0, data: null }
+  app.get('/api/rail', async (_req, res) => {
+    if (railCache.data && Date.now() - railCache.at < 10 * 60 * 1000) {
+      res.set('Cache-Control', 'public, max-age=300')
+      return res.json(railCache.data)
+    }
+    const monthAgo = new Date(Date.now() - 30 * 86400000).toISOString()
+    const halfHourAgo = new Date(Date.now() - 30 * 60000).toISOString()
+
+    const { data: pv } = await supabaseAdmin.from('page_views')
+      .select('path, session_id')
+      .eq('site', 'extrafun').is('utm_source', null).not('is_bot', 'is', true)
+      .like('path', '/magazyn/%').gte('created_at', monthAgo).limit(20000)
+    const sessionsBySlug = {}
+    for (const r of (pv || [])) {
+      const slug = String(r.path).replace('/magazyn/', '')
+      if (!slug || slug.includes('/')) continue
+      ;(sessionsBySlug[slug] ||= new Set()).add(r.session_id || Math.random())
+    }
+    const topSlugs = Object.entries(sessionsBySlug)
+      .sort((a, b) => b[1].size - a[1].size).slice(0, 8).map(([s]) => s)
+    let popular = []
+    if (topSlugs.length) {
+      const { data: arts } = await supabaseAdmin.from('articles')
+        .select('id, title, slug, cover_image')
+        .eq('site', 'extrafun').eq('status', 'published').in('slug', topSlugs)
+      const bySlug = Object.fromEntries((arts || []).map(a => [a.slug, a]))
+      popular = topSlugs.map(s => bySlug[s]).filter(Boolean).slice(0, 5)
+    }
+
+    const { data: adsRows } = await supabaseAdmin.from('ads')
+      .select('id, title, created_at')
+      .eq('status', 'active')
+      .or('source.neq.bizarriusz,cross_post_extrafun.not.is.false')
+      .gte('created_at', monthAgo)
+      .order('created_at', { ascending: false }).limit(2000)
+    const ads = { count: (adsRows || []).length, latest: (adsRows || []).slice(0, 5).map(a => ({ id: a.id, title: a.title })) }
+
+    const { data: chatRows } = await supabaseAdmin.from('shoutbox_messages')
+      .select('username, user_id').eq('source', 'bizarriusz').eq('held', false).gte('created_at', halfHourAgo)
+    const chatActive = new Set((chatRows || []).map(m => m.user_id || m.username).filter(Boolean)).size
+
+    railCache = { at: Date.now(), data: { popular, ads, chatActive } }
+    res.set('Cache-Control', 'public, max-age=300')
+    res.json(railCache.data)
+  })
+
   app.post('/api/ads', verifyJWT, async (req, res) => {
     const { type, title, description, city, latitude, longitude } = req.body || {}
     if (!title?.trim()) return res.status(400).json({ message: 'Tytuł wymagany' })

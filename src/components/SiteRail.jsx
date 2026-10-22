@@ -3,7 +3,7 @@ import { Link, useLocation } from 'wouter'
 import { getWordOfTheDay } from '../lib/dictionary'
 import { apiFetch, apiFetchShared } from '../lib/api'
 import { useGeolocation } from '../hooks/useGeolocation'
-import { sortByDistance, formatDistance } from '../lib/geo'
+import { calculateDistance } from '../lib/geo'
 import { getMonthQuiz, quizDoneKey } from '../lib/quiz-month'
 import { getPastThemes } from '../lib/theme-month'
 import { SLUG_TO_DISPLAY } from '../lib/rubryki'
@@ -155,56 +155,163 @@ function QuizModule({ onStartQuiz, quizDone }) {
   )
 }
 
-/* ── Miejsca blisko — GPS when granted, otherwise Warsaw ── */
-function NearbyModule() {
-  const [venues, setVenues] = useState(null)
-  const { location, error, loading, requestLocation } = useGeolocation()
+/* ── Ogłoszenia: liczba z ostatniego miesiąca + 5 najnowszych tytułów ── */
+function AdsModule({ ads }) {
+  if (!ads || !ads.latest.length) return null
+  return (
+    <section>
+      <h3 className={railLabel}>Ogłoszenia · {ads.count} w tym miesiącu</h3>
+      <ul className="space-y-3">
+        {ads.latest.map(a => (
+          <li key={a.id}>
+            <Link href="/ogloszenia" className="font-body text-body-md text-on-surface leading-snug line-clamp-2 no-underline hover:text-primary-container transition-colors">{a.title}</Link>
+          </li>
+        ))}
+      </ul>
+      <Link href="/ogloszenia" className={railLink}>Wszystkie ogłoszenia →</Link>
+    </section>
+  )
+}
+
+/* ── Imprezy w pobliżu: miasto z GPS albo z wyboru (zapamiętane), do 30 km.
+   Brak imprez w zasięgu → najbliższe w innych miastach z datą i miastem.
+   Brak wybranego miasta → tylko pastylka wyboru, żadnych zgadniętych imprez. ── */
+const NEAR_KM = 30
+const CITY_KEY = 'ef_city'
+const fmtDay = (d) => new Date(String(d).slice(0, 10) + 'T12:00:00').toLocaleDateString('pl-PL', { weekday: 'short', day: 'numeric', month: 'short' })
+
+function readCity() { try { return JSON.parse(localStorage.getItem(CITY_KEY)) } catch { return null } }
+
+function NearbyEventsModule() {
+  const [events, setEvents] = useState(null)
+  const [venues, setVenues] = useState([])
+  const [pick, setPick] = useState(readCity())
+  const { location, loading, error, requestLocation } = useGeolocation()
 
   useEffect(() => {
-    apiFetchShared('/api/places')
-      // ExtraFun "kluby": drop naturist beaches (own /plaze page) and gay-scene
-      // venues (gay.pl) — otherwise the 66 gay beaches bury the ~13 swing clubs.
-      .then(data => setVenues((data || []).filter(v => v.name && v.type !== 'plaża' && v.scene !== 'gay')))
-      .catch(() => setVenues([]))
+    const today = new Date().toISOString().slice(0, 10)
+    const to = new Date(Date.now() + 45 * 86400000).toISOString().slice(0, 10)
+    Promise.all([
+      apiFetchShared(`/api/events?from=${today}&to=${to}T23:59:59`),
+      apiFetchShared('/api/places'),
+    ]).then(([ev, pl]) => {
+      setEvents((ev || []).filter(e => e.event_name))
+      setVenues((pl || []).filter(v => v.lat && v.lng && v.type !== 'plaża'))
+    }).catch(() => setEvents([]))
   }, [])
 
-  if (!venues || venues.length === 0) return null
+  useEffect(() => {
+    if (!location) return
+    const c = { lat: location.lat, lng: location.lng, label: 'Twoja okolica' }
+    setPick(c)
+    try { localStorage.setItem(CITY_KEY, JSON.stringify(c)) } catch {}
+  }, [location])
 
-  const withGps = venues.filter(v => v.lat && v.lng)
-  const warsaw = venues.filter(v => (v.city || '').toLowerCase().startsWith('warszaw'))
-  const list = location
-    ? sortByDistance(withGps, location.lat, location.lng).slice(0, 4)
-    : [...warsaw].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0)).slice(0, 4)
-  if (!list.length) return null
+  if (!events) return null
+  const venueOf = (e) => venues.find(v => v.id === e.venue_id || v.legacy_swing_id === e.venue_id)
+  const cities = [...new Set(events.map(e => venueOf(e)?.city).filter(Boolean))].sort()
+  if (!cities.length) return null
+
+  const choose = (city) => {
+    const vs = venues.filter(v => v.city === city)
+    if (!vs.length) return
+    const c = { lat: parseFloat(vs[0].lat), lng: parseFloat(vs[0].lng), label: city }
+    setPick(c)
+    try { localStorage.setItem(CITY_KEY, JSON.stringify(c)) } catch {}
+  }
+
+  const withDist = pick ? events.map(e => {
+    const v = venueOf(e)
+    return { ...e, _city: v?.city, _km: v ? calculateDistance(pick.lat, pick.lng, parseFloat(v.lat), parseFloat(v.lng)) : null }
+  }).filter(e => e._km != null) : []
+  const near = withDist.filter(e => e._km <= NEAR_KM).slice(0, 5)
+  const list = near.length ? near : [...withDist].sort((a, b) => a._km - b._km).slice(0, 3)
 
   return (
-    <div className={railBox}>
-      <div className={railLabel}>{location ? 'Miejsca blisko' : 'Miejsca · Warszawa'}</div>
-      {!location && (
-        <button
-          onClick={requestLocation}
-          disabled={loading}
-          className="font-body text-body-sm text-primary-container hover:opacity-80 block mb-4 disabled:opacity-50"
+    <section>
+      <h3 className={railLabel}>Imprezy w pobliżu</h3>
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <select
+          value={cities.includes(pick?.label) ? pick.label : ''}
+          onChange={e => choose(e.target.value)}
+          className="font-body text-body-sm text-on-surface bg-transparent border border-outline-variant/20 px-3 py-1"
         >
-          {loading ? 'Szukam pozycji…' : '📍 Pokaż najbliższe mnie'}
+          <option value="" className="bg-surface">{pick && !cities.includes(pick.label) ? pick.label : 'Wybierz miasto'}</option>
+          {cities.map(c => <option key={c} value={c} className="bg-surface">{c}</option>)}
+        </select>
+        <button onClick={requestLocation} disabled={loading} className="font-body text-body-sm text-primary-container hover:opacity-80 disabled:opacity-50">
+          {loading ? 'Szukam pozycji…' : '📍 Moja lokalizacja'}
         </button>
-      )}
+      </div>
       {error && <p className="font-body text-body-sm text-on-surface-variant/70 mb-3">{error}</p>}
-      <ul className="space-y-3">
-        {list.map(v => (
-          <li key={v.id} className="flex justify-between items-baseline gap-3">
-            <div className="min-w-0">
-              <div className="font-body text-body-md text-on-surface truncate">{v.name}</div>
-              <div className="font-body text-body-sm text-on-surface-variant">{v.city}</div>
-            </div>
-            {v.distance != null && (
-              <span className="font-body text-body-sm text-primary-container whitespace-nowrap">{formatDistance(v.distance)}</span>
-            )}
+      {pick && list.length > 0 && !near.length && (
+        <p className="font-body text-body-sm text-on-surface-variant mb-3">Brak imprez w promieniu {NEAR_KM} km. Najbliższe w innych miastach:</p>
+      )}
+      <ul className="space-y-4">
+        {list.map(e => (
+          <li key={e.id}>
+            <Link href="/imprezy" className="group block no-underline">
+              <div className="font-body text-body-md text-on-surface leading-snug group-hover:text-primary-container transition-colors">{e.event_name}</div>
+              <div className="font-body text-body-sm text-on-surface-variant">
+                {[fmtDay(e.event_date), e.start_time ? e.start_time.slice(0, 5) : null, e.venue?.name || e.location_name, e._city].filter(Boolean).join(' · ')}
+              </div>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link href="/imprezy" className={railLink}>Wszystkie imprezy →</Link>
+    </section>
+  )
+}
+
+/* ── Czat: ilu różnych autorów pisało w ostatnich 30 min; 0 → moduł ukryty ── */
+function ChatModule({ count }) {
+  if (!count) return null
+  return (
+    <section>
+      <h3 className={railLabel}>Czat</h3>
+      <Link href="/czat" className="font-body text-body-md text-on-surface no-underline hover:text-primary-container transition-colors">
+        {count} {count === 1 ? 'osoba pisała' : 'osób pisało'} w ostatnich 30 minutach
+      </Link>
+      <Link href="/czat" className={railLink}>Wejdź na czat →</Link>
+    </section>
+  )
+}
+
+/* ── Najczęściej oglądane kluby (z logów page_views, bez ruchu z banera) ── */
+const TOP_CLUBS = [364, 5, 415]
+const slugify = (s) => String(s).toLowerCase()
+  .replace(/ł/g, 'l').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+
+function TopClubsModule() {
+  const [clubs, setClubs] = useState([])
+  useEffect(() => {
+    apiFetchShared('/api/places')
+      .then(data => setClubs(TOP_CLUBS.map(id => (data || []).find(v => v.id === id)).filter(Boolean)))
+      .catch(() => setClubs([]))
+  }, [])
+  if (!clubs.length) return null
+  return (
+    <section>
+      <h3 className={railLabel}>Najczęściej oglądane kluby</h3>
+      <ul className="space-y-4">
+        {clubs.map(v => (
+          <li key={v.id}>
+            <Link href={`/miejsca/${v.id}-${slugify(`${v.name} ${v.city}`)}`} className="group flex items-center gap-3 no-underline">
+              <div className="w-14 h-14 flex-shrink-0 overflow-hidden bg-surface-container">
+                {v.cover_image && <img src={v.cover_image} alt={v.name} loading="lazy" className="w-full h-full object-contain" />}
+              </div>
+              <div className="min-w-0">
+                <div className="font-body text-body-md text-on-surface truncate group-hover:text-primary-container transition-colors">{v.name}</div>
+                <div className="font-body text-body-sm text-on-surface-variant">{v.city}</div>
+              </div>
+            </Link>
           </li>
         ))}
       </ul>
       <Link href="/miejsca" className={railLink}>Wszystkie miejsca →</Link>
-    </div>
+    </section>
   )
 }
 
@@ -222,15 +329,19 @@ export function SiteRail({ related = [], exclude = null, onStartQuiz, quizDone }
   // module's useEffect on phones (3 API calls + 11 covers for nothing).
   const isDesktop = useIsDesktop()
   const [articles, setArticles] = useState([])
+  const [rail, setRail] = useState(null)
   useEffect(() => {
     if (!isDesktop) return
+    apiFetchShared('/api/rail').then(setRail).catch(() => setRail(null))
     apiFetchShared('/api/articles')
       .then(data => setArticles((data || []).filter(a => a.slug && a.title)))
       .catch(() => setArticles([]))
   }, [isDesktop])
 
   const pool = exclude ? articles.filter(a => a.slug !== exclude) : articles
-  const popular = [...pool].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5).map(toRow)
+  // Ranking z page_views bez banera (/api/rail); fallback na articles.views gdy brak danych.
+  const railPopular = (rail?.popular || []).filter(a => a.slug !== exclude).map(toRow)
+  const popular = railPopular.length ? railPopular : [...pool].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5).map(toRow)
   const newest = [...pool]
     .sort((a, b) => new Date(b.publish_date || b.created_at || 0) - new Date(a.publish_date || a.created_at || 0))
     .slice(0, 5).map(toRow)
@@ -239,13 +350,15 @@ export function SiteRail({ related = [], exclude = null, onStartQuiz, quizDone }
 
   return (
     <div className="space-y-10">
+      <AdsModule ads={rail?.ads} />
+      <NearbyEventsModule />
+      <ChatModule count={rail?.chatActive} />
       <QuizModule onStartQuiz={onStartQuiz} quizDone={quizDone} />
       <ArticleModule title="Powiązane" items={related.map(toRow)} />
       <ArticleModule title="Najczęściej czytane" items={popular} />
       <ArticleModule title="Najnowsze" items={newest} />
-      <TodayEventsModule />
+      <TopClubsModule />
       <LastThemeModule />
-      <NearbyModule />
       <WordModule />
     </div>
   )
