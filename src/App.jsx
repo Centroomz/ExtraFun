@@ -334,6 +334,19 @@ function AppInner() {
     s.async = true
     s.dataset.id = 'vanessa-ef'
     document.body.appendChild(s)
+    // Na telefonie dymek (prawy dolny róg) zasłaniał ostatni przycisk dolnego menu.
+    // Widżet siedzi w otwartym shadow DOM (#czatbot-root) — dokładamy mu odsunięcie
+    // nad pasek. Dopiero gdy się zamontuje, więc krótki polling.
+    let tries = 0
+    const lift = setInterval(() => {
+      const root = document.getElementById('czatbot-root')?.shadowRoot
+      if (root) {
+        const st = document.createElement('style')
+        st.textContent = '@media (max-width: 1023px) { .launcher { bottom: 96px !important; } }'
+        root.appendChild(st)
+        clearInterval(lift)
+      } else if (++tries > 40) clearInterval(lift)
+    }, 500)
   }, [ageConfirmed])
 
   if (loading) {
